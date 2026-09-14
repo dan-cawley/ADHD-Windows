@@ -1,0 +1,9 @@
+dist/
+obj/
+*.lnk
+*.user
+.vs/
+*.tmp
+*.bak
+test-results.txt
+save*.json
