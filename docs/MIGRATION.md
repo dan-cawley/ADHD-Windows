@@ -1,3 +1,5 @@
+> Historical phase-1 audit. See [PHASE-2.md](PHASE-2.md) for the implemented adventure progression and current limitations.
+
 # Windows migration audit
 
 Source root: `C:\Users\Dan\Documents\adhd`.
@@ -26,3 +28,4 @@ Preserve originals. Exclude Apple `._*` metadata, `.DS_Store`, build output, IDE
 ## Acceptance checks
 
 Build executable; run core regression tests for reward idempotency, recurring dates, streaks, archive behavior, atomic persistence and invalid-backup handling; exercise UI capture/edit/completion/restart/export. Record results in VALIDATION.md.
+

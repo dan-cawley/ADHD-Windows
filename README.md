@@ -1,28 +1,39 @@
-# ADHD Warrior for Windows
+# ADHD Warrior for Windows — 0.2
 
-Native Windows desktop preview, migrated from the ADHD Warrior Swift/Android project.
+Native Windows desktop preview with the quest loop and adventure progression.
 
 ## Run
 
-Double-click **dist/ADHD Warrior.exe**. Keep its config file and assets folder beside the executable. Requires Windows with .NET Framework 4.8. No Node server, browser, or account is needed.
+Open **Launch ADHD Warrior.lnk** in this folder, or **dist/0.2/ADHD Warrior.exe**. Close any older ADHD Warrior window first. Keep the config and assets folder with the executable. Requires .NET Framework 4.8.
 
-## Build and test
-
-Run `powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1` from this folder. This uses the Windows .NET Framework compiler; no package downloads are required. Run `Start-Process -FilePath '.\dist\ADHD Warrior.exe' -ArgumentList '--self-test' -Wait -PassThru` in PowerShell. An exit code of zero means success; details are in `dist/test-results.txt`. Tests use isolated temporary data.
+The earlier 0.1 executable remains at `dist/ADHD Warrior.exe` for reference. Use 0.2 for normal work. Version 0.1 cannot read a version 2 save; avoid using the old version after upgrading.
 
 ## Included
 
-- Quick capture (Enter), quest editing, categories, due dates, daily/weekly recurrence.
-- Today, all quests, overdue review, completed history, archive and restore.
-- Substeps, bulk completion/archive, quiet XP and coin feedback, levels and streaks.
-- Local persistence with atomic writes and a previous-save backup.
-- Validated Windows JSON backup import/export and recovery snapshots before restore.
-- Keyboard-accessible native controls and resizable desktop layout.
+- Quick capture, editing, categories, due dates, daily/weekly recurrence, substeps.
+- Today, overdue review, completed history, bulk actions, archive and restore.
+- Character summary, XP levels, coins and streaks.
+- Four familiars: Arcane Drake, Silent Basilisk, Storm Gryphon and Wild Hydra. Choose an active egg/pet; complete quests to hatch, level and evolve it. Spend pet skill points to increase quest XP.
+- Eighteen boss encounters with HP, automatic damage from completed quests, victory rewards, next encounters and weekly history.
+- All 54 gear entries from the original Android catalog, with artwork previews, automatic owned-item bonuses, collection rewards and a coin shop.
+- Quiet adventure reward history, atomic local saves and backup import/export.
 
-Saves live in `%LOCALAPPDATA%\AdhdWarrior\save.json`. If a save is malformed, startup stops without overwriting it. Keep the original file and restore a known-good `.bak` copy manually to recover. Only one app instance runs at a time.
+See `docs/PHASE-2.md` for exact rules and differences from the original app.
 
-## Migration status
+## Save compatibility
 
-This is a working core-loop preview, not full feature parity. Pet evolution, boss battles, loot/equipment, artwork switching, focus timers, calendar/Siri integrations, and mobile-save conversion are not implemented. XP defaults to 50 per quest; coins are XP divided by 5 (rounded down); levels require 500 XP. These Windows preview rules are explicit and are not yet certified against all legacy balancing rules.
+Normal progress lives in `%LOCALAPPDATA%\AdhdWarrior\save.json`. Version 1 Windows saves upgrade in memory when loaded, preserving quests, XP and coins. The next successful write stores version 2 and keeps the previous file in `save.json.bak`. Pets and gear are included in version 2 backups. Restore also creates a separate recovery snapshot first.
 
-Original files remain intact. Selected reference source, planning documents, and original artwork are copied into `reference/` and `assets/`. `docs/MIGRATION.md` records the keep/defer decisions. No original personal save data is included. GitHub publication is a separate step after review.
+An unsupported or damaged save stops startup without overwriting the file. Keep the original and restore a known-good backup manually if needed.
+
+iOS/Android save conversion is not implemented. Calendar/Siri integration, full rarity/set bonuses, additional familiar catalogs, paper-doll avatar equipment, signed installer and auto-updates remain future work.
+
+## Build and tests
+
+Run `powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1`. The included Windows .NET Framework compiler builds into `dist/0.2/`; no package downloads are required. A Visual Studio project is also provided.
+
+Run `Start-Process -FilePath '.\dist\0.2\ADHD Warrior.exe' -ArgumentList '--self-test' -WindowStyle Hidden -Wait -PassThru`. Exit code 0 means success. Results are in `dist/0.2/test-results.txt`. Regression tests use isolated temporary data.
+
+`--preview-test` launches a clearly labeled test session using `dist/0.2/test-state/save.json`. It does not change normal progress. Close the test window and launch normally for everyday use.
+
+Original source and art are preserved in `reference/`; only runtime artwork is copied to `assets/`. Original mobile files remain intact. The local Git remote is `https://github.com/dan-cawley/ADHD-Windows.git`. Nothing has been uploaded.

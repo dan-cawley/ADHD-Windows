@@ -1,0 +1,68 @@
+using System;
+using System.Linq;
+using System.IO;
+using System.Drawing;
+using System.Windows.Forms;
+using System.Collections.Generic;
+
+namespace AdhdWarrior {
+ public partial class MainWindow {
+  bool gearShop; string gearSet="All sets";
+  Dictionary<string,Image> artCache=new Dictionary<string,Image>();
+  static readonly Dictionary<string,string> GearSheets=new Dictionary<string,string>{
+   {"standard","storybook_standardclothes_f"},{"arcanist","storybook_arcanist_set"},{"emberforge","storybook_emberforge_f"},{"garden_gnome","storybook_gardengnome_set"},{"wood_elf","storybook_woodelf_set"},{"micah","storybook_micah_set"},{"stacy","storybook_stacy_set"},{"library","storybook_library_sheekf"},{"nightveil","storybook_nightveil_f"}};
+  Image Artwork(string name,int tile=-1) {
+   string key=name+":"+tile;if(artCache.ContainsKey(key))return artCache[key];
+   string file=Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"assets",name+".png");if(!File.Exists(file))return null;
+   using(var source=Image.FromFile(file)) {
+    Image result;if(tile<0)result=new Bitmap(source);else {int w=source.Width/3,h=source.Height/3;var bitmap=new Bitmap(w,h);using(var g=Graphics.FromImage(bitmap))g.DrawImage(source,new Rectangle(0,0,w,h),new Rectangle((tile%3)*w,(tile/3)*h,w,h),GraphicsUnit.Pixel);result=bitmap;}
+    artCache.Add(key,result);return result;
+   }
+  }
+  void AdventureCard(string title,string description,Image artwork,int current,int maximum,params Button[] actions) {
+   var panel=new TableLayoutPanel {ColumnCount=2,RowCount=1,Height=235,BackColor=Color.White,Padding=new Padding(14),Margin=new Padding(0,0,0,12)};
+   panel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,165));panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,100));
+   panel.Controls.Add(new PictureBox {Dock=DockStyle.Fill,Image=artwork,SizeMode=PictureBoxSizeMode.Zoom,AccessibleName=title+" artwork"},0,0);
+   var details=new TableLayoutPanel {Dock=DockStyle.Fill,ColumnCount=1,RowCount=4,Padding=new Padding(16,0,0,0)};
+   details.RowStyles.Add(new RowStyle(SizeType.Absolute,36));details.RowStyles.Add(new RowStyle(SizeType.Percent,100));details.RowStyles.Add(new RowStyle(SizeType.Absolute,24));details.RowStyles.Add(new RowStyle(SizeType.Absolute,60));
+   details.Controls.Add(new Label {Text=title,Font=new Font("Segoe UI",14,FontStyle.Bold),Dock=DockStyle.Fill,AutoEllipsis=true},0,0);
+   details.Controls.Add(new Label {Text=description,Dock=DockStyle.Fill,AutoEllipsis=true},0,1);
+   if(maximum>0)details.Controls.Add(new ProgressBar {Minimum=0,Maximum=maximum,Value=Math.Max(0,Math.Min(current,maximum)),Dock=DockStyle.Fill,AccessibleName=title+" progress"},0,2);
+   var buttons=new FlowLayoutPanel {Dock=DockStyle.Fill,WrapContents=false};foreach(var button in actions)buttons.Controls.Add(button);details.Controls.Add(buttons,0,3);panel.Controls.Add(details,1,0);cards.Controls.Add(panel);
+  }
+  void ShowCharacter() {
+   var pet=Journey.ActivePet(data);
+   AdventureCard("Your warrior · Level "+(1+data.XP/500),data.XP+" lifetime XP · "+data.Coins+" coins\n"+data.Journey.Gear.Count+" pieces collected · "+Game.Streak(data,DateTime.Today)+" day streak\nNext level in "+(500-data.XP%500)+" XP.",Artwork("storybook_adah_standard"),data.XP%500,500);
+   Note("Active familiar: "+Journey.Definition(pet).Name+"\n"+(pet.EggStage<4?"Your egg grows with each completed quest.":"Quest XP skill bonus: +"+(pet.Skill*Journey.Stage(pet))+" XP per quest.")+"\nOwned gear bonuses apply automatically. View Equipment to see your collection.");
+  }
+  void ShowPets() {
+   Note("Your companions grow with you.\nOnly the active familiar earns 20 XP per completed quest. Eggs hatch at stage 4; pets evolve at levels 2 and 3. Extra eggs cost 150 coins.");
+   foreach(var definition in Journey.Species) {
+    var def=definition;var p=data.Journey.Pets.FirstOrDefault(x=>x.Species==def.Id);
+    if(p==null){var adopt=Button("Adopt egg · 150 coins",()=>Change(()=>Journey.Adopt(data,def.Id),"Egg adopted and selected."));adopt.Enabled=data.Coins>=150;AdventureCard(def.Name,"Not yet in your collection.\nEach egg stage needs "+def.Threshold+" growth XP.",Artwork(def.Art[0]),0,0,adopt);continue;}
+    string phase=p.EggStage<4?"Egg · stage "+p.EggStage+" / 4":new[]{"","Hatchling","Companion","Ascended"}[Journey.Stage(p)];
+    string description=phase+"\n"+(p.EggStage<4?p.Growth+" / "+def.Threshold+" growth XP to next stage":"Level "+p.Level+" · "+p.XP+" / "+Journey.PetNextXP(p)+" XP\n"+p.Points+" skill points · +"+(p.Skill*Journey.Stage(p))+" quest XP");
+    var choose=Button(p.Species==data.Journey.Active?"Active familiar":"Make active",()=>Change(()=>data.Journey.Active=p.Species,"Active familiar changed."));choose.Enabled=p.Species!=data.Journey.Active;
+    var train=Button("Train XP skill",()=>Change(()=>Journey.Train(data,p.Species),"Skill point spent. Quest XP bonus increased."));train.Enabled=p.EggStage==4&&p.Points>0;
+    AdventureCard(def.Name,description,Artwork(def.Art[Journey.Stage(p)]),p.EggStage<4?p.Growth:p.XP,p.EggStage<4?def.Threshold:Journey.PetNextXP(p),choose,train);
+   }
+  }
+  void ShowBosses() {
+   var j=data.Journey;
+   AdventureCard(Journey.Bosses[j.BossIndex],"Encounter "+(j.BossIndex+1)+" / 18 · Week of "+j.Week+"\n"+j.BossHP+" / "+j.BossMaxHP+" HP remaining\nCompleted quests deal their awarded XP as damage.",Artwork(j.BossIndex<9?"weekly_monsters_1_9":"weekly_monsters_10_18",j.BossIndex%9),j.BossHP,j.BossMaxHP);
+   Note("Defeat a boss to collect rare-or-better gear and face the next monster.\nAt the next calendar week, an undefeated boss heals up to half its maximum HP. Your history is kept.");
+   var next=(j.BossIndex+1)%18;AdventureCard("Next: "+Journey.Bosses[next],"The next encounter unlocks when you defeat the current boss.",Artwork(next<9?"weekly_monsters_1_9":"weekly_monsters_10_18",next%9),0,0);
+   foreach(var h in j.History)Note(h.Outcome+" · "+Journey.Bosses[h.Index]+"\nWeek of "+h.Week+" · "+h.HP+" HP remaining");
+  }
+  void ShowGear() {
+   var tabs=new FlowLayoutPanel {Height=48};tabs.Controls.Add(Button("Owned gear ("+data.Journey.Gear.Count+")",()=>{gearShop=false;Render();}));tabs.Controls.Add(Button("Shop · "+data.Coins+" coins",()=>{gearShop=true;Render();}));
+   var filter=new ComboBox {DropDownStyle=ComboBoxStyle.DropDownList,Width=180,AccessibleName="Equipment set"};filter.Items.Add("All sets");filter.Items.AddRange(GearCatalog.All.Select(g=>g.Sheet).Distinct().Cast<object>().ToArray());filter.SelectedItem=gearSet;filter.SelectedIndexChanged+=(s,e)=>{gearSet=(string)filter.SelectedItem;Render();};tabs.Controls.Add(filter);cards.Controls.Add(tabs);
+   Note(gearShop?"Spend earned coins on a specific piece.\nYou also collect gear every six quest completions and after boss victories. Each item can be owned once.":"Owned bonuses are always active; there is no equip step.\nBonuses vary by slot and quest type. Common gear is cosmetic; epic and unique pieces also add a flat XP bonus.");
+   var items=GearCatalog.All.Where(g=>(gearShop?!data.Journey.Gear.Contains(g.Id):data.Journey.Gear.Contains(g.Id))&&(gearSet=="All sets"||g.Sheet==gearSet)&&g.Name.IndexOf(search.Text,StringComparison.OrdinalIgnoreCase)>=0).ToList();
+   if(items.Count==0)Note(gearShop?"No unowned items match this filter.":"No matching gear yet. Complete six quests, defeat a boss, or visit the shop.");
+   foreach(var item in items){var g=item;var actions=new List<Button>();if(gearShop){var buy=Button("Buy · "+g.Price+" coins",()=>Change(()=>Journey.BuyGear(data,g.Id),g.Name+" added to your collection."));buy.Enabled=data.Coins>=g.Price;actions.Add(buy);}AdventureCard(g.Name,g.Rarity+" · "+g.Slot+" · "+g.Sheet.Replace('_',' ')+"\n"+GearDescription(g),Artwork(GearSheets[g.Sheet],g.Tile),0,0,actions.ToArray());}
+  }
+  string GearDescription(GearDefinition g){int b=g.BaseBonus;if(b==0)return "A cosmetic piece for your collection.";string text=g.Slot=="HEAD"?"Daily quests: +"+b+" XP.":g.Slot=="CHEST"?"All quests: +"+Math.Max(1,b/2)+" XP.":g.Slot=="HANDS"?"Non-daily quests: +"+Math.Max(1,b-1)+" XP.":g.Slot=="WEAPON"?"Non-daily quests: +"+b+" XP.":g.Slot=="LEGS"?"Non-daily quests due today/overdue or with 2+ steps: +"+Math.Max(1,b/2)+" XP.":"Cosmetic for the current quest types.";if(g.Rarity=="EPIC"||g.Rarity=="UNIQUE")text+=" Plus +"+(g.Rarity=="EPIC"?2:3)+" XP on every quest.";return text;}
+  void CompleteQuests(IEnumerable<Quest> quests){var list=quests.ToList();int xp=0,coins=list.Where(q=>!q.Done&&!q.Archived).Sum(q=>q.XP/5);if(Change(()=>{xp=Game.Complete(data,list,DateTime.Today);selected.Clear();},"Progress saved."))status.Text="Well done! +"+xp+" XP · +"+coins+" coins · Your familiar and boss progressed.";}
+ }
+}
