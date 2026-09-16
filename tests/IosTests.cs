@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Web.Script.Serialization;
 namespace AdhdWarrior {
  public static class IosTests {
@@ -24,13 +25,15 @@ namespace AdhdWarrior {
    var west=TimeZoneInfo.CreateCustomTimeZone("Test west",TimeSpan.FromHours(-5),"Test west","Test west");
    Check(IosImport.Date(0,west)=="2000-12-31","Swift date converted to chosen local day");
    Check(Rejects(()=>IosImport.Date(1700000000000L,TimeZoneInfo.Utc)),"Millisecond timestamps rejected");
+   string currentWeek=DateTime.Today.Year+"-W"+CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(DateTime.Today,CalendarWeekRule.FirstDay,DayOfWeek.Sunday);
    var root=new Dictionary<string,object>{
     {"coinBalance",123},{"xpEvents",new[]{new {amount=25}}},{"inventory",new Dictionary<string,int>{{"standard_1",2},{"egg_silent_basilisk_egg",1},{"egg_fluffy_gold_gryphon_chick",1}}},
     {"quests",new[]{new {id="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",title="iOS finished quest",category="Home",xp=50,bonusXP=7,completedAt=0,dueAt=0,subquests=new[]{new {title="Step",xp=10,isCompleted=true}}}}},
     {"backlogQuestIDs",new[]{"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}},{"giftSigningPrivateKeyData","SYNTHETIC_PRIVATE_VALUE"},
     {"selectedPetID","pet-basilisk"},{"selectedEggItemID","egg_fluffy_gold_gryphon_chick"},{"eggLevels",new Dictionary<string,int>{{"egg_fluffy_gold_gryphon_chick",2}}},{"eggProgressByItem",new Dictionary<string,int>{{"egg_fluffy_gold_gryphon_chick",60}}},{"eggHatchesByItem",new Dictionary<string,int>()},{"pets",new[]{
      new {id="pet-basilisk",eggItemID="egg_silent_basilisk_egg",species="Silent Basilisk",level=2,xp=10,unspentSkillPoints=1,questXPSkillLevel=1,streakXPSkillLevel=0,lootChanceSkillLevel=0},
-     new {id="pet-duplicate",eggItemID="egg_spiked_forest_basilisk",species="Forest Basilisk",level=1,xp=0,unspentSkillPoints=1,questXPSkillLevel=0,streakXPSkillLevel=0,lootChanceSkillLevel=0}}}};
+     new {id="pet-duplicate",eggItemID="egg_spiked_forest_basilisk",species="Forest Basilisk",level=1,xp=0,unspentSkillPoints=1,questXPSkillLevel=0,streakXPSkillLevel=0,lootChanceSkillLevel=0}}},
+    {"activeWeeklyBossID","acidic_jelly"},{"weeklyBossCurrentHP",200},{"weeklyBossMaxHP",400},{"weeklyBossWeekKey",currentWeek},{"weeklyBossHistory",new[]{new {bossID="gelatinous_cube",bossName="Gelatinous Cube",weekKey="2001-W1",startHP=300,endHP=0,outcome="defeated",date=0}}}};
    var json=new JavaScriptSerializer();var imported=IosImport.Parse(json.Serialize(root),TimeZoneInfo.Utc);
    Check(imported.Data.XP==92&&imported.Data.Coins==123&&imported.Data.Quests[0].AwardedXP==67,"Legacy total includes completed base, bonus, completed steps and XP events exactly once");
    Check(imported.Data.Quests[0].Archived&&imported.Data.Quests[0].Done&&imported.Data.Quests[0].Due=="2001-01-01","Completion dates, steps and backlog transfer");
@@ -39,11 +42,15 @@ namespace AdhdWarrior {
    var importedEgg=imported.Data.Journey.Pets.Single(x=>x.Species=="gryphon");Check(importedEgg.EggStage==2&&importedEgg.Growth==90,"Growing egg stage and proportional rarity progress transfer");
    Check(imported.Report.Contains("1 compatible hatched familiars; 1 growing eggs")&&imported.Report.Contains("1 familiars with"),"Preview reports imported pet, egg and duplicate familiar counts");
    Check(imported.Report.Contains("1 duplicate")&&imported.Report.Contains("1 egg units")&&imported.Report.Contains("0 other inventory"),"Preview reports unsupported inventory counts");
+   Check(imported.Data.Journey.BossIndex==2&&imported.Data.Journey.BossHP==200&&imported.Data.Journey.BossMaxHP==400&&imported.Data.Journey.Week==Journey.WeekKey(DateTime.Today),"Current matching-week iOS boss identity and HP transfer");
+   Check(imported.Data.Journey.History.Count==1&&imported.Data.Journey.History[0].Index==1&&imported.Data.Journey.History[0].Outcome=="Defeated"&&imported.Data.Journey.History[0].Week=="2001-01-01","Boss history uses its timestamp for a stable Windows week");
+   Check(imported.Report.Contains("1 current weekly boss states; 1 boss history entries")&&imported.Report.Contains("0 boss records"),"Boss import counts appear in preview");
    Check(!Storage.Encode(imported.Data).Contains("SYNTHETIC_PRIVATE_VALUE")&&!imported.Report.Contains("SYNTHETIC_PRIVATE_VALUE"),"Private integration values are excluded from imported save and preview");
    root["totalXPEarned"]=900;root["quests"]=new[]{new {id="bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",title="Rebuild quest",category="work",xp=50,recurrence="weekly",subquests=new object[0]}};
    imported=IosImport.Parse(json.Serialize(root),TimeZoneInfo.Utc);Check(imported.Data.XP==900&&!imported.Data.Quests[0].Done&&imported.Data.Quests[0].Repeat=="Weekly","Rebuild authoritative XP and recurrence imported without inventing completion history");
    root["eggProgressByItem"]=new Dictionary<string,int>{{"egg_fluffy_gold_gryphon_chick",80}};Check(Rejects(()=>IosImport.Parse(json.Serialize(root),TimeZoneInfo.Utc)),"Impossible egg progress rejected before Apply");root["eggProgressByItem"]=new Dictionary<string,int>{{"egg_fluffy_gold_gryphon_chick",60}};
    root["eggLevels"]=new Dictionary<string,int>{{"egg_fluffy_gold_gryphon_chick",4}};imported=IosImport.Parse(json.Serialize(root),TimeZoneInfo.Utc);Check(imported.Data.Journey.Pets.Count==1&&imported.Report.Contains("2 egg units"),"Ready-to-hatch egg is reported without becoming a pet");root["eggLevels"]=new Dictionary<string,int>{{"egg_fluffy_gold_gryphon_chick",2}};
+   root["weeklyBossWeekKey"]="1900-W1";imported=IosImport.Parse(json.Serialize(root),TimeZoneInfo.Utc);Check(imported.Data.Journey.Week==""&&imported.Data.Journey.History.Count==1&&imported.Report.Contains("1 boss records"),"Stale or locale-mismatched active boss resets while valid dated history remains");root["weeklyBossWeekKey"]=currentWeek;
    root["coinBalance"]=-1;Check(Rejects(()=>IosImport.Parse(json.Serialize(root),TimeZoneInfo.Utc)),"Invalid balances rejected before Apply");
    Check(Rejects(()=>IosImport.Parse("{}",TimeZoneInfo.Utc)),"Unrecognized JSON rejected");
    return count;

@@ -19,6 +19,9 @@ namespace AdhdWarrior {
   static string PetFamily(string species,string egg){string value=(species+" "+egg).ToLowerInvariant();if(value.Contains("basilisk"))return "basilisk";if(value.Contains("gryphon"))return "gryphon";if(value.Contains("hydra"))return "hydra";if(value.Contains("drake")||value.Contains("dragon"))return "drake";return "";}
   static Dictionary<string,object> DictionaryValue(object v){return v==null?new Dictionary<string,object>():Obj(v);}
   static int EggThreshold(string id){string value=id.ToLowerInvariant();if(value.Contains("ancient")||value.Contains("colossal")||value.Contains("elder"))return 140;if(value.Contains("three_headed")||value.Contains("wild_hydra")||value.Contains("regal"))return 120;if(value.Contains("arcane")||value.Contains("storm")||value.Contains("spiked"))return 100;return 80;}
+  static string BossKey(string value){return new string((value??"").ToLowerInvariant().Where(Char.IsLetterOrDigit).ToArray());}
+  static int BossIndex(string value){string key=BossKey(value);for(int i=0;i<Journey.Bosses.Length;i++)if(BossKey(Journey.Bosses[i])==key)return i;return -1;}
+  static HashSet<string> CurrentMobileWeekKeys(DateTime day){var calendar=CultureInfo.CurrentCulture.Calendar;return new HashSet<string>{day.Year+"-W"+calendar.GetWeekOfYear(day,CalendarWeekRule.FirstDay,DayOfWeek.Sunday),day.Year+"-W"+calendar.GetWeekOfYear(day,CalendarWeekRule.FirstFourDayWeek,DayOfWeek.Monday)};}
   public static string Date(object v,TimeZoneInfo zone){
    if(v==null)return "";
    if(!(v is int)&&!(v is long)&&!(v is double)&&!(v is decimal))throw new InvalidDataException("Expected a Swift date in seconds since 2001.");
@@ -70,11 +73,21 @@ namespace AdhdWarrior {
     int targetThreshold=Journey.Species.Single(x=>x.Id==family).Threshold;var egg=new Familiar {Species=family,EggStage=stage,Growth=progress*targetThreshold/sourceThreshold};importedPets.Add(egg);eggIDs[pair.Key]=family;eggsImported++;eggUnitsSkipped=checked(eggUnitsSkipped+available-1);
    }
    if(importedPets.Count>0){data.Journey.Pets=importedPets;string active;if(petIDs.TryGetValue(selected,out active)||eggIDs.TryGetValue(selectedEgg,out active))data.Journey.Active=active;else data.Journey.Active=importedPets[0].Species;}
+   int bossStateImported=0,bossEntriesImported=0,bossEntriesSkipped=0;string bossID=Text(Value(root,rebuild?"activeBossID":"activeWeeklyBossID"));if(bossID=="")bossID=Text(Value(root,"activeBossID"));if(bossID=="")bossID=Text(Value(root,"activeWeeklyBossID"));
+   if(bossID!=""){
+    int index=BossIndex(bossID),hp=Number(Value(root,"weeklyBossCurrentHP")),maxHP=Number(Value(root,"weeklyBossMaxHP"));string mobileWeek=Text(Value(root,"weeklyBossWeekKey"));
+    if(index>=0&&hp>0&&maxHP>=300&&hp<=maxHP&&maxHP<=1000000&&CurrentMobileWeekKeys(DateTime.Today).Contains(mobileWeek)){data.Journey.BossIndex=index;data.Journey.BossHP=hp;data.Journey.BossMaxHP=maxHP;data.Journey.Week=Journey.WeekKey(DateTime.Today);bossStateImported=1;}else bossEntriesSkipped++;
+   }
+   foreach(var rawHistory in ArrayValue(Value(root,"weeklyBossHistory"))){
+    if(data.Journey.History.Count>=30){bossEntriesSkipped++;continue;}var mobile=Obj(rawHistory);int index=BossIndex(Text(Value(mobile,"bossID")));if(index<0)index=BossIndex(Text(Value(mobile,"bossName")));string outcome=Text(Value(mobile,"outcome")).ToLowerInvariant();int hp=Number(Value(mobile,"endHP"));DateTime encounter;
+    if(index<0||(outcome!="defeated"&&outcome!="survived")||hp>1000000||!DateTime.TryParseExact(Date(Value(mobile,"date"),zone),"yyyy-MM-dd",CultureInfo.InvariantCulture,DateTimeStyles.None,out encounter)){bossEntriesSkipped++;continue;}
+    data.Journey.History.Add(new BossRecord {Index=index,Week=Journey.WeekKey(encounter),Outcome=outcome=="defeated"?"Defeated":"Carried forward",HP=hp});bossEntriesImported++;
+   }
    data.Journey.Completions=Math.Max(data.Quests.Count(q=>q.Done),Number(Value(root,"completionEventsCount")));
    // Validate everything before offering Apply. Never clamp incompatible values silently.
    data=Storage.Decode(Storage.Encode(data));
-   string report=(rebuild?"iOS Rebuild export":"iOS legacy export")+"\r\n\r\nWill transfer:\r\n"+data.Quests.Count+" quests ("+data.Quests.Count(q=>q.Done)+" completed; "+data.Quests.Count(q=>q.Archived)+" backlog entries become archived)\r\n"+data.XP+" lifetime XP; "+data.Coins+" coins\r\n"+data.Journey.Gear.Count+" distinct equipment pieces\r\n"+petsImported+" compatible hatched familiars; "+eggsImported+" growing eggs\r\n\r\nLimitations in this preview:\r\n"+
-    "Boss progress/history, reward claims, streak quests, daily templates, settings, friends and integrations do not transfer. Boss progress starts fresh.\r\n"+
+   string report=(rebuild?"iOS Rebuild export":"iOS legacy export")+"\r\n\r\nWill transfer:\r\n"+data.Quests.Count+" quests ("+data.Quests.Count(q=>q.Done)+" completed; "+data.Quests.Count(q=>q.Archived)+" backlog entries become archived)\r\n"+data.XP+" lifetime XP; "+data.Coins+" coins\r\n"+data.Journey.Gear.Count+" distinct equipment pieces\r\n"+petsImported+" compatible hatched familiars; "+eggsImported+" growing eggs\r\n"+bossStateImported+" current weekly boss states; "+bossEntriesImported+" boss history entries\r\n\r\nLimitations in this preview:\r\n"+
+    bossEntriesSkipped+" boss records are reset or skipped because their identity, HP, date, history limit or locale-dependent current-week label cannot be represented safely.\r\n"+
     petConflicts+" familiars with an unsupported or duplicate Windows family are not imported. Familiar names and exact mobile evolution stages are not retained. Streak XP and Loot Chance skill levels are preserved but their Windows effects are still planned.\r\n"+
     eggUnitsSkipped+" egg units are not imported because Windows supports one familiar per family and cannot yet represent stage-4 ready eggs. Egg growth is proportionally translated between iOS rarity and Windows family thresholds.\r\n"+
     extraCopies+" duplicate equipment copies and "+otherItems+" other inventory units are not imported.\r\n"+
