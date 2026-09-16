@@ -1,12 +1,12 @@
-# ADHD Warrior for Windows — 0.11
+# ADHD Warrior for Windows — 0.12
 
 Native Windows desktop preview with the quest loop and adventure progression.
 
 ## Run
 
-Open **Launch ADHD Warrior.lnk** in this folder, or **dist/0.11/ADHD Warrior.exe**. Close any older ADHD Warrior window first. Keep the config and assets folder with the executable. Requires .NET Framework 4.8.
+Open **Launch ADHD Warrior.lnk** in this folder, or **dist/0.12/ADHD Warrior.exe**. Close any older ADHD Warrior window first. Keep the config and assets folder with the executable. Requires .NET Framework 4.8.
 
-The earlier executables remain under `dist/` for reference. Use 0.11 for normal work. Version 0.11 fixes the tiled forest flash during page navigation and buffers each page redraw.
+The earlier executables remain under `dist/` for reference. Use 0.12 for normal work. Version 0.12 adds dedicated daily, weekly, monthly and weekday streak quests and activates the familiar Streak XP skill.
 
 See `docs/PHASE-4.md` for the forest artwork, visual changes and validation.
 
@@ -42,9 +42,9 @@ Backup & settings includes a partial iOS importer for legacy and Rebuild exports
 
 ## Build and tests
 
-Run `powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1`. The included Windows .NET Framework compiler builds into `dist/0.11/`; no package downloads are required. A Visual Studio project is also provided.
+Run `powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1`. The included Windows .NET Framework compiler builds into `dist/0.12/`; no package downloads are required. A Visual Studio project is also provided.
 
-Automated checks were intentionally skipped for version 0.11; the application was compile-checked only.
+Automated checks were intentionally skipped for version 0.12; the application was compile-checked only.
 
 `--preview-test` launches a clearly labeled test session using `dist/0.4/test-state/save.json`. It does not change normal progress. Close the test window and launch normally for everyday use.
 

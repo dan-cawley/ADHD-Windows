@@ -53,6 +53,12 @@ namespace AdhdWarrior {
     if(q.Done){q.AwardedXP=checked(q.XP+Number(Value(source,"bonusXP"))+stepXP);completedXP=checked(completedXP+q.AwardedXP);}
     data.Quests.Add(q);
    }
+   int streaksImported=0;
+   foreach(var value in ArrayValue(Value(root,"streakQuests"))){
+    var source=Obj(value);Guid id;string rawID=Text(Value(source,"id"));if(!Guid.TryParse(rawID,out id))throw new InvalidDataException("An iOS streak quest has an invalid ID.");
+    var streak=new StreakQuest {Id=id.ToString(),Title=Text(Value(source,"title")),Cadence=Streaks.NormalizeCadence(Text(Value(source,"cadenceText"),"Daily")),XP=Number(Value(source,"xpPerCompletion"),15),Total=Number(Value(source,"totalCompletions")),Current=Number(Value(source,"currentStreak")),Best=Number(Value(source,"bestStreak")),LastCompleted=Date(Value(source,"lastCompletedAt"),zone)};
+    data.StreakQuests.Add(streak);streaksImported++;
+   }
    if(rebuild)data.XP=Number(root["totalXPEarned"]);
    else {data.XP=completedXP;foreach(var raw in ArrayValue(root["xpEvents"]))data.XP=checked(data.XP+Number(Value(Obj(raw),"amount")));}
    int extraCopies=0,otherItems=0;var inventory=Obj(root["inventory"]);
@@ -87,9 +93,9 @@ namespace AdhdWarrior {
    data.Journey.Completions=Math.Max(data.Quests.Count(q=>q.Done),Number(Value(root,"completionEventsCount")));
    // Validate everything before offering Apply. Never clamp incompatible values silently.
    data=Storage.Decode(Storage.Encode(data));
-   string report=(rebuild?"iOS Rebuild export":"iOS legacy export")+"\r\n\r\nWill transfer:\r\n"+data.Quests.Count+" quests ("+data.Quests.Count(q=>q.Done)+" completed; "+data.Quests.Count(q=>q.Archived)+" backlog entries become archived)\r\n"+data.XP+" lifetime XP; "+data.Coins+" coins\r\n"+data.Journey.Gear.Count+" distinct equipment pieces\r\n"+petsImported+" compatible hatched familiars; "+eggsImported+" growing eggs\r\n"+bossStateImported+" current weekly boss states; "+bossEntriesImported+" boss history entries\r\n\r\nLimitations in this preview:\r\n"+
+   string report=(rebuild?"iOS Rebuild export":"iOS legacy export")+"\r\n\r\nWill transfer:\r\n"+data.Quests.Count+" quests ("+data.Quests.Count(q=>q.Done)+" completed; "+data.Quests.Count(q=>q.Archived)+" backlog entries become archived)\r\n"+streaksImported+" streak quests with cadence and progress\r\n"+data.XP+" lifetime XP; "+data.Coins+" coins\r\n"+data.Journey.Gear.Count+" distinct equipment pieces\r\n"+petsImported+" compatible hatched familiars; "+eggsImported+" growing eggs\r\n"+bossStateImported+" current weekly boss states; "+bossEntriesImported+" boss history entries\r\n\r\nLimitations in this preview:\r\n"+
     bossEntriesSkipped+" boss records are reset or skipped because their identity, HP, date, history limit or locale-dependent current-week label cannot be represented safely.\r\n"+
-    petConflicts+" familiars with an unsupported or duplicate Windows family are not imported. Familiar names and exact mobile evolution stages are not retained. Streak XP and Loot Chance skill levels are preserved but their Windows effects are still planned.\r\n"+
+    petConflicts+" familiars with an unsupported or duplicate Windows family are not imported. Familiar names and exact mobile evolution stages are not retained.\r\n"+
     eggUnitsSkipped+" egg units are not imported because Windows supports one familiar per family and cannot yet represent stage-4 ready eggs. Egg growth is proportionally translated between iOS rarity and Windows family thresholds.\r\n"+
     extraCopies+" duplicate equipment copies and "+otherItems+" other inventory units are not imported.\r\n"+
     "Separate subquest XP, calendar links and other mobile-only metadata are not retained. Completed legacy quest rewards are included in lifetime XP. Active quests use Windows reward rules.\r\n"+
@@ -112,7 +118,7 @@ namespace AdhdWarrior {
      if(dialog.ShowDialog(this)!=DialogResult.OK)return;
     }
     Storage.Save(path+".before-ios-import-"+DateTime.Now.ToString("yyyyMMdd-HHmmssfff")+".json",data);
-    Change(()=>{data=preview.Data;Journey.RefreshWeek(data,DateTime.Today);},"iOS quests, balances and equipment imported. Recovery backup saved.");
+    Change(()=>{data=preview.Data;Journey.RefreshWeek(data,DateTime.Today);},"iOS quests, streaks, balances and equipment imported. Recovery backup saved.");
    }catch(Exception ex){MessageBox.Show(this,ex.Message,"Could not import iOS export");}
   }
  }

@@ -45,8 +45,9 @@ namespace AdhdWarrior {
     string description=phase+"\n"+(p.EggStage<4?p.Growth+" / "+def.Threshold+" growth XP to next stage":"Level "+p.Level+" · "+p.XP+" / "+Journey.PetNextXP(p)+" XP\n"+p.Points+" skill points · Quest XP "+p.QuestSkill+" · Streak XP "+p.StreakSkill+" · Loot "+(p.LootSkill*Journey.Stage(p))+"%");
     var choose=Button(p.Species==data.Journey.Active?"Active familiar":"Make active",()=>Change(()=>data.Journey.Active=p.Species,"Active familiar changed."));choose.Enabled=p.Species!=data.Journey.Active;
     var train=Button("Train Quest XP",()=>Change(()=>Journey.Train(data,p.Species,"Quest XP"),"Skill point spent. Quest XP bonus increased."));train.Enabled=p.EggStage==4&&p.Points>0;
+    var streak=Button("Train Streak XP",()=>Change(()=>Journey.Train(data,p.Species,"Streak XP"),"Skill point spent. Streak XP bonus increased."));streak.Enabled=p.EggStage==4&&p.Points>0;
     var loot=Button("Train Loot Chance",()=>Change(()=>Journey.Train(data,p.Species,"Loot Chance"),"Skill point spent. Bonus loot chance increased."));loot.Enabled=p.EggStage==4&&p.Points>0;
-    AdventureCard(def.Name,description,Artwork(def.Art[Journey.Stage(p)]),p.EggStage<4?p.Growth:p.XP,p.EggStage<4?def.Threshold:Journey.PetNextXP(p),choose,train,loot);
+    AdventureCard(def.Name,description,Artwork(def.Art[Journey.Stage(p)]),p.EggStage<4?p.Growth:p.XP,p.EggStage<4?def.Threshold:Journey.PetNextXP(p),choose,train,streak,loot);
    }
   }
   void ShowBosses() {
