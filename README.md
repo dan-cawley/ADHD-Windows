@@ -6,7 +6,7 @@ ADHD Warrior is a private, local-first Windows desktop app that turns everyday t
 
 ## Current release
 
-**Windows preview 0.12 · save format 7 · .NET Framework 4.8**
+**Windows preview 0.13 · save format 7 · .NET Framework 4.8**
 
 This repository is the native C# Windows migration of the more complete iOS app. The iOS implementation is the behavioral source of truth whenever a matching Windows feature is added. The Android port and preserved artwork are secondary references.
 
@@ -18,7 +18,7 @@ This repository is the native C# Windows migration of the more complete iOS app.
 - Daily and weekly recurring quests.
 - Common, Uncommon, Rare, Epic, and Unique rarities with iOS XP defaults.
 - iOS character level thresholds and visible progress toward the next level.
-- Dedicated daily, weekly, monthly, and weekday streak quests with current/best history.
+- Dedicated daily, weekly, monthly, and weekday streak quests with editing, next-eligible dates, guarded removal, and current/best history.
 - Four familiar families: Silent Basilisk, Arcane Drake, Storm Gryphon, and Wild Hydra.
 - Familiar hatching, leveling, evolution, skill points, Quest XP, Streak XP, and Loot Chance.
 - Eighteen weekly bosses with quest damage, rollover healing, history, and rewards.
@@ -33,7 +33,7 @@ The left navigation contains Today, All quests, Review, Streak quests, Character
 
 ## Run the app
 
-On the development machine, close any older ADHD Warrior window and open `Launch ADHD Warrior.lnk`. The launcher points to `dist/0.12/ADHD Warrior.exe`.
+On the development machine, close any older ADHD Warrior window and open `Launch ADHD Warrior.lnk`. The launcher points to `dist/0.13/ADHD Warrior.exe`.
 
 Build output and the local shortcut are intentionally excluded from Git. A fresh clone must be built before it can run:
 
@@ -90,7 +90,7 @@ The build script compiles every `src/*.cs` and `tests/*.cs` file into one execut
 
 ## Validation status
 
-The most recent full regression run was version 0.8 with **113 passing assertions**. Versions 0.9–0.12 were compile-checked only at the owner's request. Version 0.11's navigation repaint fix was confirmed interactively. Version 0.12 compiled successfully; its new streak workflow still needs an interactive smoke test and a resumed regression run before calling the app production-ready.
+The most recent full regression run was version 0.8 with **113 passing assertions**. Versions 0.9–0.13 were compile-checked only at the owner's request. Version 0.11's navigation repaint fix was confirmed interactively. Version 0.13 compiled successfully; its streak create/edit/complete/restart flow still needs an interactive smoke test and a resumed regression run before calling the app production-ready.
 
 This is an unsigned portable preview. It does not yet have an installer, code signing, automatic updates, Windows notifications, or a release package.
 

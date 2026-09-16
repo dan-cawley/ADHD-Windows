@@ -2,6 +2,13 @@
 
 All notable Windows migration phases are recorded here. The project is still a preview and does not yet publish packaged releases.
 
+## 0.13 — 2026-09-16
+
+- Added streak-quest editing and explicit next-eligible dates.
+- Added removal confirmation, visible familiar XP bonuses, and gear-reward countdowns.
+- Restarted the current chain when a streak cadence changes while retaining total and best history.
+- Tightened save validation for impossible streak totals, dates, and current/best combinations.
+
 ## 0.12 — 2026-09-16
 
 - Added dedicated daily, weekly, monthly, and weekday streak quests.

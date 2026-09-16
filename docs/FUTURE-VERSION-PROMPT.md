@@ -1,6 +1,6 @@
 # Future-version continuation prompt
 
-Last synchronized with Windows preview **0.12**, save format **7**, on **2026-09-16**.
+Last synchronized with Windows preview **0.13**, save format **7**, on **2026-09-16**.
 
 Copy the prompt below into a new development task. Update this file and the root README before every GitHub push.
 
@@ -14,11 +14,11 @@ ADHD Warrior is a calm, local-first ADHD task app wrapped in a fantasy progressi
 
 ## Current baseline
 
-- Current Windows preview: **0.12**.
+- Current Windows preview: **0.13**.
 - Save format: **7**.
 - Runtime: C# Windows Forms on .NET Framework 4.8 with no external packages.
 - Build command: `powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1`.
-- Output: `dist/0.12/ADHD Warrior.exe` plus config and assets.
+- Output: `dist/0.13/ADHD Warrior.exe` plus config and assets.
 - Normal save: `%LOCALAPPDATA%\AdhdWarrior\save.json`.
 - Git branch: `main`.
 - GitHub remote: `https://github.com/dan-cawley/ADHD-Windows.git`.
@@ -49,6 +49,8 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 - Separate streak model and `Streak quests` page; do not reinterpret ordinary recurring quests as streak quests.
 - Cadences: Daily, Weekly, Monthly, or a named weekday.
 - Completion is limited to once per cadence, tracks total/current/best, and resumes only from the immediately previous cadence.
+- Streaks can be edited. Changing cadence restarts the current chain and last-completed marker while preserving total completions and the best historical chain. Removal requires confirmation.
+- Each card shows whether it is ready, the exact next eligible date, the active familiar bonus, and completions remaining before the next gear reward.
 - Coins follow iOS rules: daily 10, weekly/weekday 18, monthly 28, plus `min(10, (currentStreak - 1) * 2)`.
 - Awarded XP is base streak XP plus the active familiar's Streak XP skill multiplied by its Windows evolution stage.
 - A streak completion also advances familiar/boss progression.
@@ -104,7 +106,7 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 
 ## Known gaps and risks
 
-- Versions 0.9–0.12 were compile-checked only. The last complete run was version 0.8 with 113 passing assertions. Resume the full suite and add meaningful streak/loot/save-format-7 coverage before production packaging.
+- Versions 0.9–0.13 were compile-checked only. The last complete run was version 0.8 with 113 passing assertions. Resume the full suite and add meaningful streak/loot/save-format-7 coverage before production packaging.
 - Run an interactive smoke test of creating/completing daily, weekly, monthly, and weekday streaks; restarting; and spending all three familiar skills.
 - iOS stage-4 ready eggs conflict with the Windows meaning of stage 4 and remain intentionally skipped.
 - Exact mobile pet names/evolution stages, duplicate inventory counts, pending rewards, standalone daily templates, avatar customization, friends, calendar links, settings, and Apple integrations remain unported.
@@ -114,7 +116,7 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 
 ## Recommended next phase
 
-First stabilize 0.12: run the full regression suite, add focused non-duplicative coverage for save format 7 and cadence boundaries, interactively verify the streak UI, and fix anything found. Then design Windows notifications/reminders based on the iOS cadence and due-time behavior without copying Apple-only APIs. After stabilization, create a signed installer/release plan.
+Build 0.14 as a quiet Windows reminder phase: due-time and streak reminders, clear opt-in controls, and no Apple-only APIs. Before production packaging, resume the full regression suite and interactively verify the 0.13 streak create/edit/complete/restart flow. After reminders, port daily templates and pending reward milestones, then create a signed installer/release plan.
 
 ## Required workflow for every change and push
 
