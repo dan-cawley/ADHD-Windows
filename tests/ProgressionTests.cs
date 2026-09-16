@@ -12,7 +12,9 @@ namespace AdhdWarrior {
    Check(Progression.Rarities.Select(Progression.QuestXP).SequenceEqual(new[]{50,75,100,150,225}),"iOS rarity rewards");
    var old=new SaveData {Version=3,XP=1200,Coins=99};old.Quests.Add(new Quest {Title="Existing custom reward",XP=135});
    var migrated=Storage.Decode(Storage.Encode(old).Replace("\"Rarity\":\"Common\",",""));
-   Check(migrated.Version==4&&migrated.Quests[0].Rarity=="Common"&&migrated.Quests[0].XP==135&&migrated.XP==1200&&migrated.Coins==99,"Older saves preserve balances and custom quest rewards");
+   Check(migrated.Version==5&&migrated.Quests[0].Rarity=="Common"&&migrated.Quests[0].XP==135&&migrated.XP==1200&&migrated.Coins==99,"Older saves preserve balances and custom quest rewards");
+   var oldPet=new SaveData {Version=4};oldPet.Journey.Pets[0].EggStage=4;oldPet.Journey.Pets[0].Level=3;oldPet.Journey.Pets[0].Points=1;oldPet.Journey.Pets[0].Skill=2;
+   var petMigrated=Storage.Decode(Storage.Encode(oldPet));Check(petMigrated.Journey.Pets[0].Skill==0&&petMigrated.Journey.Pets[0].QuestSkill==2&&petMigrated.Journey.Pets[0].Points==1,"Generic Windows pet skill migrates to iOS Quest XP skill");
    var day=new DateTime(2026,9,15);var data=new SaveData();var q=new Quest {Title="Recurring epic",Rarity="Epic",Repeat="Weekly",XP=175};data.Quests.Add(q);Game.Complete(data,new[]{q},day);
    Check(data.Quests[1].Rarity=="Epic"&&data.Quests[1].XP==175,"Recurring quest preserves rarity and custom XP");
    data.Journey.Gear.AddRange(new[]{"standard_5","standard_7","standard_8","standard_9"});

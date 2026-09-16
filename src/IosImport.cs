@@ -16,6 +16,7 @@ namespace AdhdWarrior {
   static int Number(object v,int fallback=0){if(v==null)return fallback;if(!(v is int)&&!(v is long)&&!(v is decimal))throw new InvalidDataException("Invalid iOS numeric value.");decimal n=Convert.ToDecimal(v);if(n<0||n>Int32.MaxValue||n!=Math.Truncate(n))throw new InvalidDataException("Invalid iOS numeric value.");return (int)n;}
   static string Text(object v,string fallback=""){if(v==null)return fallback;if(!(v is string))throw new InvalidDataException("Invalid iOS text.");return (string)v;}
   static bool Flag(object v){if(v==null)return false;if(!(v is bool))throw new InvalidDataException("Invalid iOS completion flag.");return (bool)v;}
+  static string PetFamily(string species,string egg){string value=(species+" "+egg).ToLowerInvariant();if(value.Contains("basilisk"))return "basilisk";if(value.Contains("gryphon"))return "gryphon";if(value.Contains("hydra"))return "hydra";if(value.Contains("drake")||value.Contains("dragon"))return "drake";return "";}
   public static string Date(object v,TimeZoneInfo zone){
    if(v==null)return "";
    if(!(v is int)&&!(v is long)&&!(v is double)&&!(v is decimal))throw new InvalidDataException("Expected a Swift date in seconds since 2001.");
@@ -53,11 +54,19 @@ namespace AdhdWarrior {
     int count=Number(pair.Value);if(count==0)continue;
     if(GearCatalog.All.Any(g=>g.Id==pair.Key)){data.Journey.Gear.Add(pair.Key);extraCopies=checked(extraCopies+count-1);}else otherItems=checked(otherItems+count);
    }
+   int petsImported=0,petConflicts=0;var selected=Text(Value(root,"selectedPetID"));var petIDs=new Dictionary<string,string>();var families=new HashSet<string>();var importedPets=new List<Familiar>();
+   foreach(var rawPet in ArrayValue(Value(root,"pets"))){
+    var mobile=Obj(rawPet);string family=PetFamily(Text(Value(mobile,"species")),Text(Value(mobile,"eggItemID")));if(family==""||!families.Add(family)){petConflicts++;continue;}
+    var pet=new Familiar {Species=family,EggStage=4,Level=Number(Value(mobile,"level"),1),XP=Number(Value(mobile,"xp")),Points=Number(Value(mobile,"unspentSkillPoints"),1),QuestSkill=Number(Value(mobile,"questXPSkillLevel")),StreakSkill=Number(Value(mobile,"streakXPSkillLevel")),LootSkill=Number(Value(mobile,"lootChanceSkillLevel"))};
+    importedPets.Add(pet);petIDs[Text(Value(mobile,"id"))]=family;petsImported++;
+   }
+   if(importedPets.Count>0){data.Journey.Pets=importedPets;string active;data.Journey.Active=petIDs.TryGetValue(selected,out active)?active:importedPets[0].Species;}
    data.Journey.Completions=Math.Max(data.Quests.Count(q=>q.Done),Number(Value(root,"completionEventsCount")));
    // Validate everything before offering Apply. Never clamp incompatible values silently.
    data=Storage.Decode(Storage.Encode(data));
-   string report=(rebuild?"iOS Rebuild export":"iOS legacy export")+"\r\n\r\nWill transfer:\r\n"+data.Quests.Count+" quests ("+data.Quests.Count(q=>q.Done)+" completed; "+data.Quests.Count(q=>q.Archived)+" backlog entries become archived)\r\n"+data.XP+" lifetime XP; "+data.Coins+" coins\r\n"+data.Journey.Gear.Count+" distinct equipment pieces\r\n\r\nLimitations in this preview:\r\n"+
-    "Pet and egg progression, boss progress/history, reward claims, streak quests, daily templates, settings, friends and integrations do not transfer. Windows starts a new familiar and boss journey.\r\n"+
+   string report=(rebuild?"iOS Rebuild export":"iOS legacy export")+"\r\n\r\nWill transfer:\r\n"+data.Quests.Count+" quests ("+data.Quests.Count(q=>q.Done)+" completed; "+data.Quests.Count(q=>q.Archived)+" backlog entries become archived)\r\n"+data.XP+" lifetime XP; "+data.Coins+" coins\r\n"+data.Journey.Gear.Count+" distinct equipment pieces\r\n"+petsImported+" compatible hatched familiars\r\n\r\nLimitations in this preview:\r\n"+
+    "Unhatched egg progression, boss progress/history, reward claims, streak quests, daily templates, settings, friends and integrations do not transfer. Boss progress starts fresh.\r\n"+
+    petConflicts+" familiars with an unsupported or duplicate Windows family are not imported. Familiar names and exact mobile evolution stages are not retained. Streak XP and Loot Chance skill levels are preserved but their Windows effects are still planned.\r\n"+
     extraCopies+" duplicate equipment copies and "+otherItems+" eggs/other inventory units are not imported.\r\n"+
     "Separate subquest XP, due times, calendar links and other mobile-only metadata are not retained. Completed legacy quest rewards are included in lifetime XP. Active quests use Windows reward rules.\r\n"+
     (rebuild?"Rebuild exports do not contain completed quest dates; reward history is not converted into completed quests.\r\n":"Legacy daily templates are not recreated as recurring quests.\r\n")+

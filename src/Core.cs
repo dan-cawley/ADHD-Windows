@@ -18,7 +18,7 @@ namespace AdhdWarrior {
  public class SaveData {
   public int Version {get;set;} public int XP {get;set;} public int Coins {get;set;} public List<Quest> Quests {get;set;}
   public JourneyState Journey {get;set;}
-  public SaveData() {Version=4; Quests=new List<Quest>();Journey=new JourneyState();}
+  public SaveData() {Version=5; Quests=new List<Quest>();Journey=new JourneyState();}
  }
  public static class Game {
   public static int Complete(SaveData data, IEnumerable<Quest> quests, DateTime today) {
@@ -51,7 +51,7 @@ namespace AdhdWarrior {
    var header=Json().DeserializeObject(json) as Dictionary<string,object>;
    if(header==null || !new[]{"Version","XP","Coins","Quests"}.All(header.ContainsKey)) throw new InvalidDataException("This is not a Windows backup. Required fields are missing.");
    var data=Json().Deserialize<SaveData>(json);
-   if(data==null || (data.Version!=1&&data.Version!=2&&data.Version!=3&&data.Version!=4) || data.Quests==null || data.XP<0 || data.Coins<0 || data.Quests.Count>100000) throw new InvalidDataException("This is not a supported Windows backup.");
+   if(data==null || (data.Version!=1&&data.Version!=2&&data.Version!=3&&data.Version!=4&&data.Version!=5) || data.Quests==null || data.XP<0 || data.Coins<0 || data.Quests.Count>100000) throw new InvalidDataException("This is not a supported Windows backup.");
    if(data.Version>=2&&!header.ContainsKey("Journey"))throw new InvalidDataException("The adventure section is missing from this backup.");
    var ids=new HashSet<string>();
    foreach(var q in data.Quests) {
@@ -63,7 +63,8 @@ namespace AdhdWarrior {
    }
    if(data.Version==1){data.Journey=new JourneyState {Completions=data.Quests.Count(q=>q.Done)};foreach(var q in data.Quests.Where(q=>q.Done))q.AwardedXP=q.XP;data.Version=2;}
    if(data.Version==2){data.Journey.Gear=data.Journey.Gear.Select(UpgradeGear).ToList();data.Version=3;}
-   data.Version=4;
+   if(data.Version<=4)foreach(var pet in data.Journey.Pets){pet.QuestSkill=pet.Skill;pet.Skill=0;}
+   data.Version=5;
    Journey.Validate(data.Journey);
    return data;
   }

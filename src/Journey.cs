@@ -8,6 +8,7 @@ namespace AdhdWarrior {
  public class Familiar {
   public string Species {get;set;} public int EggStage {get;set;} public int Growth {get;set;}
   public int Level {get;set;} public int XP {get;set;} public int Skill {get;set;} public int Points {get;set;}
+  public int QuestSkill {get;set;} public int StreakSkill {get;set;} public int LootSkill {get;set;}
   public Familiar() {EggStage=1;Level=1;Points=1;}
  }
  public class BossRecord {public int Index {get;set;} public string Week {get;set;} public string Outcome {get;set;} public int HP {get;set;} }
@@ -15,7 +16,7 @@ namespace AdhdWarrior {
   public List<Familiar> Pets {get;set;} public string Active {get;set;} public List<string> Gear {get;set;}
   public int Completions {get;set;} public int BossIndex {get;set;} public int BossHP {get;set;} public int BossMaxHP {get;set;}
   public string Week {get;set;} public List<BossRecord> History {get;set;} public List<string> Journal {get;set;}
-  public JourneyState() {Pets=new List<Familiar>{new Familiar {Species="drake"}};Active="drake";Gear=new List<string>();Week="";History=new List<BossRecord>();Journal=new List<string>();}
+  public JourneyState() {Pets=new List<Familiar>{new Familiar {Species="basilisk"}};Active="basilisk";Gear=new List<string>();Week="";History=new List<BossRecord>();Journal=new List<string>();}
  }
  public class PetDefinition {
   public string Id,Name; public string[] Art; public int Threshold;
@@ -60,7 +61,7 @@ namespace AdhdWarrior {
    if(GearCatalog.All.Where(g=>data.Journey.Gear.Contains(g.Id)).GroupBy(g=>g.Sheet).Any(set=>required.All(slot=>set.Any(g=>g.Slot==slot))))total+=q.Rarity=="Unique"?12:q.Repeat=="Daily"?8:10;
    return total;
   }
-  public static int Bonus(SaveData data,Quest q,DateTime day){var p=ActivePet(data);return GearBonus(data,q,day)+(p.EggStage==4?p.Skill*Stage(p):0);}
+  public static int Bonus(SaveData data,Quest q,DateTime day){var p=ActivePet(data);return GearBonus(data,q,day)+(p.EggStage==4?p.QuestSkill*Stage(p):0);}
   public static void OnCompletion(SaveData data,int awardedXP,DateTime day) {
    RefreshWeek(data,day);var j=data.Journey;var p=ActivePet(data);j.Completions=checked(j.Completions+1);
    if(p.EggStage<4){p.Growth+=20;while(p.Growth>=Definition(p).Threshold&&p.EggStage<4){p.Growth-=Definition(p).Threshold;p.EggStage++;}if(p.EggStage==4){p.Growth=0;Log(j,Definition(p).Name+" hatched! It is now your active companion.");}}
@@ -72,11 +73,11 @@ namespace AdhdWarrior {
   static void AwardGear(JourneyState j,bool highTier){var item=GearCatalog.All.FirstOrDefault(g=>!j.Gear.Contains(g.Id)&&(!highTier||g.Rarity=="RARE"||g.Rarity=="EPIC"||g.Rarity=="UNIQUE"));if(item==null){Log(j,"Collection complete. Your adventure continues!");return;}j.Gear.Add(item.Id);Log(j,"Collected "+item.Name+". Its bonuses apply automatically.");}
   public static void BuyGear(SaveData data,string id){var g=GearCatalog.All.Single(x=>x.Id==id);if(data.Journey.Gear.Contains(id))throw new InvalidOperationException("You already own this item.");if(data.Coins<g.Price)throw new InvalidOperationException("Not enough coins.");data.Coins-=g.Price;data.Journey.Gear.Add(id);Log(data.Journey,"Purchased "+g.Name+".");}
   public static void Adopt(SaveData data,string id){if(!Species.Any(s=>s.Id==id))throw new InvalidOperationException("Unknown familiar.");if(data.Journey.Pets.Any(p=>p.Species==id))throw new InvalidOperationException("You already have this familiar.");if(data.Coins<150)throw new InvalidOperationException("An egg costs 150 coins.");data.Coins-=150;data.Journey.Pets.Add(new Familiar {Species=id});data.Journey.Active=id;Log(data.Journey,"Adopted a "+Species.Single(s=>s.Id==id).Name+" egg.");}
-  public static void Train(SaveData data,string id){var p=data.Journey.Pets.Single(x=>x.Species==id);if(p.EggStage<4||p.Points<1)throw new InvalidOperationException("Hatch your familiar and earn a skill point first.");p.Points--;p.Skill++;}
+  public static void Train(SaveData data,string id,string skill){var p=data.Journey.Pets.Single(x=>x.Species==id);if(p.EggStage<4||p.Points<1)throw new InvalidOperationException("Hatch your familiar and earn a skill point first.");if(skill!="Quest XP")throw new InvalidOperationException("That iOS skill is preserved for a future Windows feature.");p.Points--;p.QuestSkill++;}
   public static void Validate(JourneyState j) {
    if(j==null||j.Pets==null||j.Pets.Count<1||j.Pets.Count>4||j.Pets.Any(p=>p==null)||j.Pets.Select(p=>p.Species).Distinct().Count()!=j.Pets.Count||!j.Pets.Any(p=>p.Species==j.Active)||j.Gear==null||j.Gear.Count>GearCatalog.All.Length||j.Gear.Distinct().Count()!=j.Gear.Count||j.Gear.Any(id=>!GearCatalog.All.Any(g=>g.Id==id))||j.Completions<0||j.BossIndex<0||j.BossIndex>=Bosses.Length||j.History==null||j.History.Count>30||j.Journal==null||j.Journal.Count>50||j.Journal.Any(x=>x==null||x.Length>1000))throw new InvalidDataException("Invalid adventure data.");
    DateTime d;if(j.Week==null||j.Week!=""&&(!ParseDate(j.Week,out d)||WeekKey(d)!=j.Week)||j.BossHP<0||j.BossHP>j.BossMaxHP||j.BossMaxHP>1000000||j.Week!=""&&(j.BossHP==0||j.BossMaxHP<300))throw new InvalidDataException("Invalid weekly boss data.");
-   foreach(var p in j.Pets)if(!Species.Any(s=>s.Id==p.Species)||p.EggStage<1||p.EggStage>4||p.Level<1||p.Level>100000||p.XP<0||p.XP>=PetNextXP(p)||p.Growth<0||p.Growth>=Definition(p).Threshold||p.Points<0||p.Skill<0||(long)p.Points+p.Skill!=p.Level||p.EggStage<4&&(p.Level!=1||p.XP!=0||p.Skill!=0)||p.EggStage==4&&p.Growth!=0)throw new InvalidDataException("Invalid familiar progression.");
+   foreach(var p in j.Pets)if(!Species.Any(s=>s.Id==p.Species)||p.EggStage<1||p.EggStage>4||p.Level<1||p.Level>100000||p.XP<0||p.XP>=PetNextXP(p)||p.Growth<0||p.Growth>=Definition(p).Threshold||p.Points<0||p.Skill!=0||p.QuestSkill<0||p.StreakSkill<0||p.LootSkill<0||(long)p.Points+p.QuestSkill+p.StreakSkill+p.LootSkill!=p.Level||p.EggStage<4&&(p.Level!=1||p.XP!=0||p.QuestSkill!=0||p.StreakSkill!=0||p.LootSkill!=0)||p.EggStage==4&&p.Growth!=0)throw new InvalidDataException("Invalid familiar progression.");
    foreach(var h in j.History)if(h==null||h.Index<0||h.Index>=18||h.HP<0||h.HP>1000000||!ParseDate(h.Week,out d)||WeekKey(d)!=h.Week||h.Outcome!="Defeated"&&h.Outcome!="Carried forward")throw new InvalidDataException("Invalid boss history.");
   }
   static bool ParseDate(string text,out DateTime date){return DateTime.TryParseExact(text,"yyyy-MM-dd",CultureInfo.InvariantCulture,DateTimeStyles.None,out date);}

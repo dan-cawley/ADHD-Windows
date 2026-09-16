@@ -27,11 +27,16 @@ namespace AdhdWarrior {
    var root=new Dictionary<string,object>{
     {"coinBalance",123},{"xpEvents",new[]{new {amount=25}}},{"inventory",new Dictionary<string,int>{{"standard_1",2},{"egg_silent_basilisk_egg",1}}},
     {"quests",new[]{new {id="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",title="iOS finished quest",category="Home",xp=50,bonusXP=7,completedAt=0,dueAt=0,subquests=new[]{new {title="Step",xp=10,isCompleted=true}}}}},
-    {"backlogQuestIDs",new[]{"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}},{"giftSigningPrivateKeyData","SYNTHETIC_PRIVATE_VALUE"}};
+    {"backlogQuestIDs",new[]{"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}},{"giftSigningPrivateKeyData","SYNTHETIC_PRIVATE_VALUE"},
+    {"selectedPetID","pet-basilisk"},{"pets",new[]{
+     new {id="pet-basilisk",eggItemID="egg_silent_basilisk_egg",species="Silent Basilisk",level=2,xp=10,unspentSkillPoints=1,questXPSkillLevel=1,streakXPSkillLevel=0,lootChanceSkillLevel=0},
+     new {id="pet-duplicate",eggItemID="egg_spiked_forest_basilisk",species="Forest Basilisk",level=1,xp=0,unspentSkillPoints=1,questXPSkillLevel=0,streakXPSkillLevel=0,lootChanceSkillLevel=0}}}};
    var json=new JavaScriptSerializer();var imported=IosImport.Parse(json.Serialize(root),TimeZoneInfo.Utc);
    Check(imported.Data.XP==92&&imported.Data.Coins==123&&imported.Data.Quests[0].AwardedXP==67,"Legacy total includes completed base, bonus, completed steps and XP events exactly once");
    Check(imported.Data.Quests[0].Archived&&imported.Data.Quests[0].Done&&imported.Data.Quests[0].Due=="2001-01-01","Completion dates, steps and backlog transfer");
    Check(imported.Data.Journey.Gear.SequenceEqual(new[]{"standard_1"}),"iOS IDs do not receive Android migration");
+   Check(imported.Data.Journey.Pets.Count==1&&imported.Data.Journey.Active=="basilisk"&&imported.Data.Journey.Pets[0].QuestSkill==1,"Compatible selected iOS familiar and skills transfer");
+   Check(imported.Report.Contains("1 compatible hatched")&&imported.Report.Contains("1 familiars with"),"Preview reports imported and duplicate familiar counts");
    Check(imported.Report.Contains("1 duplicate")&&imported.Report.Contains("1 eggs/other"),"Preview reports unsupported inventory counts");
    Check(!Storage.Encode(imported.Data).Contains("SYNTHETIC_PRIVATE_VALUE")&&!imported.Report.Contains("SYNTHETIC_PRIVATE_VALUE"),"Private integration values are excluded from imported save and preview");
    root["totalXPEarned"]=900;root["quests"]=new[]{new {id="bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",title="Rebuild quest",category="work",xp=50,recurrence="weekly",subquests=new object[0]}};
