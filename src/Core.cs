@@ -9,15 +9,16 @@ namespace AdhdWarrior {
  public class Quest {
   public string Id {get;set;} public string Title {get;set;} public string Category {get;set;}
   public string Due {get;set;} public string Repeat {get;set;} public int XP {get;set;}
+  public string Rarity {get;set;}
   public int AwardedXP {get;set;}
   public bool Done {get;set;} public bool Archived {get;set;} public string Completed {get;set;}
   public List<Step> Steps {get;set;}
-  public Quest() { Id=Guid.NewGuid().ToString(); Title=""; Category="Life"; Due=""; Repeat="None"; XP=50; Steps=new List<Step>(); }
+  public Quest() { Id=Guid.NewGuid().ToString(); Title=""; Category="Life"; Due=""; Repeat="None"; Rarity="Common"; XP=50; Steps=new List<Step>(); }
  }
  public class SaveData {
   public int Version {get;set;} public int XP {get;set;} public int Coins {get;set;} public List<Quest> Quests {get;set;}
   public JourneyState Journey {get;set;}
-  public SaveData() {Version=3; Quests=new List<Quest>();Journey=new JourneyState();}
+  public SaveData() {Version=4; Quests=new List<Quest>();Journey=new JourneyState();}
  }
  public static class Game {
   public static int Complete(SaveData data, IEnumerable<Quest> quests, DateTime today) {
@@ -32,7 +33,7 @@ namespace AdhdWarrior {
     if(q.Repeat!="None") {
      DateTime due; if(!DateTime.TryParseExact(q.Due,"yyyy-MM-dd",System.Globalization.CultureInfo.InvariantCulture,System.Globalization.DateTimeStyles.None,out due)) due=today;
      if(due<today) due=today;
-     data.Quests.Add(new Quest { Title=q.Title,Category=q.Category,Due=due.AddDays(q.Repeat=="Daily"?1:7).ToString("yyyy-MM-dd"),Repeat=q.Repeat,XP=q.XP,Steps=q.Steps.Select(s=>new Step {Title=s.Title}).ToList() });
+     data.Quests.Add(new Quest { Title=q.Title,Category=q.Category,Due=due.AddDays(q.Repeat=="Daily"?1:7).ToString("yyyy-MM-dd"),Repeat=q.Repeat,Rarity=q.Rarity,XP=q.XP,Steps=q.Steps.Select(s=>new Step {Title=s.Title}).ToList() });
     }
    }
    data.XP=checked(data.XP+total); return total;
@@ -50,18 +51,19 @@ namespace AdhdWarrior {
    var header=Json().DeserializeObject(json) as Dictionary<string,object>;
    if(header==null || !new[]{"Version","XP","Coins","Quests"}.All(header.ContainsKey)) throw new InvalidDataException("This is not a Windows backup. Required fields are missing.");
    var data=Json().Deserialize<SaveData>(json);
-   if(data==null || (data.Version!=1&&data.Version!=2&&data.Version!=3) || data.Quests==null || data.XP<0 || data.Coins<0 || data.Quests.Count>100000) throw new InvalidDataException("This is not a supported Windows backup.");
+   if(data==null || (data.Version!=1&&data.Version!=2&&data.Version!=3&&data.Version!=4) || data.Quests==null || data.XP<0 || data.Coins<0 || data.Quests.Count>100000) throw new InvalidDataException("This is not a supported Windows backup.");
    if(data.Version>=2&&!header.ContainsKey("Journey"))throw new InvalidDataException("The adventure section is missing from this backup.");
    var ids=new HashSet<string>();
    foreach(var q in data.Quests) {
     DateTime parsed;
-    if(q==null || String.IsNullOrWhiteSpace(q.Id) || !ids.Add(q.Id) || String.IsNullOrWhiteSpace(q.Title) || q.Title.Length>500 || q.XP<5 || q.XP>1000 || q.Steps==null || q.Steps.Count>100 || q.Steps.Any(s=>s==null || String.IsNullOrWhiteSpace(s.Title) || s.Title.Length>500) || !new[]{"None","Daily","Weekly"}.Contains(q.Repeat) || !new[]{"School","Work","Home","Life","Fun"}.Contains(q.Category)) throw new InvalidDataException("The backup contains an invalid quest.");
+    if(q==null || String.IsNullOrWhiteSpace(q.Id) || !ids.Add(q.Id) || String.IsNullOrWhiteSpace(q.Title) || q.Title.Length>500 || !Progression.Rarities.Contains(q.Rarity) || q.XP<5 || q.XP>1000 || q.Steps==null || q.Steps.Count>100 || q.Steps.Any(s=>s==null || String.IsNullOrWhiteSpace(s.Title) || s.Title.Length>500) || !new[]{"None","Daily","Weekly"}.Contains(q.Repeat) || !new[]{"School","Work","Home","Life","Fun"}.Contains(q.Category)) throw new InvalidDataException("The backup contains an invalid quest.");
     if(!String.IsNullOrEmpty(q.Due) && !DateTime.TryParseExact(q.Due,"yyyy-MM-dd",System.Globalization.CultureInfo.InvariantCulture,System.Globalization.DateTimeStyles.None,out parsed)) throw new InvalidDataException("Invalid quest date.");
     if(q.Done && !DateTime.TryParseExact(q.Completed,"yyyy-MM-dd",System.Globalization.CultureInfo.InvariantCulture,System.Globalization.DateTimeStyles.None,out parsed)) throw new InvalidDataException("Invalid completion date.");
     if(q.AwardedXP<0||q.AwardedXP>1000000)throw new InvalidDataException("Invalid quest reward.");
    }
    if(data.Version==1){data.Journey=new JourneyState {Completions=data.Quests.Count(q=>q.Done)};foreach(var q in data.Quests.Where(q=>q.Done))q.AwardedXP=q.XP;data.Version=2;}
    if(data.Version==2){data.Journey.Gear=data.Journey.Gear.Select(UpgradeGear).ToList();data.Version=3;}
+   data.Version=4;
    Journey.Validate(data.Journey);
    return data;
   }

@@ -1,18 +1,21 @@
-# ADHD Warrior for Windows — 0.4
+# ADHD Warrior for Windows — 0.5
 
 Native Windows desktop preview with the quest loop and adventure progression.
 
 ## Run
 
-Open **Launch ADHD Warrior.lnk** in this folder, or **dist/0.4/ADHD Warrior.exe**. Close any older ADHD Warrior window first. Keep the config and assets folder with the executable. Requires .NET Framework 4.8.
+Open **Launch ADHD Warrior.lnk** in this folder, or **dist/0.5/ADHD Warrior.exe**. Close any older ADHD Warrior window first. Keep the config and assets folder with the executable. Requires .NET Framework 4.8.
 
-The earlier 0.1 executable remains at `dist/ADHD Warrior.exe` for reference. Use 0.4 for normal work. Versions 0.3 and 0.4 share save format 3; earlier previews cannot read it.
+The earlier executables remain under `dist/` for reference. Use 0.5 for normal work. Version 0.5 writes save format 4; older previews cannot read it.
 
 See `docs/PHASE-4.md` for the forest artwork, visual changes and validation.
+
+See `docs/PHASE-5.md` for iOS level thresholds, quest rarity and save migration details.
 
 ## Included
 
 - Quick capture, editing, categories, due dates, daily/weekly recurrence, substeps.
+- Common, Uncommon, Rare, Epic and Unique quest rarity with iOS reward defaults.
 - Today, overdue review, completed history, bulk actions, archive and restore.
 - Character summary, XP levels, coins and streaks.
 - Four familiars: Arcane Drake, Silent Basilisk, Storm Gryphon and Wild Hydra. Choose an active egg/pet; complete quests to hatch, level and evolve it. Spend pet skill points to increase quest XP.
@@ -24,7 +27,7 @@ See `docs/PHASE-3.md` for iOS compatibility and remaining differences.
 
 ## Save compatibility
 
-Normal progress lives in `%LOCALAPPDATA%\AdhdWarrior\save.json`. Version 1 and 2 Windows saves upgrade in memory when loaded, preserving quests, XP and coins and remapping old equipment IDs by set and slot. The next successful write stores version 3 and keeps the previous file in `save.json.bak`. Pets and gear are included in version 3 backups. Restore also creates a separate recovery snapshot first.
+Normal progress lives in `%LOCALAPPDATA%\AdhdWarrior\save.json`. Versions 1–3 upgrade in memory when loaded, preserving quests, XP, coins and custom quest rewards while remapping old equipment IDs. The next successful write stores version 4 and keeps the previous file in `save.json.bak`. Restore also creates a separate recovery snapshot first.
 
 An unsupported or damaged save stops startup without overwriting the file. Keep the original and restore a known-good backup manually if needed.
 
@@ -32,9 +35,9 @@ Backup & settings includes a partial iOS importer for legacy and Rebuild exports
 
 ## Build and tests
 
-Run `powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1`. The included Windows .NET Framework compiler builds into `dist/0.4/`; no package downloads are required. A Visual Studio project is also provided.
+Run `powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1`. The included Windows .NET Framework compiler builds into `dist/0.5/`; no package downloads are required. A Visual Studio project is also provided.
 
-Run `Start-Process -FilePath '.\dist\0.4\ADHD Warrior.exe' -ArgumentList '--self-test' -WindowStyle Hidden -Wait -PassThru`. Exit code 0 means success. Results are in `dist/0.4/test-results.txt`. Regression tests use isolated temporary data.
+Run `Start-Process -FilePath '.\dist\0.5\ADHD Warrior.exe' -ArgumentList '--self-test' -WindowStyle Hidden -Wait -PassThru`. Exit code 0 means success. Results are in `dist/0.5/test-results.txt`. Regression tests use isolated temporary data.
 
 `--preview-test` launches a clearly labeled test session using `dist/0.4/test-state/save.json`. It does not change normal progress. Close the test window and launch normally for everyday use.
 

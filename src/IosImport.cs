@@ -38,6 +38,7 @@ namespace AdhdWarrior {
     string category=Text(Value(source,"category"),Flag(Value(source,"isSchoolQuest"))?"School":"Life");
     category=CultureInfo.InvariantCulture.TextInfo.ToTitleCase(category.ToLowerInvariant());
     var q=new Quest {Id=id.ToString(),Title=Text(Value(source,"title")),Category=category,XP=Number(Value(source,"xp"),50),Due=Date(Value(source,"dueAt"),zone),Completed=Date(Value(source,"completedAt"),zone),Archived=backlog.Contains(rawID)};
+    q.Rarity=CultureInfo.InvariantCulture.TextInfo.ToTitleCase(Text(Value(source,"rarity"),"Common").Trim().ToLowerInvariant());if(q.Rarity=="Legendary")q.Rarity="Unique";
     q.Done=!String.IsNullOrEmpty(q.Completed);
     if(rebuild)q.Repeat=CultureInfo.InvariantCulture.TextInfo.ToTitleCase(Text(Value(source,"recurrence"),"none").ToLowerInvariant());
     int stepXP=0;
@@ -58,7 +59,7 @@ namespace AdhdWarrior {
    string report=(rebuild?"iOS Rebuild export":"iOS legacy export")+"\r\n\r\nWill transfer:\r\n"+data.Quests.Count+" quests ("+data.Quests.Count(q=>q.Done)+" completed; "+data.Quests.Count(q=>q.Archived)+" backlog entries become archived)\r\n"+data.XP+" lifetime XP; "+data.Coins+" coins\r\n"+data.Journey.Gear.Count+" distinct equipment pieces\r\n\r\nLimitations in this preview:\r\n"+
     "Pet and egg progression, boss progress/history, reward claims, streak quests, daily templates, settings, friends and integrations do not transfer. Windows starts a new familiar and boss journey.\r\n"+
     extraCopies+" duplicate equipment copies and "+otherItems+" eggs/other inventory units are not imported.\r\n"+
-    "Quest rarity, separate subquest XP, due times, calendar links and other mobile-only metadata are not retained. Completed legacy quest rewards are included in lifetime XP. Active quests use Windows reward rules.\r\n"+
+    "Separate subquest XP, due times, calendar links and other mobile-only metadata are not retained. Completed legacy quest rewards are included in lifetime XP. Active quests use Windows reward rules.\r\n"+
     (rebuild?"Rebuild exports do not contain completed quest dates; reward history is not converted into completed quests.\r\n":"Legacy daily templates are not recreated as recurring quests.\r\n")+
     "Dates use this computer's time zone: "+zone.DisplayName+".\r\n\r\nApplying replaces your Windows progress after saving a recovery backup. Keep the original iOS export for features that do not yet transfer; this app leaves that file unchanged.";
    return new IosImportResult {Data=data,Report=report};

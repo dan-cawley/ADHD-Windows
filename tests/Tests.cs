@@ -24,7 +24,7 @@ namespace AdhdWarrior {
     bool rejected=false;try {Storage.Decode("{\"Version\":9}");} catch {rejected=true;}Check(rejected,"Invalid backup rejected");
     rejected=false;try {Storage.Decode("{}");} catch {rejected=true;}Check(rejected,"Empty JSON cannot replace user progress");
     rejected=false;data.Quests[0].XP=-1;try{Storage.Save(path,data);}catch{rejected=true;}Check(rejected&&Storage.Load(path).Coins==99,"Invalid save leaves existing data intact");
-    count+=JourneyTests.Run(folder);count+=IosTests.Run();
+    count+=JourneyTests.Run(folder);count+=IosTests.Run();count+=ProgressionTests.Run();
     lines.Add("PASS: "+count+" assertions. Test storage: "+folder);
     File.WriteAllLines(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"test-results.txt"),lines);return 0;
    }catch(Exception ex){File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"test-results.txt"),"FAIL: "+ex);return 1;}

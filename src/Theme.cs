@@ -51,7 +51,7 @@ namespace AdhdWarrior {
    }return row;
   }
   void RefreshTheme(){
-   metricValues[0].Text=(1+data.XP/500).ToString();metricValues[1].Text=data.XP.ToString("N0");metricValues[2].Text=data.Coins.ToString("N0");metricValues[3].Text=Game.Streak(data,DateTime.Today).ToString();
+   metricValues[0].Text=Progression.Level(data.XP).ToString();metricValues[1].Text=data.XP.ToString("N0");metricValues[2].Text=data.Coins.ToString("N0");metricValues[3].Text=Game.Streak(data,DateTime.Today).ToString();
    string[] labels={"Warrior level","Total XP","Coins","Day streak"};for(int i=0;i<4;i++)metricValues[i].AccessibleName=labels[i]+": "+metricValues[i].Text;
    foreach(var pair in navigation){bool active=pair.Key==view;pair.Value.BackColor=active?Color.FromArgb(38,72,72):Theme.Sidebar;pair.Value.ForeColor=active?Theme.Gold:Theme.Muted;pair.Value.AccessibleDescription=active?"Current page":"Open "+pair.Key;pair.Value.Invalidate();}
   }

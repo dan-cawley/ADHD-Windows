@@ -24,7 +24,7 @@ namespace AdhdWarrior {
   Color ink=Theme.Text, green=Theme.Emerald, paper=Theme.Canvas;
   public MainWindow(bool testMode=false) {
    if(testMode) path=Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"test-state","save.json");
-   data=Storage.Load(path); Journey.RefreshWeek(data,DateTime.Today); Text="ADHD Warrior — Windows 0.4"+(testMode?" [TEST DATA]":""); MinimumSize=new Size(1000,680); Size=new Size(1240,860); StartPosition=FormStartPosition.CenterScreen; Font=new Font("Segoe UI",10); BackColor=paper; ForeColor=ink; AutoScaleMode=AutoScaleMode.Dpi;
+   data=Storage.Load(path); Journey.RefreshWeek(data,DateTime.Today); Text="ADHD Warrior — Windows 0.5"+(testMode?" [TEST DATA]":""); MinimumSize=new Size(1000,680); Size=new Size(1240,860); StartPosition=FormStartPosition.CenterScreen; Font=new Font("Segoe UI",10); BackColor=paper; ForeColor=ink; AutoScaleMode=AutoScaleMode.Dpi;
    var layout=new ForestLayout {BackgroundImage=Artwork("forest-twilight"),Dock=DockStyle.Fill,ColumnCount=2,RowCount=1}; layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,220));layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,100)); Controls.Add(layout);
    var nav=new FlowLayoutPanel {Dock=DockStyle.Fill,FlowDirection=FlowDirection.TopDown,WrapContents=false,AutoScroll=true,Padding=new Padding(18,28,12,12),BackColor=Theme.Sidebar,ForeColor=Theme.Text};layout.Controls.Add(nav,0,0);
    nav.Controls.Add(new Label {Text="ADHD\nWARRIOR",Font=new Font("Georgia",18,FontStyle.Bold),ForeColor=Theme.Gold,AutoSize=false,Size=new Size(165,90)});
@@ -57,16 +57,16 @@ namespace AdhdWarrior {
   void Note(string text) {cards.Controls.Add(new Label {Text=text,AutoSize=false,Height=100,Padding=new Padding(18),Font=new Font("Segoe UI",10),BackColor=Theme.Surface,ForeColor=Theme.Muted,Margin=new Padding(0,0,0,12)});}
   void Render() {
    cards.SuspendLayout();foreach(Control c in cards.Controls.Cast<Control>().ToArray()){cards.Controls.Remove(c);c.Dispose();}
-   RefreshTheme();heading.Text=view; stats.Text="LEVEL "+(1+data.XP/500)+"     /     "+data.XP+" XP     /     "+data.Coins+" COINS     /     "+Game.Streak(data,DateTime.Today)+" DAY STREAK";
+   RefreshTheme();heading.Text=view; stats.Text="LEVEL "+Progression.Level(data.XP)+"     /     "+data.XP+" XP     /     "+data.Coins+" COINS     /     "+Game.Streak(data,DateTime.Today)+" DAY STREAK";
    if(view=="Character")ShowCharacter();
    else if(view=="Familiars")ShowPets();
    else if(view=="Boss map")ShowBosses();
    else if(view=="Equipment")ShowGear();
-   else if(view=="Rewards") {Note("Every step counts.\n\n"+data.Quests.Count(q=>q.Done)+" quests completed • "+data.XP+" lifetime XP • "+data.Coins+" coins available");Note("Next level in "+(500-data.XP%500)+" XP.\n\nQuest rewards: XP you choose, plus 1 coin per 5 XP. Completing a quest also completes its remaining steps.");foreach(var entry in data.Journey.Journal)Note(entry);}
+   else if(view=="Rewards") {Note("Every step counts.\n\n"+data.Quests.Count(q=>q.Done)+" quests completed • "+data.XP+" lifetime XP • "+data.Coins+" coins available");Note(Progression.NextLabel(data.XP)+"\n\nQuest rewards: XP you choose, plus 1 coin per 5 XP. Completing a quest also completes its remaining steps.");foreach(var entry in data.Journey.Journal)Note(entry);}
    else if(view=="Backup & settings") {
-    Note("Windows preview 0.4\n\nYour progress is saved on this computer after every change. No account is required.");
+    Note("Windows preview 0.5\n\nYour progress is saved on this computer after every change. No account is required.");
     cards.Controls.Add(Button("Export Windows backup…",Export));cards.Controls.Add(Button("Restore Windows backup…",Import));cards.Controls.Add(Button("Preview iOS import…",ImportIos));
-    Note("Save location:\n"+path+"\n\nThe previous save is retained as save.json.bak.");Note("Backups use Windows format 3. Older Windows backups upgrade automatically. iOS import supports quests, balances and equipment; review its limitations before applying.\n\nKeyboard: Enter to capture; Tab to move between controls; Space to select.");
+    Note("Save location:\n"+path+"\n\nThe previous save is retained as save.json.bak.");Note("Backups use Windows format 4. Older Windows backups upgrade automatically. iOS import supports quests, balances and equipment; review its limitations before applying.\n\nKeyboard: Enter to capture; Tab to move between controls; Space to select.");
    } else {
     if(view=="Today")ShowWelcome();
     string today=DateTime.Today.ToString("yyyy-MM-dd");
@@ -85,7 +85,7 @@ namespace AdhdWarrior {
    Theme.Frame(panel,Theme.Category(q.Category));
    var check=new CheckBox {Text=q.Title,Checked=selected.Contains(q.Id),AutoSize=false,AutoEllipsis=true,Width=650,Height=30,Font=new Font("Segoe UI",12,FontStyle.Bold),Enabled=!q.Done&&!q.Archived};check.CheckedChanged+=(s,e)=>{if(check.Checked)selected.Add(q.Id);else selected.Remove(q.Id);};panel.Controls.Add(check);
    bool overdue=!q.Done&&!String.IsNullOrEmpty(q.Due)&&String.CompareOrdinal(q.Due,today)<0;
-   panel.Controls.Add(new Label {Text=q.Category+"   •   "+q.XP+" XP   •   "+(String.IsNullOrEmpty(q.Due)?"Anytime":q.Due)+(overdue?"  ·  Overdue":"")+(q.Repeat=="None"?"":"   •   "+q.Repeat),AutoSize=true,ForeColor=overdue?Theme.Coral:Theme.Category(q.Category),Margin=new Padding(0,0,0,8)});
+   panel.Controls.Add(new Label {Text=q.Category+"   •   "+q.Rarity+"   •   "+q.XP+" XP   •   "+(String.IsNullOrEmpty(q.Due)?"Anytime":q.Due)+(overdue?"  ·  Overdue":"")+(q.Repeat=="None"?"":"   •   "+q.Repeat),AutoSize=true,ForeColor=overdue?Theme.Coral:Theme.Category(q.Category),Margin=new Padding(0,0,0,8)});
    foreach(var step in q.Steps) {var item=step;var cb=new CheckBox {Text=item.Title,Checked=item.Done,AutoSize=false,Width=630,Height=24,Enabled=!q.Done&&!q.Archived};cb.CheckedChanged+=(s,e)=>Change(()=>item.Done=cb.Checked,"Small step saved.");panel.Controls.Add(cb);}
    var actions=new FlowLayoutPanel {AutoSize=true,WrapContents=false};
    if(q.Archived) actions.Controls.Add(Button("Restore",()=>Change(()=>q.Archived=false,"Quest restored.")));
@@ -97,21 +97,22 @@ namespace AdhdWarrior {
   void Import() {using(var dialog=new OpenFileDialog {Filter="JSON backup|*.json"}) if(dialog.ShowDialog(this)==DialogResult.OK) {try {var incoming=Storage.Decode(File.ReadAllText(dialog.FileName));if(MessageBox.Show(this,"Restore "+incoming.Quests.Count+" quests from this Windows backup? Your current progress will be retained in a recovery backup.","Restore backup",MessageBoxButtons.OKCancel)!=DialogResult.OK)return;Storage.Save(path+".before-restore-"+DateTime.Now.ToString("yyyyMMdd-HHmmssfff")+".json",data);Change(()=>{data=incoming;Journey.RefreshWeek(data,DateTime.Today);},"Backup restored.");}catch(Exception ex){MessageBox.Show(this,ex.Message,"Could not restore backup");}}}
  }
  public class QuestEditor : Form {
-  public Quest Result; TextBox title=new TextBox(),steps=new TextBox(); ComboBox category=new ComboBox(),repeat=new ComboBox();DateTimePicker due=new DateTimePicker();NumericUpDown xp=new NumericUpDown();Quest original;
+  public Quest Result; TextBox title=new TextBox(),steps=new TextBox(); ComboBox category=new ComboBox(),repeat=new ComboBox(),rarity=new ComboBox();DateTimePicker due=new DateTimePicker();NumericUpDown xp=new NumericUpDown();Quest original;
   public QuestEditor(Quest q) {
-   original=q;Text=q==null?"New quest":"Edit quest";Size=new Size(550,570);MinimumSize=Size;StartPosition=FormStartPosition.CenterParent;Font=new Font("Segoe UI",10);BackColor=Theme.Canvas;ForeColor=Theme.Text;
-   var form=new TableLayoutPanel {Dock=DockStyle.Fill,ColumnCount=2,RowCount=7,Padding=new Padding(22)};form.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,120));form.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,100));Controls.Add(form);
-   title.MaxLength=500;category.Items.AddRange(new object[]{"School","Work","Home","Life","Fun"});repeat.Items.AddRange(new object[]{"None","Daily","Weekly"});category.DropDownStyle=repeat.DropDownStyle=ComboBoxStyle.DropDownList;
+   original=q;Text=q==null?"New quest":"Edit quest";Size=new Size(580,640);MinimumSize=Size;StartPosition=FormStartPosition.CenterParent;Font=new Font("Segoe UI",10);BackColor=Theme.Canvas;ForeColor=Theme.Text;
+   var form=new TableLayoutPanel {Dock=DockStyle.Fill,ColumnCount=2,RowCount=8,Padding=new Padding(22)};form.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,120));form.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,100));Controls.Add(form);
+   title.MaxLength=500;rarity.Items.AddRange(Progression.Rarities);rarity.DropDownStyle=ComboBoxStyle.DropDownList;category.Items.AddRange(new object[]{"School","Work","Home","Life","Fun"});repeat.Items.AddRange(new object[]{"None","Daily","Weekly"});category.DropDownStyle=repeat.DropDownStyle=ComboBoxStyle.DropDownList;
    due.Format=DateTimePickerFormat.Short;due.ShowCheckBox=true;due.Checked=false;xp.Minimum=5;xp.Maximum=1000;xp.Increment=5;xp.Value=50;steps.Multiline=true;steps.ScrollBars=ScrollBars.Vertical;
-   string[] labels={"Quest","Category","Due date","Repeat","XP reward","Steps\n(one per line)"};Control[] inputs={title,category,due,repeat,xp,steps};
-   for(int i=0;i<inputs.Length;i++){form.RowStyles.Add(new RowStyle(i==5?SizeType.Percent:SizeType.Absolute,i==5?100:48));form.Controls.Add(new Label {Text=labels[i],AutoSize=true},0,i);Theme.StyleInput(inputs[i]);inputs[i].Dock=DockStyle.Fill;form.Controls.Add(inputs[i],1,i);}
+   string[] labels={"Quest","Category","Due date","Repeat","Rarity","XP reward","Steps\n(one per line)"};Control[] inputs={title,category,due,repeat,rarity,xp,steps};
+   for(int i=0;i<inputs.Length;i++){form.RowStyles.Add(new RowStyle(i==6?SizeType.Percent:SizeType.Absolute,i==6?100:48));form.Controls.Add(new Label {Text=labels[i],AutoSize=true},0,i);Theme.StyleInput(inputs[i]);inputs[i].Dock=DockStyle.Fill;form.Controls.Add(inputs[i],1,i);}
+   rarity.SelectedItem=q==null?"Common":q.Rarity;rarity.SelectedIndexChanged+=(s,e)=>{if(rarity.SelectedItem!=null)xp.Value=Progression.QuestXP((string)rarity.SelectedItem);};
    category.SelectedItem=q==null?"Life":q.Category;repeat.SelectedItem=q==null?"None":q.Repeat;
    if(q!=null) {title.Text=q.Title;xp.Value=q.XP;steps.Text=String.Join(Environment.NewLine,q.Steps.Select(s=>s.Title));DateTime d;if(DateTime.TryParse(q.Due,out d)){due.Value=d;due.Checked=true;}}
-   var buttons=new FlowLayoutPanel {Dock=DockStyle.Fill,AutoSize=true};var save=new ThemedButton {Text="Save quest",AutoSize=true};var cancel=new ThemedButton {Text="Cancel",DialogResult=DialogResult.Cancel,AutoSize=true};Theme.StyleButton(save,true);Theme.StyleButton(cancel);buttons.Controls.Add(save);buttons.Controls.Add(cancel);form.Controls.Add(buttons,1,6);form.RowStyles.Add(new RowStyle(SizeType.Absolute,44));AcceptButton=save;CancelButton=cancel;
+   var buttons=new FlowLayoutPanel {Dock=DockStyle.Fill,AutoSize=true};var save=new ThemedButton {Text="Save quest",AutoSize=true};var cancel=new ThemedButton {Text="Cancel",DialogResult=DialogResult.Cancel,AutoSize=true};Theme.StyleButton(save,true);Theme.StyleButton(cancel);buttons.Controls.Add(save);buttons.Controls.Add(cancel);form.Controls.Add(buttons,1,7);form.RowStyles.Add(new RowStyle(SizeType.Absolute,44));AcceptButton=save;CancelButton=cancel;
    save.Click+=(s,e)=>{
     var lines=steps.Lines.Select(x=>x.Trim()).Where(x=>x.Length>0).ToList();
     if(String.IsNullOrWhiteSpace(title.Text)||lines.Count>100||lines.Any(x=>x.Length>500)){MessageBox.Show(this,"Add a quest title and up to 100 steps of 500 characters each.");return;}
-    Result=new Quest {Id=original==null?Guid.NewGuid().ToString():original.Id,Title=title.Text.Trim(),Category=(string)category.SelectedItem,Repeat=(string)repeat.SelectedItem,Due=due.Checked?due.Value.ToString("yyyy-MM-dd"):"",XP=(int)xp.Value,Steps=lines.Select((x,i)=>new Step {Title=x,Done=original!=null&&i<original.Steps.Count&&original.Steps[i].Title==x&&original.Steps[i].Done}).ToList()};DialogResult=DialogResult.OK;
+    Result=new Quest {Id=original==null?Guid.NewGuid().ToString():original.Id,Title=title.Text.Trim(),Category=(string)category.SelectedItem,Rarity=(string)rarity.SelectedItem,Repeat=(string)repeat.SelectedItem,Due=due.Checked?due.Value.ToString("yyyy-MM-dd"):"",XP=(int)xp.Value,Steps=lines.Select((x,i)=>new Step {Title=x,Done=original!=null&&i<original.Steps.Count&&original.Steps[i].Title==x&&original.Steps[i].Done}).ToList()};DialogResult=DialogResult.OK;
    };
   }
  }

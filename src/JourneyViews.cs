@@ -33,7 +33,7 @@ namespace AdhdWarrior {
   }
   void ShowCharacter() {
    var pet=Journey.ActivePet(data);
-   AdventureCard("Your warrior · Level "+(1+data.XP/500),data.XP+" lifetime XP · "+data.Coins+" coins\n"+data.Journey.Gear.Count+" pieces collected · "+Game.Streak(data,DateTime.Today)+" day streak\nNext level in "+(500-data.XP%500)+" XP.",Artwork("storybook_adah_standard"),data.XP%500,500);
+   AdventureCard("Your warrior · Level "+Progression.Level(data.XP),data.XP+" lifetime XP · "+data.Coins+" coins\n"+data.Journey.Gear.Count+" pieces collected · "+Game.Streak(data,DateTime.Today)+" day streak\n"+Progression.NextLabel(data.XP),Artwork("storybook_adah_standard"),Progression.Current(data.XP),Progression.Span(data.XP));
    Note("Active familiar: "+Journey.Definition(pet).Name+"\n"+(pet.EggStage<4?"Your egg grows with each completed quest.":"Quest XP skill bonus: +"+(pet.Skill*Journey.Stage(pet))+" XP per quest.")+"\nOwned gear bonuses apply automatically. View Equipment to see your collection.");
   }
   void ShowPets() {
