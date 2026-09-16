@@ -2,6 +2,13 @@
 
 All notable Windows migration phases are recorded here. The project is still a preview and does not yet publish packaged releases.
 
+## 0.17 — 2026-09-16
+
+- Added opt-in launch at Windows sign-in using the current portable executable.
+- Added opt-in close-to-tray behavior so reminders can continue with the main window hidden.
+- Added tray Open and Exit commands and restored an already-running hidden window when the launcher is opened again.
+- Kept startup and background behavior disabled by default and added save format 11.
+
 ## 0.16 — 2026-09-16
 
 - Added local character display-name editing and familiar naming.

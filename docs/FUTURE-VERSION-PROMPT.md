@@ -1,6 +1,6 @@
 # Future-version continuation prompt
 
-Last synchronized with Windows preview **0.16**, save format **10**, on **2026-09-16**.
+Last synchronized with Windows preview **0.17**, save format **11**, on **2026-09-16**.
 
 Copy the prompt below into a new development task. Update this file and the root README before every GitHub push.
 
@@ -14,11 +14,11 @@ ADHD Warrior is a calm, local-first ADHD task app wrapped in a fantasy progressi
 
 ## Current baseline
 
-- Current Windows preview: **0.16**.
-- Save format: **10**.
+- Current Windows preview: **0.17**.
+- Save format: **11**.
 - Runtime: C# Windows Forms on .NET Framework 4.8 with no external packages.
 - Build command: `powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1`.
-- Output: `dist/0.16/ADHD Warrior.exe` plus config and assets.
+- Output: `dist/0.17/ADHD Warrior.exe` plus config and assets.
 - Normal save: `%LOCALAPPDATA%\AdhdWarrior\save.json`.
 - Git branch: `main`.
 - GitHub remote: `https://github.com/dan-cawley/ADHD-Windows.git`.
@@ -95,7 +95,7 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 ### Persistence and imports
 
 - Save writes use temp-file replacement and keep `save.json.bak`.
-- Formats 1–9 migrate forward to format 10. Validate before replacing good data. Never silently clamp impossible imported progress.
+- Formats 1–10 migrate forward to format 11. Validate before replacing good data. Never silently clamp impossible imported progress.
 - Windows backup export/restore is available.
 - iOS import uses preview → explicit Apply → timestamped recovery backup.
 - Imported data includes compatible quests, due times, recurrence, streaks, daily templates, pending equipment rewards, consistency milestones, character and familiar identity, XP, coins, unique equipment ownership, four familiar families, stages 1–3 growing eggs, skill allocation, current compatible boss state, and dated boss history.
@@ -109,10 +109,12 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 
 ### Windows reminders
 
-- Reminders are opt-in and currently run only while the app is open.
+- Reminders are opt-in. Users may also opt into starting quietly at Windows sign-in and keeping the app running in the notification area when its window closes.
 - Quest and streak notifications can be enabled independently. Date-only quests and ready streaks use the configured daily time; timed quests use their exact due time.
 - Quiet hours may cross midnight. Eligible items are aggregated into one notification and each quest due value or streak cadence is delivered once.
-- Reminder settings and a bounded delivery history use save format 8. A test notification is available in Backup & settings.
+- The tray menu can reopen or fully exit the app. Launching the shortcut while a hidden instance exists restores that window.
+- Startup uses the current portable executable in the current user's Windows Run key and is removed when disabled. The app refreshes the path after an update.
+- Reminder settings and delivery history began in save format 8; startup/background preferences use format 11. A test notification is available in Backup & settings.
 
 ## Code map
 
@@ -134,17 +136,17 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 
 ## Known gaps and risks
 
-- Versions 0.9–0.16 were compile-checked only. The last complete run was version 0.8 with 113 passing assertions. Resume the full suite and add meaningful reminder/streak/loot/template/reward/identity/save-format-10 coverage before production packaging.
+- Versions 0.9–0.17 were compile-checked only. The last complete run was version 0.8 with 113 passing assertions. Resume the full suite and add meaningful reminder/startup/tray/streak/loot/template/reward/identity/save-format-11 coverage before production packaging.
 - Run an interactive smoke test of creating/completing daily, weekly, monthly, and weekday streaks; restarting; and spending all three familiar skills.
 - iOS stage-4 ready eggs conflict with the Windows meaning of stage 4 and remain intentionally skipped.
 - Exact mobile evolution stages, duplicate inventory counts, unsupported reward items, user-supplied avatar photos, friends, calendar links, other settings, and Apple integrations remain unported.
-- Reminders require the app to stay open; startup/background mode is not implemented. No installer, code signing, release packaging, crash reporting, or update mechanism exists.
+- Background reminders require the process to stay running in the notification area. No installer, code signing, release packaging, crash reporting, or update mechanism exists.
 - The Visual Studio project output path must stay synchronized with `build.ps1` and the documented version.
 - Historical phase documents describe their own point in time and contain superseded limitations. The root README and this prompt describe current behavior.
 
 ## Recommended next phase
 
-Build 0.17 around optional startup/background reminder support with clear controls and a reversible Windows startup entry. Then prepare a conventional installer and release package while keeping the portable build. Before production packaging, resume the full regression suite and interactively verify 0.16 identity editing and avatar unlocking, 0.15 daily generation and reward claiming, reminder boundaries, and the streak flow.
+Build 0.18 around a conventional per-user installer and release package while retaining the portable build and existing save location. Include a clean uninstall path, Start menu shortcut, version metadata, and an upgrade story that keeps progress. Before release, resume the full regression suite and interactively verify 0.17 sign-in startup, tray restore/exit, reminder boundaries, identity editing, daily generation, rewards, and streaks.
 
 ## Required workflow for every change and push
 

@@ -6,7 +6,7 @@ ADHD Warrior is a private, local-first Windows desktop app that turns everyday t
 
 ## Current release
 
-**Windows preview 0.16 · save format 10 · .NET Framework 4.8**
+**Windows preview 0.17 · save format 11 · .NET Framework 4.8**
 
 This repository is the native C# Windows migration of the more complete iOS app. The iOS implementation is the behavioral source of truth whenever a matching Windows feature is added. The Android port and preserved artwork are secondary references.
 
@@ -20,7 +20,7 @@ This repository is the native C# Windows migration of the more complete iOS app.
 - Common, Uncommon, Rare, Epic, and Unique rarities with iOS XP defaults.
 - iOS character level thresholds and visible progress toward the next level.
 - Dedicated daily, weekly, monthly, and weekday streak quests with editing, next-eligible dates, guarded removal, and current/best history.
-- Optional Windows notifications while the app is running, with separate quest/streak switches, a daily reminder time, quiet hours, aggregation, and duplicate suppression.
+- Optional Windows notifications with sign-in startup, close-to-tray background mode, separate quest/streak switches, a daily reminder time, quiet hours, aggregation, and duplicate suppression.
 - Four familiar families: Silent Basilisk, Arcane Drake, Storm Gryphon, and Wild Hydra.
 - Familiar hatching, leveling, evolution, skill points, Quest XP, Streak XP, and Loot Chance.
 - Local character display names, custom familiar names, and nine iOS avatar themes unlocked through matching equipment sets.
@@ -37,7 +37,7 @@ The left navigation contains Today, All quests, Review, Daily templates, Streak 
 
 ## Run the app
 
-On the development machine, close any older ADHD Warrior window and open `Launch ADHD Warrior.lnk`. The launcher points to `dist/0.16/ADHD Warrior.exe`.
+On the development machine, close any older ADHD Warrior window and open `Launch ADHD Warrior.lnk`. The launcher points to `dist/0.17/ADHD Warrior.exe`.
 
 Build output and the local shortcut are intentionally excluded from Git. A fresh clone must be built before it can run:
 
@@ -55,7 +55,7 @@ Normal progress is stored at:
 %LOCALAPPDATA%\AdhdWarrior\save.json
 ```
 
-Writes are atomic. The prior file is retained as `save.json.bak`. Windows save formats 1–9 migrate to format 10 when loaded and are written in the new format after the next successful change. Existing Windows users receive the standard character identity and retain all prior progress. Invalid or unsupported saves stop loading before the original is overwritten.
+Writes are atomic. The prior file is retained as `save.json.bak`. Windows save formats 1–10 migrate to format 11 when loaded and are written in the new format after the next successful change. Startup and background options default off. Invalid or unsupported saves stop loading before the original is overwritten.
 
 The app requires no account and does not send progress to a server. Personal saves, backups, build output, shortcuts, and test state are excluded from Git.
 
@@ -98,9 +98,9 @@ The build script compiles every `src/*.cs` and `tests/*.cs` file into one execut
 
 ## Validation status
 
-The most recent full regression run was version 0.8 with **113 passing assertions**. Versions 0.9–0.16 were compile-checked only at the owner's request. Version 0.11's navigation repaint fix was confirmed interactively. Version 0.16 compiled successfully; identity editing and avatar unlocking, daily-template generation and reward claiming, reminder delivery, quiet-hour boundaries, and the streak flow still need interactive smoke tests before calling the app production-ready.
+The most recent full regression run was version 0.8 with **113 passing assertions**. Versions 0.9–0.17 were compile-checked only at the owner's request. Version 0.11's navigation repaint fix was confirmed interactively. Version 0.17 compiled successfully; Windows sign-in startup, tray restoration/exit, notification delivery, identity editing, daily templates, rewards, and streaks still need interactive smoke tests before calling the app production-ready.
 
-This is an unsigned portable preview. Reminders currently require the app to remain running. It does not yet have an installer, startup/background mode, code signing, automatic updates, or a release package.
+This is an unsigned portable preview. Background reminders require the app process to remain running in the notification area. It does not yet have an installer, code signing, automatic updates, or a release package.
 
 ## Development source of truth
 
