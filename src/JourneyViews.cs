@@ -20,14 +20,15 @@ namespace AdhdWarrior {
    }
   }
   void AdventureCard(string title,string description,Image artwork,int current,int maximum,params Button[] actions) {
-   var panel=new TableLayoutPanel {ColumnCount=2,RowCount=1,Height=235,BackColor=Color.White,Padding=new Padding(14),Margin=new Padding(0,0,0,12)};
+   var panel=new TableLayoutPanel {ColumnCount=2,RowCount=1,Height=235,BackColor=Theme.Surface,Padding=new Padding(14),Margin=new Padding(0,0,0,12)};
+   Color accent=view=="Boss map"?Theme.Coral:view=="Familiars"?Theme.Violet:view=="Equipment"?Theme.Rarity(description.Split(' ')[0]):Theme.Gold;Theme.Frame(panel,accent);
    panel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,165));panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,100));
-   panel.Controls.Add(new PictureBox {Dock=DockStyle.Fill,Image=artwork,SizeMode=PictureBoxSizeMode.Zoom,AccessibleName=title+" artwork"},0,0);
+   panel.Controls.Add(new PictureBox {Dock=DockStyle.Fill,Image=artwork,SizeMode=PictureBoxSizeMode.Zoom,BackColor=Color.FromArgb(44,48,59),Padding=new Padding(6),AccessibleName=title+" artwork"},0,0);
    var details=new TableLayoutPanel {Dock=DockStyle.Fill,ColumnCount=1,RowCount=4,Padding=new Padding(16,0,0,0)};
    details.RowStyles.Add(new RowStyle(SizeType.Absolute,36));details.RowStyles.Add(new RowStyle(SizeType.Percent,100));details.RowStyles.Add(new RowStyle(SizeType.Absolute,24));details.RowStyles.Add(new RowStyle(SizeType.Absolute,60));
-   details.Controls.Add(new Label {Text=title,Font=new Font("Segoe UI",14,FontStyle.Bold),Dock=DockStyle.Fill,AutoEllipsis=true},0,0);
-   details.Controls.Add(new Label {Text=description,Dock=DockStyle.Fill,AutoEllipsis=true},0,1);
-   if(maximum>0)details.Controls.Add(new ProgressBar {Minimum=0,Maximum=maximum,Value=Math.Max(0,Math.Min(current,maximum)),Dock=DockStyle.Fill,AccessibleName=title+" progress"},0,2);
+   details.Controls.Add(new Label {Text=title,Font=new Font("Georgia",15,FontStyle.Bold),ForeColor=accent,Dock=DockStyle.Fill,AutoEllipsis=true},0,0);
+   details.Controls.Add(new Label {Text=description,ForeColor=Theme.Muted,Dock=DockStyle.Fill,AutoEllipsis=true},0,1);
+   if(maximum>0)details.Controls.Add(new JourneyMeter {Maximum=maximum,Value=Math.Max(0,Math.Min(current,maximum)),Accent=accent,Dock=DockStyle.Fill,AccessibleName=title+" progress: "+current+" of "+maximum},0,2);
    var buttons=new FlowLayoutPanel {Dock=DockStyle.Fill,WrapContents=false};foreach(var button in actions)buttons.Controls.Add(button);details.Controls.Add(buttons,0,3);panel.Controls.Add(details,1,0);cards.Controls.Add(panel);
   }
   void ShowCharacter() {
@@ -56,7 +57,7 @@ namespace AdhdWarrior {
   }
   void ShowGear() {
    var tabs=new FlowLayoutPanel {Height=48};tabs.Controls.Add(Button("Owned gear ("+data.Journey.Gear.Count+")",()=>{gearShop=false;Render();}));tabs.Controls.Add(Button("Shop · "+data.Coins+" coins",()=>{gearShop=true;Render();}));
-   var filter=new ComboBox {DropDownStyle=ComboBoxStyle.DropDownList,Width=180,AccessibleName="Equipment set"};filter.Items.Add("All sets");filter.Items.AddRange(GearCatalog.All.Select(g=>g.Sheet).Distinct().Cast<object>().ToArray());filter.SelectedItem=gearSet;filter.SelectedIndexChanged+=(s,e)=>{gearSet=(string)filter.SelectedItem;Render();};tabs.Controls.Add(filter);cards.Controls.Add(tabs);
+   var filter=new ComboBox {DropDownStyle=ComboBoxStyle.DropDownList,Width=180,AccessibleName="Equipment set"};Theme.StyleInput(filter);filter.Items.Add("All sets");filter.Items.AddRange(GearCatalog.All.Select(g=>g.Sheet).Distinct().Cast<object>().ToArray());filter.SelectedItem=gearSet;filter.SelectedIndexChanged+=(s,e)=>{gearSet=(string)filter.SelectedItem;Render();};tabs.Controls.Add(filter);cards.Controls.Add(tabs);
    Note(gearShop?"Spend earned coins on a specific piece.\nYou also collect gear every six quest completions and after boss victories. Each item can be owned once.":"Owned bonuses are always active; there is no equip step.\nBonuses vary by slot and quest type. Common gear is cosmetic; epic and unique pieces also add a flat XP bonus.");
    var items=GearCatalog.All.Where(g=>(gearShop?!data.Journey.Gear.Contains(g.Id):data.Journey.Gear.Contains(g.Id))&&(gearSet=="All sets"||g.Sheet==gearSet)&&g.Name.IndexOf(search.Text,StringComparison.OrdinalIgnoreCase)>=0).ToList();
    if(items.Count==0)Note(gearShop?"No unowned items match this filter.":"No matching gear yet. Complete six quests, defeat a boss, or visit the shop.");

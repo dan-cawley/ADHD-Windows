@@ -1,12 +1,14 @@
-# ADHD Warrior for Windows — 0.3
+# ADHD Warrior for Windows — 0.4
 
 Native Windows desktop preview with the quest loop and adventure progression.
 
 ## Run
 
-Open **Launch ADHD Warrior.lnk** in this folder, or **dist/0.3/ADHD Warrior.exe**. Close any older ADHD Warrior window first. Keep the config and assets folder with the executable. Requires .NET Framework 4.8.
+Open **Launch ADHD Warrior.lnk** in this folder, or **dist/0.4/ADHD Warrior.exe**. Close any older ADHD Warrior window first. Keep the config and assets folder with the executable. Requires .NET Framework 4.8.
 
-The earlier 0.1 executable remains at `dist/ADHD Warrior.exe` for reference. Use 0.3 for normal work. Older previews cannot read format 3 saves; use 0.3 after upgrading.
+The earlier 0.1 executable remains at `dist/ADHD Warrior.exe` for reference. Use 0.4 for normal work. Versions 0.3 and 0.4 share save format 3; earlier previews cannot read it.
+
+See `docs/PHASE-4.md` for the forest artwork, visual changes and validation.
 
 ## Included
 
@@ -30,10 +32,10 @@ Backup & settings includes a partial iOS importer for legacy and Rebuild exports
 
 ## Build and tests
 
-Run `powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1`. The included Windows .NET Framework compiler builds into `dist/0.3/`; no package downloads are required. A Visual Studio project is also provided.
+Run `powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1`. The included Windows .NET Framework compiler builds into `dist/0.4/`; no package downloads are required. A Visual Studio project is also provided.
 
-Run `Start-Process -FilePath '.\dist\0.3\ADHD Warrior.exe' -ArgumentList '--self-test' -WindowStyle Hidden -Wait -PassThru`. Exit code 0 means success. Results are in `dist/0.3/test-results.txt`. Regression tests use isolated temporary data.
+Run `Start-Process -FilePath '.\dist\0.4\ADHD Warrior.exe' -ArgumentList '--self-test' -WindowStyle Hidden -Wait -PassThru`. Exit code 0 means success. Results are in `dist/0.4/test-results.txt`. Regression tests use isolated temporary data.
 
-`--preview-test` launches a clearly labeled test session using `dist/0.3/test-state/save.json`. It does not change normal progress. Close the test window and launch normally for everyday use.
+`--preview-test` launches a clearly labeled test session using `dist/0.4/test-state/save.json`. It does not change normal progress. Close the test window and launch normally for everyday use.
 
 Original source and art are preserved in `reference/`; only runtime artwork is copied to `assets/`. Original mobile files remain intact. The local Git remote is `https://github.com/dan-cawley/ADHD-Windows.git`. Nothing has been uploaded.

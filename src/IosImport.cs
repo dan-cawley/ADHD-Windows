@@ -68,12 +68,13 @@ namespace AdhdWarrior {
   void ImportIos(){
    using(var picker=new OpenFileDialog {Filter="iOS JSON export|*.json",Title="Preview an iOS export"})if(picker.ShowDialog(this)==DialogResult.OK)try{
     var preview=IosImport.Parse(File.ReadAllText(picker.FileName),TimeZoneInfo.Local);
-    using(var dialog=new Form {Text="Review iOS import",Size=new Size(730,670),MinimumSize=new Size(550,450),StartPosition=FormStartPosition.CenterParent}){
+    using(var dialog=new Form {Text="Review iOS import",Size=new Size(730,670),MinimumSize=new Size(550,450),StartPosition=FormStartPosition.CenterParent,BackColor=Theme.Canvas,ForeColor=Theme.Text}){
      var details=new TextBox {Multiline=true,ReadOnly=true,ScrollBars=ScrollBars.Vertical,Dock=DockStyle.Fill,Text=preview.Report,Font=new Font("Segoe UI",11)};
+     Theme.StyleInput(details);
      var actions=new FlowLayoutPanel {Dock=DockStyle.Bottom,Height=55,FlowDirection=FlowDirection.RightToLeft,Padding=new Padding(8)};
-     var cancel=new Button {Text="Cancel",DialogResult=DialogResult.Cancel,AutoSize=true};
-     var apply=new Button {Text="Apply partial import",DialogResult=DialogResult.OK,AutoSize=true};
-     actions.Controls.Add(cancel);actions.Controls.Add(apply);dialog.Controls.Add(details);dialog.Controls.Add(actions);dialog.CancelButton=cancel;
+     var cancel=new ThemedButton {Text="Cancel",DialogResult=DialogResult.Cancel,AutoSize=true};
+     var apply=new ThemedButton {Text="Apply partial import",DialogResult=DialogResult.OK,AutoSize=true};
+     Theme.StyleButton(cancel);Theme.StyleButton(apply,true);actions.Controls.Add(cancel);actions.Controls.Add(apply);dialog.Controls.Add(details);dialog.Controls.Add(actions);dialog.CancelButton=cancel;
      if(dialog.ShowDialog(this)!=DialogResult.OK)return;
     }
     Storage.Save(path+".before-ios-import-"+DateTime.Now.ToString("yyyyMMdd-HHmmssfff")+".json",data);
