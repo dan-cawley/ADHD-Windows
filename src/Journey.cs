@@ -6,6 +6,7 @@ using System.Globalization;
 
 namespace AdhdWarrior {
  public class Familiar {
+  public string Name {get;set;}
   public string Species {get;set;} public int EggStage {get;set;} public int Growth {get;set;}
   public int Level {get;set;} public int XP {get;set;} public int Skill {get;set;} public int Points {get;set;}
   public int QuestSkill {get;set;} public int StreakSkill {get;set;} public int LootSkill {get;set;}
@@ -38,6 +39,7 @@ namespace AdhdWarrior {
   public static readonly string[] Bosses={"Mire Collosus","Gelatinous Cube","Acidic Jelly","Barbaric Thwamp","Wasting Minotaur","One Armed Skeleton","Blind Mummy","Meat Hummunculus","Vampiric Vines","Ashen Basilisk","Frostbound Chimera","Stormforged Cyclops","Hollow Wyrm","Ember Maw Drake","Moonlit Harpy Queen","Ironroot Treant","Rift Stalker","Crypt Warden"};
   public static Familiar ActivePet(SaveData data){return data.Journey.Pets.Single(p=>p.Species==data.Journey.Active);}
   public static PetDefinition Definition(Familiar p){return Species.Single(s=>s.Id==p.Species);}
+  public static string PetName(Familiar p){return String.IsNullOrWhiteSpace(p.Name)?Definition(p).Name:p.Name.Trim();}
   public static int Stage(Familiar p){return p.EggStage<4?0:Math.Min(3,p.Level);}
   public static int PetNextXP(Familiar p){return checked(100+(p.Level-1)*30);}
   public static string WeekKey(DateTime day){return day.Date.AddDays(-(((int)day.DayOfWeek+6)%7)).ToString("yyyy-MM-dd");}
@@ -84,7 +86,7 @@ namespace AdhdWarrior {
   public static void Validate(JourneyState j) {
    if(j==null||j.Pets==null||j.Pets.Count<1||j.Pets.Count>4||j.Pets.Any(p=>p==null)||j.Pets.Select(p=>p.Species).Distinct().Count()!=j.Pets.Count||!j.Pets.Any(p=>p.Species==j.Active)||j.Gear==null||j.Gear.Count>GearCatalog.All.Length||j.Gear.Distinct().Count()!=j.Gear.Count||j.Gear.Any(id=>!GearCatalog.All.Any(g=>g.Id==id))||j.Completions<0||j.BossIndex<0||j.BossIndex>=Bosses.Length||j.History==null||j.History.Count>30||j.Journal==null||j.Journal.Count>50||j.Journal.Any(x=>x==null||x.Length>1000))throw new InvalidDataException("Invalid adventure data.");
    DateTime d;if(j.Week==null||j.Week!=""&&(!ParseDate(j.Week,out d)||WeekKey(d)!=j.Week)||j.BossHP<0||j.BossHP>j.BossMaxHP||j.BossMaxHP>1000000||j.Week!=""&&(j.BossHP==0||j.BossMaxHP<300))throw new InvalidDataException("Invalid weekly boss data.");
-   foreach(var p in j.Pets)if(!Species.Any(s=>s.Id==p.Species)||p.EggStage<1||p.EggStage>4||p.Level<1||p.Level>100000||p.XP<0||p.XP>=PetNextXP(p)||p.Growth<0||p.Growth>=Definition(p).Threshold||p.Points<0||p.Skill!=0||p.QuestSkill<0||p.StreakSkill<0||p.LootSkill<0||(long)p.Points+p.QuestSkill+p.StreakSkill+p.LootSkill!=p.Level||p.EggStage<4&&(p.Level!=1||p.XP!=0||p.QuestSkill!=0||p.StreakSkill!=0||p.LootSkill!=0)||p.EggStage==4&&p.Growth!=0)throw new InvalidDataException("Invalid familiar progression.");
+   foreach(var p in j.Pets)if(!Species.Any(s=>s.Id==p.Species)||p.Name!=null&&p.Name.Length>80||p.EggStage<1||p.EggStage>4||p.Level<1||p.Level>100000||p.XP<0||p.XP>=PetNextXP(p)||p.Growth<0||p.Growth>=Definition(p).Threshold||p.Points<0||p.Skill!=0||p.QuestSkill<0||p.StreakSkill<0||p.LootSkill<0||(long)p.Points+p.QuestSkill+p.StreakSkill+p.LootSkill!=p.Level||p.EggStage<4&&(p.Level!=1||p.XP!=0||p.QuestSkill!=0||p.StreakSkill!=0||p.LootSkill!=0)||p.EggStage==4&&p.Growth!=0)throw new InvalidDataException("Invalid familiar progression.");
    foreach(var h in j.History)if(h==null||h.Index<0||h.Index>=18||h.HP<0||h.HP>1000000||!ParseDate(h.Week,out d)||WeekKey(d)!=h.Week||h.Outcome!="Defeated"&&h.Outcome!="Carried forward")throw new InvalidDataException("Invalid boss history.");
   }
   static bool ParseDate(string text,out DateTime date){return DateTime.TryParseExact(text,"yyyy-MM-dd",CultureInfo.InvariantCulture,DateTimeStyles.None,out date);}

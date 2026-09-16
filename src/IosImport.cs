@@ -36,7 +36,7 @@ namespace AdhdWarrior {
    if(root["quests"]==null||root["coinBalance"]==null||root["inventory"]==null)throw new InvalidDataException("The iOS export has missing progress data.");
    bool rebuild=root.ContainsKey("totalXPEarned");
    if(!rebuild&&!root.ContainsKey("xpEvents"))throw new InvalidDataException("The iOS export is missing its XP history.");
-   var data=new SaveData {Coins=Number(root["coinBalance"])};
+   var data=new SaveData {Coins=Number(root["coinBalance"]),DisplayName=Text(Value(root,"myDisplayName"),"Player")};if(String.IsNullOrWhiteSpace(data.DisplayName))data.DisplayName="Boggins";
    var backlog=new HashSet<string>(ArrayValue(Value(root,"backlogQuestIDs")).Select(v=>Text(v)),StringComparer.OrdinalIgnoreCase);
    int completedXP=0;
    foreach(var value in ArrayValue(root["quests"])){
@@ -67,6 +67,7 @@ namespace AdhdWarrior {
     int count=Number(pair.Value);if(count==0)continue;
     if(GearCatalog.All.Any(g=>g.Id==pair.Key)){data.Journey.Gear.Add(pair.Key);extraCopies=checked(extraCopies+count-1);}else if(!pair.Key.StartsWith("egg_"))otherItems=checked(otherItems+count);
    }
+   string importedAvatar=Identity.FromIosAsset(Text(Value(root,"preferredAvatarAssetName")));if(Identity.Unlocked(data,Identity.Avatars.Single(x=>x.Id==importedAvatar)))data.AvatarSet=importedAvatar;
    int templatesImported=0,rewardsImported=0,rewardsSkipped=0;
    if(root.ContainsKey("dailyQuestTemplates")){
     data.DailyTemplates.Clear();foreach(var raw in ArrayValue(Value(root,"dailyQuestTemplates"))){var source=Obj(raw);Guid id;string rawID=Text(Value(source,"id"));if(!Guid.TryParse(rawID,out id))throw new InvalidDataException("An iOS daily template has an invalid ID.");var weekdays=ArrayValue(Value(source,"activeWeekdays")).Select(x=>Number(x)).Where(x=>x>=1&&x<=7).Distinct().ToList();if(weekdays.Count==0)weekdays=Enumerable.Range(1,7).ToList();string window=Text(Value(source,"window"),"Morning");window=CultureInfo.InvariantCulture.TextInfo.ToTitleCase(window.ToLowerInvariant());data.DailyTemplates.Add(new DailyTemplate {Id=id.ToString(),Title=Text(Value(source,"title")),XP=Math.Max(5,Number(Value(source,"xp"),10)),Enabled=Value(source,"isEnabled")==null||Flag(Value(source,"isEnabled")),Weekdays=weekdays,Window=window});templatesImported++;}
@@ -77,7 +78,7 @@ namespace AdhdWarrior {
    int petsImported=0,petConflicts=0;var selected=Text(Value(root,"selectedPetID"));var petIDs=new Dictionary<string,string>();var families=new HashSet<string>();var importedPets=new List<Familiar>();
    foreach(var rawPet in ArrayValue(Value(root,"pets"))){
     var mobile=Obj(rawPet);string family=PetFamily(Text(Value(mobile,"species")),Text(Value(mobile,"eggItemID")));if(family==""||!families.Add(family)){petConflicts++;continue;}
-    var pet=new Familiar {Species=family,EggStage=4,Level=Number(Value(mobile,"level"),1),XP=Number(Value(mobile,"xp")),Points=Number(Value(mobile,"unspentSkillPoints"),1),QuestSkill=Number(Value(mobile,"questXPSkillLevel")),StreakSkill=Number(Value(mobile,"streakXPSkillLevel")),LootSkill=Number(Value(mobile,"lootChanceSkillLevel"))};
+    var pet=new Familiar {Name=Text(Value(mobile,"name")),Species=family,EggStage=4,Level=Number(Value(mobile,"level"),1),XP=Number(Value(mobile,"xp")),Points=Number(Value(mobile,"unspentSkillPoints"),1),QuestSkill=Number(Value(mobile,"questXPSkillLevel")),StreakSkill=Number(Value(mobile,"streakXPSkillLevel")),LootSkill=Number(Value(mobile,"lootChanceSkillLevel"))};
     importedPets.Add(pet);petIDs[Text(Value(mobile,"id"))]=family;petsImported++;
    }
    int eggsImported=0,eggUnitsSkipped=0;var selectedEgg=Text(Value(root,"selectedEggItemID"));var eggIDs=new Dictionary<string,string>();var eggLevels=DictionaryValue(Value(root,"eggLevels"));var eggProgress=DictionaryValue(Value(root,"eggProgressByItem"));var eggHatches=DictionaryValue(Value(root,"eggHatchesByItem"));
@@ -101,7 +102,7 @@ namespace AdhdWarrior {
    data.Journey.Completions=Math.Max(data.Quests.Count(q=>q.Done),Number(Value(root,"completionEventsCount")));
    // Validate everything before offering Apply. Never clamp incompatible values silently.
    data=Storage.Decode(Storage.Encode(data));
-   string report=(rebuild?"iOS Rebuild export":"iOS legacy export")+"\r\n\r\nWill transfer:\r\n"+data.Quests.Count+" quests ("+data.Quests.Count(q=>q.Done)+" completed; "+data.Quests.Count(q=>q.Archived)+" backlog entries become archived)\r\n"+streaksImported+" streak quests with cadence and progress\r\n"+templatesImported+" daily templates; "+rewardsImported+" pending rewards\r\n"+data.XP+" lifetime XP; "+data.Coins+" coins\r\n"+data.Journey.Gear.Count+" distinct equipment pieces\r\n"+petsImported+" compatible hatched familiars; "+eggsImported+" growing eggs\r\n"+bossStateImported+" current weekly boss states; "+bossEntriesImported+" boss history entries\r\n\r\nLimitations in this preview:\r\n"+
+   string report=(rebuild?"iOS Rebuild export":"iOS legacy export")+"\r\n\r\nWill transfer:\r\nCharacter name, compatible avatar theme, and familiar names\r\n"+data.Quests.Count+" quests ("+data.Quests.Count(q=>q.Done)+" completed; "+data.Quests.Count(q=>q.Archived)+" backlog entries become archived)\r\n"+streaksImported+" streak quests with cadence and progress\r\n"+templatesImported+" daily templates; "+rewardsImported+" pending rewards\r\n"+data.XP+" lifetime XP; "+data.Coins+" coins\r\n"+data.Journey.Gear.Count+" distinct equipment pieces\r\n"+petsImported+" compatible hatched familiars; "+eggsImported+" growing eggs\r\n"+bossStateImported+" current weekly boss states; "+bossEntriesImported+" boss history entries\r\n\r\nLimitations in this preview:\r\n"+
     rewardsSkipped+" pending rewards are skipped because their equipment is unsupported, already owned, duplicated, or malformed.\r\n"+
     bossEntriesSkipped+" boss records are reset or skipped because their identity, HP, date, history limit or locale-dependent current-week label cannot be represented safely.\r\n"+
     petConflicts+" familiars with an unsupported or duplicate Windows family are not imported. Familiar names and exact mobile evolution stages are not retained.\r\n"+

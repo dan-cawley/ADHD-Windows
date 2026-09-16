@@ -6,7 +6,7 @@ ADHD Warrior is a private, local-first Windows desktop app that turns everyday t
 
 ## Current release
 
-**Windows preview 0.15 · save format 9 · .NET Framework 4.8**
+**Windows preview 0.16 · save format 10 · .NET Framework 4.8**
 
 This repository is the native C# Windows migration of the more complete iOS app. The iOS implementation is the behavioral source of truth whenever a matching Windows feature is added. The Android port and preserved artwork are secondary references.
 
@@ -23,6 +23,7 @@ This repository is the native C# Windows migration of the more complete iOS app.
 - Optional Windows notifications while the app is running, with separate quest/streak switches, a daily reminder time, quiet hours, aggregation, and duplicate suppression.
 - Four familiar families: Silent Basilisk, Arcane Drake, Storm Gryphon, and Wild Hydra.
 - Familiar hatching, leveling, evolution, skill points, Quest XP, Streak XP, and Loot Chance.
+- Local character display names, custom familiar names, and nine iOS avatar themes unlocked through matching equipment sets.
 - Eighteen weekly bosses with quest damage, rollover healing, history, and rewards.
 - All 81 iOS equipment definitions, nine visual sets, automatic bonuses, collections, and a coin shop.
 - Rarity-weighted bonus loot based on the iOS drop tables.
@@ -36,7 +37,7 @@ The left navigation contains Today, All quests, Review, Daily templates, Streak 
 
 ## Run the app
 
-On the development machine, close any older ADHD Warrior window and open `Launch ADHD Warrior.lnk`. The launcher points to `dist/0.15/ADHD Warrior.exe`.
+On the development machine, close any older ADHD Warrior window and open `Launch ADHD Warrior.lnk`. The launcher points to `dist/0.16/ADHD Warrior.exe`.
 
 Build output and the local shortcut are intentionally excluded from Git. A fresh clone must be built before it can run:
 
@@ -54,7 +55,7 @@ Normal progress is stored at:
 %LOCALAPPDATA%\AdhdWarrior\save.json
 ```
 
-Writes are atomic. The prior file is retained as `save.json.bak`. Windows save formats 1–8 migrate to format 9 when loaded and are written in the new format after the next successful change. Existing Windows users receive the standard templates in a paused state, so upgrading does not add surprise quests. Invalid or unsupported saves stop loading before the original is overwritten.
+Writes are atomic. The prior file is retained as `save.json.bak`. Windows save formats 1–9 migrate to format 10 when loaded and are written in the new format after the next successful change. Existing Windows users receive the standard character identity and retain all prior progress. Invalid or unsupported saves stop loading before the original is overwritten.
 
 The app requires no account and does not send progress to a server. Personal saves, backups, build output, shortcuts, and test state are excluded from Git.
 
@@ -69,9 +70,10 @@ The importer currently carries over:
 - Daily templates, their schedules and generation preference, compatible pending equipment rewards, and claimed consistency milestones.
 - Lifetime XP, coins, and distinct known equipment.
 - Compatible hatched familiars, skill allocations, selected familiar, and growing eggs at stages 1–3.
+- Character display name, compatible unlocked avatar selection, and familiar names.
 - Compatible current weekly boss state and up to 30 dated boss-history entries.
 
-Known migration limits include duplicate or unsupported familiar families, exact mobile familiar names/stages, stage-4 ready eggs, duplicate inventory quantities, unsupported or duplicate reward items, calendar links, friends, other settings, and Apple integrations. Keep the original iOS export.
+Known migration limits include duplicate or unsupported familiar families, exact mobile evolution stages, stage-4 ready eggs, duplicate inventory quantities, unsupported or duplicate reward items, calendar links, friends, other settings, and Apple integrations. Keep the original iOS export.
 
 ## Architecture
 
@@ -85,6 +87,7 @@ This is a dependency-free Windows Forms application targeting .NET Framework 4.8
 | Adventure pages | `src/JourneyViews.cs` |
 | Streak model, rules, and page | `src/Streaks.cs` |
 | Daily templates and pending rewards | `src/DailyTemplates.cs` |
+| Character and familiar identity | `src/Identity.cs` |
 | iOS JSON preview/import | `src/IosImport.cs` |
 | Visual system and repaint buffering | `src/Theme.cs` |
 | Quest editor | `src/Editor.cs` |
@@ -95,7 +98,7 @@ The build script compiles every `src/*.cs` and `tests/*.cs` file into one execut
 
 ## Validation status
 
-The most recent full regression run was version 0.8 with **113 passing assertions**. Versions 0.9–0.15 were compile-checked only at the owner's request. Version 0.11's navigation repaint fix was confirmed interactively. Version 0.15 compiled successfully; daily-template generation and reward claiming, reminder delivery, quiet-hour boundaries, and the streak create/edit/complete/restart flow still need interactive smoke tests and a resumed regression run before calling the app production-ready.
+The most recent full regression run was version 0.8 with **113 passing assertions**. Versions 0.9–0.16 were compile-checked only at the owner's request. Version 0.11's navigation repaint fix was confirmed interactively. Version 0.16 compiled successfully; identity editing and avatar unlocking, daily-template generation and reward claiming, reminder delivery, quiet-hour boundaries, and the streak flow still need interactive smoke tests before calling the app production-ready.
 
 This is an unsigned portable preview. Reminders currently require the app to remain running. It does not yet have an installer, startup/background mode, code signing, automatic updates, or a release package.
 

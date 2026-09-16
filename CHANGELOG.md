@@ -2,6 +2,13 @@
 
 All notable Windows migration phases are recorded here. The project is still a preview and does not yet publish packaged releases.
 
+## 0.16 — 2026-09-16
+
+- Added local character display-name editing and familiar naming.
+- Added all nine iOS avatar themes; the Standard avatar is always available and the other themes unlock when their matching equipment set is complete.
+- Imported compatible iOS character names, selected avatar themes, and familiar names.
+- Added save format 10 for character and familiar identity.
+
 ## 0.15 — 2026-09-16
 
 - Added iOS-style daily quest templates with weekday schedules, time-of-day labels, pause controls, and once-per-day generation.

@@ -33,8 +33,9 @@ namespace AdhdWarrior {
   }
   void ShowCharacter() {
    var pet=Journey.ActivePet(data);
-   AdventureCard("Your warrior · Level "+Progression.Level(data.XP),data.XP+" lifetime XP · "+data.Coins+" coins\n"+data.Journey.Gear.Count+" pieces collected · "+Game.Streak(data,DateTime.Today)+" day streak\n"+Progression.NextLabel(data.XP),Artwork("storybook_adah_standard"),Progression.Current(data.XP),Progression.Span(data.XP));
-   Note("Active familiar: "+Journey.Definition(pet).Name+"\n"+(pet.EggStage<4?"Your egg grows with each completed quest.":"Quest XP skill bonus: +"+(pet.QuestSkill*Journey.Stage(pet))+" XP per quest.")+"\nOwned gear bonuses apply automatically. View Equipment to see your collection.");
+   var avatar=Identity.Avatar(data);AdventureCard(Identity.Name(data)+" · Level "+Progression.Level(data.XP),data.XP+" lifetime XP · "+data.Coins+" coins\n"+data.Journey.Gear.Count+" pieces collected · "+Game.Streak(data,DateTime.Today)+" day streak\nAvatar: "+avatar.Title+" · "+Progression.NextLabel(data.XP),Artwork(avatar.Asset),Progression.Current(data.XP),Progression.Span(data.XP),Button("Customize identity",EditIdentity));
+   Note("Active familiar: "+Journey.PetName(pet)+"\n"+(pet.EggStage<4?"Your egg grows with each completed quest.":"Quest XP skill bonus: +"+(pet.QuestSkill*Journey.Stage(pet))+" XP per quest.")+"\nComplete every piece in an equipment set to unlock its matching avatar theme.");
+   foreach(var option in Identity.Avatars)Note(option.Title+" avatar · "+Identity.SetProgress(data,option)+(Identity.Unlocked(data,option)?" · available":""));
   }
   void ShowPets() {
    Note("Your companions grow with you.\nOnly the active familiar earns 20 XP per completed quest. Each Loot Chance level adds 1% per evolution stage to find bonus gear. Extra eggs cost 150 coins.");
@@ -47,7 +48,7 @@ namespace AdhdWarrior {
     var train=Button("Train Quest XP",()=>Change(()=>Journey.Train(data,p.Species,"Quest XP"),"Skill point spent. Quest XP bonus increased."));train.Enabled=p.EggStage==4&&p.Points>0;
     var streak=Button("Train Streak XP",()=>Change(()=>Journey.Train(data,p.Species,"Streak XP"),"Skill point spent. Streak XP bonus increased."));streak.Enabled=p.EggStage==4&&p.Points>0;
     var loot=Button("Train Loot Chance",()=>Change(()=>Journey.Train(data,p.Species,"Loot Chance"),"Skill point spent. Bonus loot chance increased."));loot.Enabled=p.EggStage==4&&p.Points>0;
-    AdventureCard(def.Name,description,Artwork(def.Art[Journey.Stage(p)]),p.EggStage<4?p.Growth:p.XP,p.EggStage<4?def.Threshold:Journey.PetNextXP(p),choose,train,streak,loot);
+    var rename=Button("Rename",()=>RenameFamiliar(p));AdventureCard(Journey.PetName(p),def.Name+" · "+description,Artwork(def.Art[Journey.Stage(p)]),p.EggStage<4?p.Growth:p.XP,p.EggStage<4?def.Threshold:Journey.PetNextXP(p),choose,rename,train,streak,loot);
    }
   }
   void ShowBosses() {

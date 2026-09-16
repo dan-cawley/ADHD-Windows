@@ -1,6 +1,6 @@
 # Future-version continuation prompt
 
-Last synchronized with Windows preview **0.15**, save format **9**, on **2026-09-16**.
+Last synchronized with Windows preview **0.16**, save format **10**, on **2026-09-16**.
 
 Copy the prompt below into a new development task. Update this file and the root README before every GitHub push.
 
@@ -14,11 +14,11 @@ ADHD Warrior is a calm, local-first ADHD task app wrapped in a fantasy progressi
 
 ## Current baseline
 
-- Current Windows preview: **0.15**.
-- Save format: **9**.
+- Current Windows preview: **0.16**.
+- Save format: **10**.
 - Runtime: C# Windows Forms on .NET Framework 4.8 with no external packages.
 - Build command: `powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1`.
-- Output: `dist/0.15/ADHD Warrior.exe` plus config and assets.
+- Output: `dist/0.16/ADHD Warrior.exe` plus config and assets.
 - Normal save: `%LOCALAPPDATA%\AdhdWarrior\save.json`.
 - Git branch: `main`.
 - GitHub remote: `https://github.com/dan-cawley/ADHD-Windows.git`.
@@ -73,6 +73,15 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 - Quest XP and Streak XP each add `skill level × evolution stage` XP to their matching completion type.
 - Loot Chance adds `skill level × evolution stage` percent. A successful roll selects unowned equipment through the iOS quest-rarity weight table.
 - Save validation requires unspent points plus all three allocations to equal familiar level.
+- Each owned familiar can have a local custom name. Compatible names are preserved by iOS import.
+
+### Character identity and avatars
+
+- Character supports a local display name with no account requirement.
+- The nine iOS avatar themes and full-size artwork are included: Standard, Archanist, Garden Gnome, Wood Elf, Micah, Stacy, Spellbinder, Sunforge, and Moonveil.
+- Standard is always available. Each other avatar becomes selectable when every equipment item in its matching set is owned.
+- The Character page shows set progress and provides the identity editor. Save validation prevents selecting a locked or unknown avatar.
+- iOS import preserves the display name and selected avatar when its required equipment is also compatible and imported.
 
 ### Bosses and equipment
 
@@ -86,10 +95,10 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 ### Persistence and imports
 
 - Save writes use temp-file replacement and keep `save.json.bak`.
-- Formats 1–8 migrate forward to format 9. Validate before replacing good data. Never silently clamp impossible imported progress.
+- Formats 1–9 migrate forward to format 10. Validate before replacing good data. Never silently clamp impossible imported progress.
 - Windows backup export/restore is available.
 - iOS import uses preview → explicit Apply → timestamped recovery backup.
-- Imported data includes compatible quests, due times, recurrence, streaks, daily templates, pending equipment rewards, consistency milestones, XP, coins, unique equipment ownership, four familiar families, stages 1–3 growing eggs, skill allocation, current compatible boss state, and dated boss history.
+- Imported data includes compatible quests, due times, recurrence, streaks, daily templates, pending equipment rewards, consistency milestones, character and familiar identity, XP, coins, unique equipment ownership, four familiar families, stages 1–3 growing eggs, skill allocation, current compatible boss state, and dated boss history.
 - Keep reports explicit about skipped data. Do not import secrets, signing material, account integrations, or private metadata.
 
 ### Visual system
@@ -115,6 +124,7 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 - `src/JourneyViews.cs`: Character, Familiars, Boss map, Equipment, and adventure completion UI.
 - `src/Streaks.cs`: streak model, cadence rules, rewards, validation-facing shape, and UI.
 - `src/DailyTemplates.cs`: daily template generation/editor, consistency milestones, pending rewards, and Rewards UI.
+- `src/Identity.cs`: character name, avatar unlock rules and editor, and familiar naming dialogs.
 - `src/IosImport.cs`: safe partial iOS JSON converter and review dialog.
 - `src/GearCatalog.cs`: generated iOS equipment catalog.
 - `src/Theme.cs`: palette, themed controls, background painting, metrics, welcome banner.
@@ -124,17 +134,17 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 
 ## Known gaps and risks
 
-- Versions 0.9–0.15 were compile-checked only. The last complete run was version 0.8 with 113 passing assertions. Resume the full suite and add meaningful reminder/streak/loot/template/reward/save-format-9 coverage before production packaging.
+- Versions 0.9–0.16 were compile-checked only. The last complete run was version 0.8 with 113 passing assertions. Resume the full suite and add meaningful reminder/streak/loot/template/reward/identity/save-format-10 coverage before production packaging.
 - Run an interactive smoke test of creating/completing daily, weekly, monthly, and weekday streaks; restarting; and spending all three familiar skills.
 - iOS stage-4 ready eggs conflict with the Windows meaning of stage 4 and remain intentionally skipped.
-- Exact mobile pet names/evolution stages, duplicate inventory counts, unsupported reward items, avatar customization, friends, calendar links, other settings, and Apple integrations remain unported.
+- Exact mobile evolution stages, duplicate inventory counts, unsupported reward items, user-supplied avatar photos, friends, calendar links, other settings, and Apple integrations remain unported.
 - Reminders require the app to stay open; startup/background mode is not implemented. No installer, code signing, release packaging, crash reporting, or update mechanism exists.
 - The Visual Studio project output path must stay synchronized with `build.ps1` and the documented version.
 - Historical phase documents describe their own point in time and contain superseded limitations. The root README and this prompt describe current behavior.
 
 ## Recommended next phase
 
-Build 0.16 around avatar and familiar identity parity: inspect the iOS profile/avatar models, add the highest-value local customization without adding accounts, and preserve imported identity fields that Windows can represent. Also add optional startup/background reminder support if it can remain clear and reversible. Before production packaging, resume the full regression suite and interactively verify 0.15 daily generation and reward claiming, 0.14 reminder boundaries, and streak create/edit/complete/restart. Follow with a signed installer and release plan.
+Build 0.17 around optional startup/background reminder support with clear controls and a reversible Windows startup entry. Then prepare a conventional installer and release package while keeping the portable build. Before production packaging, resume the full regression suite and interactively verify 0.16 identity editing and avatar unlocking, 0.15 daily generation and reward claiming, reminder boundaries, and the streak flow.
 
 ## Required workflow for every change and push
 
