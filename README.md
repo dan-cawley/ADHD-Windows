@@ -6,7 +6,7 @@ ADHD Warrior is a private, local-first Windows desktop app that turns everyday t
 
 ## Current release
 
-**Windows preview 0.14 · save format 8 · .NET Framework 4.8**
+**Windows preview 0.15 · save format 9 · .NET Framework 4.8**
 
 This repository is the native C# Windows migration of the more complete iOS app. The iOS implementation is the behavioral source of truth whenever a matching Windows feature is added. The Android port and preserved artwork are secondary references.
 
@@ -16,6 +16,7 @@ This repository is the native C# Windows migration of the more complete iOS app.
 - School, Work, Home, Life, and Fun categories.
 - Optional due dates and times, substeps, archive/restore, search, and bulk actions.
 - Daily and weekly recurring quests.
+- iOS-style daily quest templates with weekday schedules, time-of-day labels, pause controls, and duplicate-safe daily generation.
 - Common, Uncommon, Rare, Epic, and Unique rarities with iOS XP defaults.
 - iOS character level thresholds and visible progress toward the next level.
 - Dedicated daily, weekly, monthly, and weekday streak quests with editing, next-eligible dates, guarded removal, and current/best history.
@@ -25,16 +26,17 @@ This repository is the native C# Windows migration of the more complete iOS app.
 - Eighteen weekly bosses with quest damage, rollover healing, history, and rewards.
 - All 81 iOS equipment definitions, nine visual sets, automatic bonuses, collections, and a coin shop.
 - Rarity-weighted bonus loot based on the iOS drop tables.
+- Claimable consistency milestone rewards at 3, 7, 14, 30, and 60 total completions.
 - Twilight forest theme with buffered page rendering.
 - Atomic local saves, previous-save recovery, Windows backup/restore, and reviewed partial iOS import.
 
 ### Screens
 
-The left navigation contains Today, All quests, Review, Streak quests, Character, Familiars, Boss map, Equipment, Rewards, Completed, Archive, and Backup & settings.
+The left navigation contains Today, All quests, Review, Daily templates, Streak quests, Character, Familiars, Boss map, Equipment, Rewards, Completed, Archive, and Backup & settings.
 
 ## Run the app
 
-On the development machine, close any older ADHD Warrior window and open `Launch ADHD Warrior.lnk`. The launcher points to `dist/0.14/ADHD Warrior.exe`.
+On the development machine, close any older ADHD Warrior window and open `Launch ADHD Warrior.lnk`. The launcher points to `dist/0.15/ADHD Warrior.exe`.
 
 Build output and the local shortcut are intentionally excluded from Git. A fresh clone must be built before it can run:
 
@@ -52,7 +54,7 @@ Normal progress is stored at:
 %LOCALAPPDATA%\AdhdWarrior\save.json
 ```
 
-Writes are atomic. The prior file is retained as `save.json.bak`. Windows save formats 1–7 migrate to format 8 when loaded and are written in the new format after the next successful change. Invalid or unsupported saves stop loading before the original is overwritten.
+Writes are atomic. The prior file is retained as `save.json.bak`. Windows save formats 1–8 migrate to format 9 when loaded and are written in the new format after the next successful change. Existing Windows users receive the standard templates in a paused state, so upgrading does not add surprise quests. Invalid or unsupported saves stop loading before the original is overwritten.
 
 The app requires no account and does not send progress to a server. Personal saves, backups, build output, shortcuts, and test state are excluded from Git.
 
@@ -64,11 +66,12 @@ The importer currently carries over:
 
 - Quest identity, title, category, rarity, XP, due date/time, completion, substeps, backlog/archive state, and supported recurrence.
 - Streak quests, cadence, XP, total completions, current/best streaks, and last completion date.
+- Daily templates, their schedules and generation preference, compatible pending equipment rewards, and claimed consistency milestones.
 - Lifetime XP, coins, and distinct known equipment.
 - Compatible hatched familiars, skill allocations, selected familiar, and growing eggs at stages 1–3.
 - Compatible current weekly boss state and up to 30 dated boss-history entries.
 
-Known migration limits include duplicate or unsupported familiar families, exact mobile familiar names/stages, stage-4 ready eggs, duplicate inventory quantities, pending rewards, standalone daily templates, calendar links, friends, settings, and Apple integrations. Keep the original iOS export.
+Known migration limits include duplicate or unsupported familiar families, exact mobile familiar names/stages, stage-4 ready eggs, duplicate inventory quantities, unsupported or duplicate reward items, calendar links, friends, other settings, and Apple integrations. Keep the original iOS export.
 
 ## Architecture
 
@@ -81,6 +84,7 @@ This is a dependency-free Windows Forms application targeting .NET Framework 4.8
 | Familiar, equipment, and boss rules | `src/Journey.cs`, `src/GearCatalog.cs` |
 | Adventure pages | `src/JourneyViews.cs` |
 | Streak model, rules, and page | `src/Streaks.cs` |
+| Daily templates and pending rewards | `src/DailyTemplates.cs` |
 | iOS JSON preview/import | `src/IosImport.cs` |
 | Visual system and repaint buffering | `src/Theme.cs` |
 | Quest editor | `src/Editor.cs` |
@@ -91,7 +95,7 @@ The build script compiles every `src/*.cs` and `tests/*.cs` file into one execut
 
 ## Validation status
 
-The most recent full regression run was version 0.8 with **113 passing assertions**. Versions 0.9–0.14 were compile-checked only at the owner's request. Version 0.11's navigation repaint fix was confirmed interactively. Version 0.14 compiled successfully; reminder delivery, quiet-hour boundaries, and the streak create/edit/complete/restart flow still need interactive smoke tests and a resumed regression run before calling the app production-ready.
+The most recent full regression run was version 0.8 with **113 passing assertions**. Versions 0.9–0.15 were compile-checked only at the owner's request. Version 0.11's navigation repaint fix was confirmed interactively. Version 0.15 compiled successfully; daily-template generation and reward claiming, reminder delivery, quiet-hour boundaries, and the streak create/edit/complete/restart flow still need interactive smoke tests and a resumed regression run before calling the app production-ready.
 
 This is an unsigned portable preview. Reminders currently require the app to remain running. It does not yet have an installer, startup/background mode, code signing, automatic updates, or a release package.
 

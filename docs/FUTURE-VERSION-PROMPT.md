@@ -1,6 +1,6 @@
 # Future-version continuation prompt
 
-Last synchronized with Windows preview **0.14**, save format **8**, on **2026-09-16**.
+Last synchronized with Windows preview **0.15**, save format **9**, on **2026-09-16**.
 
 Copy the prompt below into a new development task. Update this file and the root README before every GitHub push.
 
@@ -14,11 +14,11 @@ ADHD Warrior is a calm, local-first ADHD task app wrapped in a fantasy progressi
 
 ## Current baseline
 
-- Current Windows preview: **0.14**.
-- Save format: **8**.
+- Current Windows preview: **0.15**.
+- Save format: **9**.
 - Runtime: C# Windows Forms on .NET Framework 4.8 with no external packages.
 - Build command: `powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1`.
-- Output: `dist/0.14/ADHD Warrior.exe` plus config and assets.
+- Output: `dist/0.15/ADHD Warrior.exe` plus config and assets.
 - Normal save: `%LOCALAPPDATA%\AdhdWarrior\save.json`.
 - Git branch: `main`.
 - GitHub remote: `https://github.com/dan-cawley/ADHD-Windows.git`.
@@ -55,6 +55,15 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 - Awarded XP is base streak XP plus the active familiar's Streak XP skill multiplied by its Windows evolution stage.
 - A streak completion also advances familiar/boss progression.
 
+### Daily templates and consistency rewards
+
+- The Daily templates page follows the iOS model: title, XP, enabled state, weekdays numbered Sunday 1 through Saturday 7, and Morning/Afternoon/Evening window.
+- New saves start with the four iOS standard templates and automatic generation enabled. Each matching template creates one Common quest per day, tracked by template ID and generated date.
+- Editing, pausing, removing, or rescheduling a template updates or removes today's unfinished generated quest. Completed generated quests remain history.
+- Saves upgraded from format 8 receive the standard templates paused to avoid surprise quests.
+- Completion milestones are 3, 7, 14, 30, and 60. Reaching one queues an unowned non-egg equipment reward; Rewards shows and claims the queue.
+- Older Windows saves mark already-reached milestones as claimed, so migration does not backfill rewards. Existing every-sixth-completion, boss, and familiar loot rules remain active.
+
 ### Familiars
 
 - Families: Silent Basilisk, Arcane Drake, Storm Gryphon, Wild Hydra. New saves start with the Silent Basilisk egg.
@@ -77,10 +86,10 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 ### Persistence and imports
 
 - Save writes use temp-file replacement and keep `save.json.bak`.
-- Formats 1–7 migrate forward to format 8. Validate before replacing good data. Never silently clamp impossible imported progress.
+- Formats 1–8 migrate forward to format 9. Validate before replacing good data. Never silently clamp impossible imported progress.
 - Windows backup export/restore is available.
 - iOS import uses preview → explicit Apply → timestamped recovery backup.
-- Imported data includes compatible quests, due times, recurrence, streaks, XP, coins, unique equipment ownership, four familiar families, stages 1–3 growing eggs, skill allocation, current compatible boss state, and dated boss history.
+- Imported data includes compatible quests, due times, recurrence, streaks, daily templates, pending equipment rewards, consistency milestones, XP, coins, unique equipment ownership, four familiar families, stages 1–3 growing eggs, skill allocation, current compatible boss state, and dated boss history.
 - Keep reports explicit about skipped data. Do not import secrets, signing material, account integrations, or private metadata.
 
 ### Visual system
@@ -105,6 +114,7 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 - `src/Journey.cs`: familiar, boss, gear bonuses, loot rolls, training, adventure validation.
 - `src/JourneyViews.cs`: Character, Familiars, Boss map, Equipment, and adventure completion UI.
 - `src/Streaks.cs`: streak model, cadence rules, rewards, validation-facing shape, and UI.
+- `src/DailyTemplates.cs`: daily template generation/editor, consistency milestones, pending rewards, and Rewards UI.
 - `src/IosImport.cs`: safe partial iOS JSON converter and review dialog.
 - `src/GearCatalog.cs`: generated iOS equipment catalog.
 - `src/Theme.cs`: palette, themed controls, background painting, metrics, welcome banner.
@@ -114,17 +124,17 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 
 ## Known gaps and risks
 
-- Versions 0.9–0.14 were compile-checked only. The last complete run was version 0.8 with 113 passing assertions. Resume the full suite and add meaningful reminder/streak/loot/save-format-8 coverage before production packaging.
+- Versions 0.9–0.15 were compile-checked only. The last complete run was version 0.8 with 113 passing assertions. Resume the full suite and add meaningful reminder/streak/loot/template/reward/save-format-9 coverage before production packaging.
 - Run an interactive smoke test of creating/completing daily, weekly, monthly, and weekday streaks; restarting; and spending all three familiar skills.
 - iOS stage-4 ready eggs conflict with the Windows meaning of stage 4 and remain intentionally skipped.
-- Exact mobile pet names/evolution stages, duplicate inventory counts, pending rewards, standalone daily templates, avatar customization, friends, calendar links, settings, and Apple integrations remain unported.
+- Exact mobile pet names/evolution stages, duplicate inventory counts, unsupported reward items, avatar customization, friends, calendar links, other settings, and Apple integrations remain unported.
 - Reminders require the app to stay open; startup/background mode is not implemented. No installer, code signing, release packaging, crash reporting, or update mechanism exists.
 - The Visual Studio project output path must stay synchronized with `build.ps1` and the documented version.
 - Historical phase documents describe their own point in time and contain superseded limitations. The root README and this prompt describe current behavior.
 
 ## Recommended next phase
 
-Build 0.15 around more iOS parity: daily quest templates, pending rewards, and consistency milestones. Before production packaging, resume the full regression suite and interactively verify 0.14 reminder delivery and quiet-hour boundaries plus the streak create/edit/complete/restart flow. Follow with avatar/familiar identity work, then a signed installer and release plan.
+Build 0.16 around avatar and familiar identity parity: inspect the iOS profile/avatar models, add the highest-value local customization without adding accounts, and preserve imported identity fields that Windows can represent. Also add optional startup/background reminder support if it can remain clear and reversible. Before production packaging, resume the full regression suite and interactively verify 0.15 daily generation and reward claiming, 0.14 reminder boundaries, and streak create/edit/complete/restart. Follow with a signed installer and release plan.
 
 ## Required workflow for every change and push
 

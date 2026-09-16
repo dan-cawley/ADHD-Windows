@@ -24,12 +24,12 @@ namespace AdhdWarrior {
   Color ink=Theme.Text, green=Theme.Emerald, paper=Theme.Canvas;
   public MainWindow(bool testMode=false) {
    if(testMode) path=Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"test-state","save.json");
-   data=Storage.Load(path); Journey.RefreshWeek(data,DateTime.Today); Text="ADHD Warrior — Windows 0.14"+(testMode?" [TEST DATA]":""); MinimumSize=new Size(1000,680); Size=new Size(1240,860); StartPosition=FormStartPosition.CenterScreen; Font=new Font("Segoe UI",10); BackColor=paper; ForeColor=ink; AutoScaleMode=AutoScaleMode.Dpi;
+   data=Storage.Load(path); Journey.RefreshWeek(data,DateTime.Today);if(DailyTemplatesEngine.EnsureToday(data,DateTime.Today))Storage.Save(path,data); Text="ADHD Warrior — Windows 0.15"+(testMode?" [TEST DATA]":""); MinimumSize=new Size(1000,680); Size=new Size(1240,860); StartPosition=FormStartPosition.CenterScreen; Font=new Font("Segoe UI",10); BackColor=paper; ForeColor=ink; AutoScaleMode=AutoScaleMode.Dpi;
    var layout=new ForestLayout {BackgroundImage=Artwork("forest-twilight"),Dock=DockStyle.Fill,ColumnCount=2,RowCount=1}; layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,220));layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,100)); Controls.Add(layout);
    var nav=new FlowLayoutPanel {Dock=DockStyle.Fill,FlowDirection=FlowDirection.TopDown,WrapContents=false,AutoScroll=true,Padding=new Padding(18,28,12,12),BackColor=Theme.Sidebar,ForeColor=Theme.Text};layout.Controls.Add(nav,0,0);
    nav.Controls.Add(new Label {Text="ADHD\nWARRIOR",Font=new Font("Georgia",18,FontStyle.Bold),ForeColor=Theme.Gold,AutoSize=false,Size=new Size(165,90)});
    nav.Controls.Add(new Label {Text="Small steps. Real progress.",ForeColor=Theme.Muted,AutoSize=true,MaximumSize=new Size(165,0),Margin=new Padding(0,0,0,22)});
-   foreach(string v in new[]{"Today","All quests","Review","Streak quests","Character","Familiars","Boss map","Equipment","Rewards","Completed","Archive","Backup & settings"}) {string target=v;var b=Button(v,()=>{view=target;selected.Clear();Render();});b.AutoSize=false;b.Width=165;b.Height=36;b.TextAlign=ContentAlignment.MiddleLeft;b.Padding=new Padding(12,3,7,3);b.FlatAppearance.BorderSize=0;b.BackColor=Theme.Sidebar;b.Paint+=(sender,e)=>{if(view==target)using(var pen=new Pen(Theme.Gold,3))e.Graphics.DrawLine(pen,1,8,1,b.Height-8);};navigation.Add(v,b);nav.Controls.Add(b);}
+   foreach(string v in new[]{"Today","All quests","Review","Daily templates","Streak quests","Character","Familiars","Boss map","Equipment","Rewards","Completed","Archive","Backup & settings"}) {string target=v;var b=Button(v,()=>{view=target;selected.Clear();Render();});b.AutoSize=false;b.Width=165;b.Height=36;b.TextAlign=ContentAlignment.MiddleLeft;b.Padding=new Padding(12,3,7,3);b.FlatAppearance.BorderSize=0;b.BackColor=Theme.Sidebar;b.Paint+=(sender,e)=>{if(view==target)using(var pen=new Pen(Theme.Gold,3))e.Graphics.DrawLine(pen,1,8,1,b.Height-8);};navigation.Add(v,b);nav.Controls.Add(b);}
    var body=new TableLayoutPanel {BackColor=Color.Transparent,Dock=DockStyle.Fill,ColumnCount=1,RowCount=6,Padding=new Padding(30,24,30,14)};layout.Controls.Add(body,1,0);
    foreach(int h in new[]{58,88,52,52}) body.RowStyles.Add(new RowStyle(SizeType.Absolute,h)); body.RowStyles.Add(new RowStyle(SizeType.Percent,100));body.RowStyles.Add(new RowStyle(SizeType.Absolute,44));
    heading.Font=new Font("Georgia",25);heading.ForeColor=Theme.Text;heading.BackColor=Color.Transparent;heading.Dock=DockStyle.Fill;body.Controls.Add(heading,0,0);
@@ -59,15 +59,16 @@ namespace AdhdWarrior {
    cards.SuspendLayout();foreach(Control c in cards.Controls.Cast<Control>().ToArray()){cards.Controls.Remove(c);c.Dispose();}
    RefreshTheme();heading.Text=view; stats.Text="LEVEL "+Progression.Level(data.XP)+"     /     "+data.XP+" XP     /     "+data.Coins+" COINS     /     "+Game.Streak(data,DateTime.Today)+" DAY STREAK";
    if(view=="Streak quests")ShowStreaks();
+   else if(view=="Daily templates")ShowDailyTemplates();
    else if(view=="Character")ShowCharacter();
    else if(view=="Familiars")ShowPets();
    else if(view=="Boss map")ShowBosses();
    else if(view=="Equipment")ShowGear();
-   else if(view=="Rewards") {Note("Every step counts.\n\n"+data.Quests.Count(q=>q.Done)+" quests completed • "+data.XP+" lifetime XP • "+data.Coins+" coins available");Note(Progression.NextLabel(data.XP)+"\n\nQuest rewards: XP you choose, plus 1 coin per 5 XP. Completing a quest also completes its remaining steps.");foreach(var entry in data.Journey.Journal)Note(entry);}
+   else if(view=="Rewards")ShowRewards();
    else if(view=="Backup & settings") {
-    Note("Windows preview 0.14\n\nYour progress is saved on this computer after every change. No account is required.");
+    Note("Windows preview 0.15\n\nYour progress is saved on this computer after every change. No account is required.");
     ShowReminderSettings();cards.Controls.Add(Button("Export Windows backup…",Export));cards.Controls.Add(Button("Restore Windows backup…",Import));cards.Controls.Add(Button("Preview iOS import…",ImportIos));
-    Note("Save location:\n"+path+"\n\nThe previous save is retained as save.json.bak.");Note("Backups use Windows format 8. Older Windows backups upgrade automatically. iOS import supports streak quests, quest due times and active legacy daily recurrence in addition to adventure progress.\n\nKeyboard: Enter to capture; Tab to move between controls; Space to select.");
+    Note("Save location:\n"+path+"\n\nThe previous save is retained as save.json.bak.");Note("Backups use Windows format 9. Older Windows backups upgrade automatically. iOS import supports streak quests, quest due times and active legacy daily recurrence in addition to adventure progress.\n\nKeyboard: Enter to capture; Tab to move between controls; Space to select.");
    } else {
     if(view=="Today")ShowWelcome();
     string today=DateTime.Today.ToString("yyyy-MM-dd");

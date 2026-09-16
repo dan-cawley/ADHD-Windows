@@ -2,6 +2,13 @@
 
 All notable Windows migration phases are recorded here. The project is still a preview and does not yet publish packaged releases.
 
+## 0.15 — 2026-09-16
+
+- Added iOS-style daily quest templates with weekday schedules, time-of-day labels, pause controls, and once-per-day generation.
+- Added claimable equipment rewards for the iOS consistency milestones at 3, 7, 14, 30, and 60 completions.
+- Imported compatible iOS daily templates, pending equipment rewards, and claimed consistency milestones.
+- Added save format 9; existing Windows saves receive paused default templates and do not backfill earlier milestone rewards.
+
 ## 0.14 — 2026-09-16
 
 - Added opt-in Windows notifications while ADHD Warrior is running.
