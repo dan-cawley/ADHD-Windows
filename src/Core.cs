@@ -17,7 +17,7 @@ namespace AdhdWarrior {
  public class SaveData {
   public int Version {get;set;} public int XP {get;set;} public int Coins {get;set;} public List<Quest> Quests {get;set;}
   public JourneyState Journey {get;set;}
-  public SaveData() {Version=2; Quests=new List<Quest>();Journey=new JourneyState();}
+  public SaveData() {Version=3; Quests=new List<Quest>();Journey=new JourneyState();}
  }
  public static class Game {
   public static int Complete(SaveData data, IEnumerable<Quest> quests, DateTime today) {
@@ -50,8 +50,8 @@ namespace AdhdWarrior {
    var header=Json().DeserializeObject(json) as Dictionary<string,object>;
    if(header==null || !new[]{"Version","XP","Coins","Quests"}.All(header.ContainsKey)) throw new InvalidDataException("This is not a Windows backup. Required fields are missing.");
    var data=Json().Deserialize<SaveData>(json);
-   if(data==null || (data.Version!=1&&data.Version!=2) || data.Quests==null || data.XP<0 || data.Coins<0 || data.Quests.Count>100000) throw new InvalidDataException("This is not a supported Windows backup.");
-   if(data.Version==2&&!header.ContainsKey("Journey"))throw new InvalidDataException("The adventure section is missing from this backup.");
+   if(data==null || (data.Version!=1&&data.Version!=2&&data.Version!=3) || data.Quests==null || data.XP<0 || data.Coins<0 || data.Quests.Count>100000) throw new InvalidDataException("This is not a supported Windows backup.");
+   if(data.Version>=2&&!header.ContainsKey("Journey"))throw new InvalidDataException("The adventure section is missing from this backup.");
    var ids=new HashSet<string>();
    foreach(var q in data.Quests) {
     DateTime parsed;
@@ -61,8 +61,20 @@ namespace AdhdWarrior {
     if(q.AwardedXP<0||q.AwardedXP>1000000)throw new InvalidDataException("Invalid quest reward.");
    }
    if(data.Version==1){data.Journey=new JourneyState {Completions=data.Quests.Count(q=>q.Done)};foreach(var q in data.Quests.Where(q=>q.Done))q.AwardedXP=q.XP;data.Version=2;}
+   if(data.Version==2){data.Journey.Gear=data.Journey.Gear.Select(UpgradeGear).ToList();data.Version=3;}
    Journey.Validate(data.Journey);
    return data;
+  }
+  static string UpgradeGear(string id) {
+   if(id.StartsWith("standard_"))return "standard_clothes_"+id.Substring(9);
+   if(id.StartsWith("arcanist_"))return "standard_"+id.Substring(9);
+   if(id.StartsWith("gnome_"))return "garden_gnome_"+id.Substring(6);
+   string[] micah={"micah_1","micah_4","micah_3","micah_5","micah_6","micah_9"};
+   string[] stacy={"stacy_1","stacy_4","stacy_3","stacy_5","stacy_7","stacy_8"};
+   int index;
+   if(id.StartsWith("micah_")&&Int32.TryParse(id.Substring(6),out index)&&index>=1&&index<=6)return micah[index-1];
+   if(id.StartsWith("stacy_")&&Int32.TryParse(id.Substring(6),out index)&&index>=1&&index<=6)return stacy[index-1];
+   return id;
   }
   public static SaveData Load(string path) {return File.Exists(path)?Decode(File.ReadAllText(path)):new SaveData();}
   public static void Save(string path, SaveData data) {

@@ -10,7 +10,7 @@ namespace AdhdWarrior {
   bool gearShop; string gearSet="All sets";
   Dictionary<string,Image> artCache=new Dictionary<string,Image>();
   static readonly Dictionary<string,string> GearSheets=new Dictionary<string,string>{
-   {"standard","storybook_standardclothes_f"},{"arcanist","storybook_arcanist_set"},{"emberforge","storybook_emberforge_f"},{"garden_gnome","storybook_gardengnome_set"},{"wood_elf","storybook_woodelf_set"},{"micah","storybook_micah_set"},{"stacy","storybook_stacy_set"},{"library","storybook_library_sheekf"},{"nightveil","storybook_nightveil_f"}};
+   {"standard_clothes","storybook_standardclothes_f"},{"standard","storybook_arcanist_set"},{"emberforge","storybook_emberforge_f"},{"garden_gnome","storybook_gardengnome_set"},{"wood_elf","storybook_woodelf_set"},{"micah","storybook_micah_set"},{"stacy","storybook_stacy_set"},{"library","storybook_library_sheekf"},{"nightveil","storybook_nightveil_f"}};
   Image Artwork(string name,int tile=-1) {
    string key=name+":"+tile;if(artCache.ContainsKey(key))return artCache[key];
    string file=Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"assets",name+".png");if(!File.Exists(file))return null;
@@ -62,7 +62,7 @@ namespace AdhdWarrior {
    if(items.Count==0)Note(gearShop?"No unowned items match this filter.":"No matching gear yet. Complete six quests, defeat a boss, or visit the shop.");
    foreach(var item in items){var g=item;var actions=new List<Button>();if(gearShop){var buy=Button("Buy · "+g.Price+" coins",()=>Change(()=>Journey.BuyGear(data,g.Id),g.Name+" added to your collection."));buy.Enabled=data.Coins>=g.Price;actions.Add(buy);}AdventureCard(g.Name,g.Rarity+" · "+g.Slot+" · "+g.Sheet.Replace('_',' ')+"\n"+GearDescription(g),Artwork(GearSheets[g.Sheet],g.Tile),0,0,actions.ToArray());}
   }
-  string GearDescription(GearDefinition g){int b=g.BaseBonus;if(b==0)return "A cosmetic piece for your collection.";string text=g.Slot=="HEAD"?"Daily quests: +"+b+" XP.":g.Slot=="CHEST"?"All quests: +"+Math.Max(1,b/2)+" XP.":g.Slot=="HANDS"?"Non-daily quests: +"+Math.Max(1,b-1)+" XP.":g.Slot=="WEAPON"?"Non-daily quests: +"+b+" XP.":g.Slot=="LEGS"?"Non-daily quests due today/overdue or with 2+ steps: +"+Math.Max(1,b/2)+" XP.":"Cosmetic for the current quest types.";if(g.Rarity=="EPIC"||g.Rarity=="UNIQUE")text+=" Plus +"+(g.Rarity=="EPIC"?2:3)+" XP on every quest.";return text;}
+  string GearDescription(GearDefinition g){int b=g.BaseBonus;if(b==0)return "A cosmetic piece for your collection.";string text=g.Slot=="HEAD"?"Daily quests: +"+b+" XP.":g.Slot=="CHEST"?"All quests: +"+Math.Max(1,b/2)+" XP.":g.Slot=="HANDS"?"Non-daily quests: +"+Math.Max(1,b-1)+" XP.":g.Slot=="WEAPON"?"Non-daily quests: +"+b+" XP.":g.Slot=="LEGS"?"Non-daily quests due today/overdue or with 2+ steps: +"+Math.Max(1,b/2)+" XP.":g.Slot=="OFFHAND"?"Non-daily quests with steps: +"+Math.Max(1,b/2)+" XP.":g.Slot=="ACCESSORY"?"All quests: +1 XP.":g.Slot=="RING"?"Non-daily quests: +1 XP.":"Cosmetic for the current quest types.";if(g.Rarity=="EPIC"||g.Rarity=="UNIQUE")text+=" Plus +"+(g.Rarity=="EPIC"?2:3)+" XP on every quest.";return text;}
   void CompleteQuests(IEnumerable<Quest> quests){var list=quests.ToList();int xp=0,coins=list.Where(q=>!q.Done&&!q.Archived).Sum(q=>q.XP/5);if(Change(()=>{xp=Game.Complete(data,list,DateTime.Today);selected.Clear();},"Progress saved."))status.Text="Well done! +"+xp+" XP · +"+coins+" coins · Your familiar and boss progressed.";}
  }
 }

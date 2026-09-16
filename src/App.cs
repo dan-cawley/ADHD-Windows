@@ -24,7 +24,7 @@ namespace AdhdWarrior {
   Color ink=Color.FromArgb(41,49,58), green=Color.FromArgb(49,101,84), paper=Color.FromArgb(248,246,240);
   public MainWindow(bool testMode=false) {
    if(testMode) path=Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"test-state","save.json");
-   data=Storage.Load(path); Journey.RefreshWeek(data,DateTime.Today); Text="ADHD Warrior — Windows 0.2"+(testMode?" [TEST DATA]":""); MinimumSize=new Size(1000,680); Size=new Size(1200,820); StartPosition=FormStartPosition.CenterScreen; Font=new Font("Segoe UI",10); BackColor=paper; ForeColor=ink; AutoScaleMode=AutoScaleMode.Dpi;
+   data=Storage.Load(path); Journey.RefreshWeek(data,DateTime.Today); Text="ADHD Warrior — Windows 0.3"+(testMode?" [TEST DATA]":""); MinimumSize=new Size(1000,680); Size=new Size(1200,820); StartPosition=FormStartPosition.CenterScreen; Font=new Font("Segoe UI",10); BackColor=paper; ForeColor=ink; AutoScaleMode=AutoScaleMode.Dpi;
    var layout=new TableLayoutPanel {Dock=DockStyle.Fill,ColumnCount=2,RowCount=1}; layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,220));layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,100)); Controls.Add(layout);
    var nav=new FlowLayoutPanel {Dock=DockStyle.Fill,FlowDirection=FlowDirection.TopDown,WrapContents=false,AutoScroll=true,Padding=new Padding(18,28,12,12),BackColor=Color.FromArgb(231,235,225)};layout.Controls.Add(nav,0,0);
    nav.Controls.Add(new Label {Text="ADHD\nWARRIOR",Font=new Font("Segoe UI",21,FontStyle.Bold),AutoSize=false,Size=new Size(165,90)});
@@ -64,9 +64,9 @@ namespace AdhdWarrior {
    else if(view=="Equipment")ShowGear();
    else if(view=="Rewards") {Note("Every step counts.\n\n"+data.Quests.Count(q=>q.Done)+" quests completed • "+data.XP+" lifetime XP • "+data.Coins+" coins available");Note("Next level in "+(500-data.XP%500)+" XP.\n\nQuest rewards: XP you choose, plus 1 coin per 5 XP. Completing a quest also completes its remaining steps.");foreach(var entry in data.Journey.Journal)Note(entry);}
    else if(view=="Backup & settings") {
-    Note("Windows preview 0.2\n\nYour progress is saved on this computer after every change. No account is required.");
-    cards.Controls.Add(Button("Export Windows backup…",Export));cards.Controls.Add(Button("Restore Windows backup…",Import));
-    Note("Save location:\n"+path+"\n\nThe previous save is retained as save.json.bak.");Note("Backups use Windows format 2. Version 1 backups upgrade automatically. iOS and Android saves are not yet compatible.\n\nKeyboard: Enter to capture; Tab to move between controls; Space to select.");
+    Note("Windows preview 0.3\n\nYour progress is saved on this computer after every change. No account is required.");
+    cards.Controls.Add(Button("Export Windows backup…",Export));cards.Controls.Add(Button("Restore Windows backup…",Import));cards.Controls.Add(Button("Preview iOS import…",ImportIos));
+    Note("Save location:\n"+path+"\n\nThe previous save is retained as save.json.bak.");Note("Backups use Windows format 3. Older Windows backups upgrade automatically. iOS import supports quests, balances and equipment; review its limitations before applying.\n\nKeyboard: Enter to capture; Tab to move between controls; Space to select.");
    } else {
     string today=DateTime.Today.ToString("yyyy-MM-dd");
     IEnumerable<Quest> list=data.Quests;

@@ -11,7 +11,7 @@ namespace AdhdWarrior {
   public static int Run(string folder) {
    assertions=0;var day=new DateTime(2026,9,14);
    string old="{\"Version\":1,\"XP\":200,\"Coins\":40,\"Quests\":[]}";
-   var migrated=Storage.Decode(old);Expect(migrated.Version==2&&migrated.XP==200&&migrated.Coins==40&&migrated.Journey.Pets.Count==1,"V1 migration preserves balances and grants exactly one starter egg");
+   var migrated=Storage.Decode(old);Expect(migrated.Version==3&&migrated.XP==200&&migrated.Coins==40&&migrated.Journey.Pets.Count==1,"V1 migration preserves balances and grants exactly one starter egg");
    var again=Storage.Decode(Storage.Encode(migrated));Expect(again.Journey.Pets.Count==1&&again.Coins==40,"V2 reload cannot duplicate starter rewards");
    Expect(Rejects(()=>Storage.Decode("{\"Version\":2,\"XP\":0,\"Coins\":0,\"Quests\":[]}")),"V2 requires adventure section");
    var data=new SaveData();Journey.RefreshWeek(data,day);Expect(data.Journey.BossHP==315&&data.Journey.Week=="2026-09-14","Initial boss budget and Monday week key");
@@ -25,21 +25,21 @@ namespace AdhdWarrior {
    int oldXP=pet.XP;Complete(data,day);Expect(pet.XP==oldXP&&Journey.ActivePet(data).Growth==20,"Only active familiar advances");
    Expect(Rejects(()=>Journey.Adopt(data,"basilisk"))&&data.Journey.Pets.Count==2,"Duplicate adoption rejected");
    Expect(Rejects(()=>Journey.Train(data,"basilisk")),"Unhatched eggs cannot spend skill points");
-   var shop=new SaveData {Coins=100};Journey.BuyGear(shop,"arcanist_2");Expect(shop.Coins==60&&Journey.GearBonus(shop,ordinary,day)==1,"Owned chest gear automatically grants ordinary quest XP");
-   Expect(Rejects(()=>Journey.BuyGear(shop,"arcanist_2"))&&shop.Coins==60,"Cannot pay twice for an owned item");
-   Expect(Rejects(()=>Journey.BuyGear(shop,"nightveil_2"))&&shop.Coins==60,"Insufficient balance cannot purchase gear");
-   var earned=Complete(shop,day);Expect(earned.AwardedXP==51&&shop.XP==51&&shop.Coins==70,"Quest receipt records bonus XP while coins follow base XP");
+   var shop=new SaveData {Coins=150};Journey.BuyGear(shop,"standard_2");Expect(shop.Coins==50&&Journey.GearBonus(shop,ordinary,day)==2,"Owned chest gear automatically grants ordinary quest XP");
+   Expect(Rejects(()=>Journey.BuyGear(shop,"standard_2"))&&shop.Coins==50,"Cannot pay twice for an owned item");
+   Expect(Rejects(()=>Journey.BuyGear(shop,"nightveil_2"))&&shop.Coins==50,"Insufficient balance cannot purchase gear");
+   var earned=Complete(shop,day);Expect(earned.AwardedXP==52&&shop.XP==52&&shop.Coins==60,"Quest receipt records bonus XP while coins follow base XP");
    var victory=new SaveData();Journey.RefreshWeek(victory,day);victory.Journey.BossHP=5;var winner=Complete(victory,day);Expect(victory.Journey.BossIndex==1&&victory.Journey.History.Count==1&&victory.Journey.History[0].HP==0,"Victory records history and advances to next boss");
    Expect(victory.Journey.Gear.Count==1&&GearCatalog.All.Single(g=>g.Id==victory.Journey.Gear[0]).Rarity=="RARE","Boss drops rare-or-better gear");
    int hp=victory.Journey.BossHP;Game.Complete(victory,new[]{winner},day);Expect(victory.Journey.BossHP==hp&&victory.Journey.History.Count==1,"Boss victory cannot be replayed");
    var rollover=new SaveData();Journey.RefreshWeek(rollover,day);rollover.Journey.BossHP=20;Journey.RefreshWeek(rollover,day.AddDays(7));Expect(rollover.Journey.BossHP==177&&rollover.Journey.History.Count==1,"New week heals half HP and retains encounter");
    Expect(!Journey.RefreshWeek(rollover,day.AddDays(8))&&!Journey.RefreshWeek(rollover,day)&&rollover.Journey.BossHP==177,"Same week and backward clock changes do not heal repeatedly");
    Expect(Journey.WeekKey(new DateTime(2027,1,1))=="2026-12-28","Week key remains stable across year boundary");
-   var drops=new SaveData();for(int i=0;i<6;i++)Complete(drops,day,5);Expect(drops.Journey.Gear.SequenceEqual(new[]{"standard_1"}),"Six completions grant a unique collection item");
+   var drops=new SaveData();for(int i=0;i<6;i++)Complete(drops,day,5);Expect(drops.Journey.Gear.SequenceEqual(new[]{"library_1"}),"Six completions grant a unique collection item");
    string save=Path.Combine(folder,"adventure.json");Storage.Save(save,data);var loaded=Storage.Load(save);Expect(Storage.Encode(loaded)==Storage.Encode(data),"Adventure state round trips including history, skills, receipts and inventory");
    data.Journey.Gear.Add("unknown");Expect(Rejects(()=>Storage.Save(save,data))&&Storage.Encode(Storage.Load(save))==Storage.Encode(loaded),"Invalid gear cannot overwrite an existing save");
    var corrupt=Storage.Decode(Storage.Encode(loaded));corrupt.Journey.Pets[0].Skill=100;Expect(Rejects(()=>Storage.Decode(Storage.Encode(corrupt))),"Invalid skill-point allocation rejected");
-   Expect(GearCatalog.All.Length==54&&GearCatalog.All.Select(g=>g.Id).Distinct().Count()==54,"All 54 Android gear definitions ported with unique IDs");
+   Expect(GearCatalog.All.Length==81&&GearCatalog.All.Select(g=>g.Id).Distinct().Count()==81,"All 81 iOS gear definitions ported with unique IDs");
    foreach(var definition in Journey.Species)foreach(var name in definition.Art)Expect(File.Exists(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"assets",name+".png")),"Familiar artwork packaged: "+name);
    return assertions;
   }

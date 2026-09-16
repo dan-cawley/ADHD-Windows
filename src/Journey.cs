@@ -51,10 +51,13 @@ namespace AdhdWarrior {
   public static void Log(JourneyState j,string text){j.Journal.Insert(0,text);if(j.Journal.Count>50)j.Journal.RemoveAt(50);}
   public static int GearBonus(SaveData data,Quest q,DateTime day) {
    int total=0;foreach(string id in data.Journey.Gear){var g=GearCatalog.All.Single(x=>x.Id==id);int b=g.BaseBonus;if(b==0)continue;
-    if(q.Repeat=="Daily"){if(g.Slot=="HEAD")total+=b;if(g.Slot=="CHEST")total+=Math.Max(1,b/2);}
-    else {if(g.Slot=="HANDS")total+=Math.Max(1,b-1);if(g.Slot=="WEAPON")total+=b;if(g.Slot=="CHEST")total+=Math.Max(1,b/2);if(g.Slot=="LEGS"&&(q.Steps.Count>=2||(!String.IsNullOrEmpty(q.Due)&&String.CompareOrdinal(q.Due,day.ToString("yyyy-MM-dd"))<=0)))total+=Math.Max(1,b/2);}
+    if(q.Repeat=="Daily"){if(g.Slot=="ACCESSORY")total++;if(g.Slot=="HEAD")total+=b;if(g.Slot=="CHEST")total+=Math.Max(1,b/2);}
+    else {if(g.Slot=="ACCESSORY"||g.Slot=="RING")total++;if(g.Slot=="OFFHAND"&&q.Steps.Count>0)total+=Math.Max(1,b/2);if(g.Slot=="HANDS")total+=Math.Max(1,b-1);if(g.Slot=="WEAPON")total+=b;if(g.Slot=="CHEST")total+=Math.Max(1,b/2);if(g.Slot=="LEGS"&&(q.Steps.Count>=2||(!String.IsNullOrEmpty(q.Due)&&String.CompareOrdinal(q.Due,day.ToString("yyyy-MM-dd"))<=0)))total+=Math.Max(1,b/2);}
     if(g.Rarity=="EPIC")total+=2;if(g.Rarity=="UNIQUE")total+=3;
-   }return total;
+   }
+   var required=new[]{"HEAD","CHEST","HANDS","LEGS","FEET","WEAPON","ACCESSORY"};
+   if(GearCatalog.All.Where(g=>data.Journey.Gear.Contains(g.Id)).GroupBy(g=>g.Sheet).Any(set=>required.All(slot=>set.Any(g=>g.Slot==slot))))total+=q.Repeat=="Daily"?8:10;
+   return total;
   }
   public static int Bonus(SaveData data,Quest q,DateTime day){var p=ActivePet(data);return GearBonus(data,q,day)+(p.EggStage==4?p.Skill*Stage(p):0);}
   public static void OnCompletion(SaveData data,int awardedXP,DateTime day) {
