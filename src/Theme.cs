@@ -34,11 +34,12 @@ namespace AdhdWarrior {
   protected override void OnPaintBackground(PaintEventArgs e){if(BackgroundImage!=null)ForestLayout.DrawCover(e.Graphics,BackgroundImage,ClientRectangle);using(var gradient=new LinearGradientBrush(ClientRectangle,Color.FromArgb(220,15,31,37),Color.FromArgb(30,22,28,47),0f))e.Graphics.FillRectangle(gradient,ClientRectangle);using(var border=new Pen(Theme.Line))e.Graphics.DrawRectangle(border,0,0,Width-1,Height-1);}
  }
  public class ForestLayout : TableLayoutPanel {
-  public ForestLayout(){DoubleBuffered=true;}
+  public ForestLayout(){SetStyle(ControlStyles.UserPaint|ControlStyles.AllPaintingInWmPaint|ControlStyles.OptimizedDoubleBuffer|ControlStyles.ResizeRedraw|ControlStyles.SupportsTransparentBackColor,true);UpdateStyles();}
   public static void DrawCover(Graphics g,Image art,Rectangle bounds){if(bounds.Width<=0||bounds.Height<=0)return;float scale=Math.Max((float)bounds.Width/art.Width,(float)bounds.Height/art.Height);float w=art.Width*scale,h=art.Height*scale;g.DrawImage(art,bounds.X+(bounds.Width-w)/2,bounds.Y+(bounds.Height-h)/2,w,h);}
-  protected override void OnPaintBackground(PaintEventArgs e){base.OnPaintBackground(e);if(BackgroundImage!=null)DrawCover(e.Graphics,BackgroundImage,ClientRectangle);using(var shade=new SolidBrush(Color.FromArgb(170,12,20,32)))e.Graphics.FillRectangle(shade,ClientRectangle);}
+  protected override void OnPaintBackground(PaintEventArgs e){using(var fill=new SolidBrush(Theme.Canvas))e.Graphics.FillRectangle(fill,ClientRectangle);if(BackgroundImage!=null)DrawCover(e.Graphics,BackgroundImage,ClientRectangle);using(var shade=new SolidBrush(Color.FromArgb(170,12,20,32)))e.Graphics.FillRectangle(shade,ClientRectangle);}
  }
  public partial class MainWindow {
+  protected override CreateParams CreateParams {get {var cp=base.CreateParams;cp.ExStyle|=0x02000000;return cp;}}
   System.Collections.Generic.Dictionary<string,Button> navigation=new System.Collections.Generic.Dictionary<string,Button>();
   Label[] metricValues=new Label[4];
   Control BuildMetrics(){
