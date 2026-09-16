@@ -1,18 +1,16 @@
-# Validation — September 14, 2026
+# Validation — September 16, 2026
 
 ## Passed
 
-- Compiled `ADHD Warrior.exe` with the installed Windows .NET Framework C# compiler.
-- Final executable's `--self-test` exits 0: 12 assertions cover rewards, step completion, duplicate completion, archived quests, daily and weekly recurrence, streak boundaries, save round trip, previous-save retention and malformed-backup rejection.
-- Launched the native desktop window; visually inspected the main layout and quest editor at the machine's current display scale.
-- Entered a smoke-test quest through the desktop UI. It appeared in Today and was written to the isolated test save.
-- Observed the same quest completed in the UI with 50 XP, 10 coins and a one-day streak; confirmed these values in its saved JSON.
-- Original artwork copied with a SHA-256 manifest.
-- Local Git repository points to `https://github.com/dan-cawley/ADHD-Windows.git`; the remote was verified empty in the signed-in browser.
+- Compiled Windows preview 0.17.1 with the installed .NET Framework compiler.
+- The built executable's `--self-test` exits 0 with 139 assertions.
+- Coverage includes quests, recurrence, streak boundaries, XP and coins, familiar/boss progression, equipment, atomic persistence, formats 1–11 migration, iOS import boundaries, daily templates, milestone rewards, pending-reward uniqueness, avatar unlocking/assets, identity, and opt-in reminder background preferences.
+- Found and fixed a format-11 save failure caused by awarding or selling equipment already reserved in pending rewards.
+- Launched with `--preview-test`; confirmed the native 0.17.1 window opened, exited cleanly, and created an isolated format-11 save containing four generated daily quests with startup and tray settings disabled.
 
 ## Still to validate
 
-Full interactive export/restore, extended keyboard navigation, other display scales, and installer behavior. Automated persistence tests pass; an interactive close/reopen test was not completed while the user was trying the preview. This is an unsigned, portable preview, not a packaged production release.
+Actual Windows sign-in startup, notification-area Open/Exit interaction, real balloon delivery, quiet-hour timing, interactive export/restore, extended keyboard navigation, other display scales, and installer behavior. This remains an unsigned portable preview.
 
 ## Test data
 

@@ -2,6 +2,12 @@
 
 All notable Windows migration phases are recorded here. The project is still a preview and does not yet publish packaged releases.
 
+## 0.17.1 — 2026-09-16
+
+- Fixed a save-breaking conflict where normal, boss, familiar, or shop gear acquisition could duplicate an item reserved in pending milestone rewards.
+- Updated stale migration expectations and expanded the suite from 113 to 139 assertions for templates, milestones, identity, avatar assets, reminder preferences, and format-11 migration.
+- Completed an isolated desktop launch, fresh-save, and clean-close smoke test.
+
 ## 0.17 — 2026-09-16
 
 - Added opt-in launch at Windows sign-in using the current portable executable.

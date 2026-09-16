@@ -6,7 +6,7 @@ ADHD Warrior is a private, local-first Windows desktop app that turns everyday t
 
 ## Current release
 
-**Windows preview 0.17 · save format 11 · .NET Framework 4.8**
+**Windows preview 0.17.1 · save format 11 · .NET Framework 4.8**
 
 This repository is the native C# Windows migration of the more complete iOS app. The iOS implementation is the behavioral source of truth whenever a matching Windows feature is added. The Android port and preserved artwork are secondary references.
 
@@ -37,7 +37,7 @@ The left navigation contains Today, All quests, Review, Daily templates, Streak 
 
 ## Run the app
 
-On the development machine, close any older ADHD Warrior window and open `Launch ADHD Warrior.lnk`. The launcher points to `dist/0.17/ADHD Warrior.exe`.
+On the development machine, close any older ADHD Warrior window and open `Launch ADHD Warrior.lnk`. The launcher points to `dist/0.17.1/ADHD Warrior.exe`.
 
 Build output and the local shortcut are intentionally excluded from Git. A fresh clone must be built before it can run:
 
@@ -98,7 +98,7 @@ The build script compiles every `src/*.cs` and `tests/*.cs` file into one execut
 
 ## Validation status
 
-The most recent full regression run was version 0.8 with **113 passing assertions**. Versions 0.9–0.17 were compile-checked only at the owner's request. Version 0.11's navigation repaint fix was confirmed interactively. Version 0.17 compiled successfully; Windows sign-in startup, tray restoration/exit, notification delivery, identity editing, daily templates, rewards, and streaks still need interactive smoke tests before calling the app production-ready.
+Version 0.17.1 passes **139 automated assertions** covering the core quest/adventure suite plus current templates, milestones, reward reservation, identity, avatar assets, reminder preferences, save migrations, and iOS import boundaries. An isolated desktop smoke test confirmed startup, fresh format-11 save creation, four default daily quests, and a clean window close. Sign-in startup, tray interaction, real notification delivery, export/restore dialogs, and varied display scaling still require interactive verification before calling the app production-ready.
 
 This is an unsigned portable preview. Background reminders require the app process to remain running in the notification area. It does not yet have an installer, code signing, automatic updates, or a release package.
 

@@ -11,7 +11,7 @@ namespace AdhdWarrior {
   public static int Run(string folder) {
    assertions=0;var day=new DateTime(2026,9,14);
    string old="{\"Version\":1,\"XP\":200,\"Coins\":40,\"Quests\":[]}";
-   var migrated=Storage.Decode(old);Expect(migrated.Version==5&&migrated.XP==200&&migrated.Coins==40&&migrated.Journey.Pets.Count==1&&migrated.Journey.Active=="basilisk","V1 migration preserves balances and grants the iOS starter egg");
+   var migrated=Storage.Decode(old);Expect(migrated.Version==11&&migrated.XP==200&&migrated.Coins==40&&migrated.Journey.Pets.Count==1&&migrated.Journey.Active=="basilisk","V1 migration preserves balances and grants the iOS starter egg");
    var again=Storage.Decode(Storage.Encode(migrated));Expect(again.Journey.Pets.Count==1&&again.Coins==40,"V2 reload cannot duplicate starter rewards");
    Expect(Rejects(()=>Storage.Decode("{\"Version\":2,\"XP\":0,\"Coins\":0,\"Quests\":[]}")),"V2 requires adventure section");
    var data=new SaveData();Expect(data.Journey.Active=="basilisk","New Windows saves use the iOS Silent Basilisk starter");data.Journey.Pets[0].Species="drake";data.Journey.Active="drake";Journey.RefreshWeek(data,day);Expect(data.Journey.BossHP==315&&data.Journey.Week=="2026-09-14","Initial boss budget and Monday week key");
@@ -35,7 +35,7 @@ namespace AdhdWarrior {
    var rollover=new SaveData();Journey.RefreshWeek(rollover,day);rollover.Journey.BossHP=20;Journey.RefreshWeek(rollover,day.AddDays(7));Expect(rollover.Journey.BossHP==177&&rollover.Journey.History.Count==1,"New week heals half HP and retains encounter");
    Expect(!Journey.RefreshWeek(rollover,day.AddDays(8))&&!Journey.RefreshWeek(rollover,day)&&rollover.Journey.BossHP==177,"Same week and backward clock changes do not heal repeatedly");
    Expect(Journey.WeekKey(new DateTime(2027,1,1))=="2026-12-28","Week key remains stable across year boundary");
-   var drops=new SaveData();for(int i=0;i<6;i++)Complete(drops,day,5);Expect(drops.Journey.Gear.SequenceEqual(new[]{"library_1"}),"Six completions grant a unique collection item");
+   var drops=new SaveData();for(int i=0;i<6;i++)Complete(drops,day,5);Expect(drops.PendingRewards.Count==1&&drops.PendingRewards[0].GearId=="library_1"&&drops.Journey.Gear.SequenceEqual(new[]{"library_2"}),"Milestone and sixth-completion rewards reserve different collection items");Storage.Decode(Storage.Encode(drops));
    string save=Path.Combine(folder,"adventure.json");Storage.Save(save,data);var loaded=Storage.Load(save);Expect(Storage.Encode(loaded)==Storage.Encode(data),"Adventure state round trips including history, skills, receipts and inventory");
    data.Journey.Gear.Add("unknown");Expect(Rejects(()=>Storage.Save(save,data))&&Storage.Encode(Storage.Load(save))==Storage.Encode(loaded),"Invalid gear cannot overwrite an existing save");
    var corrupt=Storage.Decode(Storage.Encode(loaded));corrupt.Journey.Pets[0].QuestSkill=100;Expect(Rejects(()=>Storage.Decode(Storage.Encode(corrupt))),"Invalid skill-point allocation rejected");

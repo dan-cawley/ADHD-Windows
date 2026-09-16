@@ -1,6 +1,6 @@
 # Future-version continuation prompt
 
-Last synchronized with Windows preview **0.17**, save format **11**, on **2026-09-16**.
+Last synchronized with Windows preview **0.17.1**, save format **11**, on **2026-09-16**.
 
 Copy the prompt below into a new development task. Update this file and the root README before every GitHub push.
 
@@ -14,11 +14,11 @@ ADHD Warrior is a calm, local-first ADHD task app wrapped in a fantasy progressi
 
 ## Current baseline
 
-- Current Windows preview: **0.17**.
+- Current Windows preview: **0.17.1**.
 - Save format: **11**.
 - Runtime: C# Windows Forms on .NET Framework 4.8 with no external packages.
 - Build command: `powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1`.
-- Output: `dist/0.17/ADHD Warrior.exe` plus config and assets.
+- Output: `dist/0.17.1/ADHD Warrior.exe` plus config and assets.
 - Normal save: `%LOCALAPPDATA%\AdhdWarrior\save.json`.
 - Git branch: `main`.
 - GitHub remote: `https://github.com/dan-cawley/ADHD-Windows.git`.
@@ -136,8 +136,9 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 
 ## Known gaps and risks
 
-- Versions 0.9–0.17 were compile-checked only. The last complete run was version 0.8 with 113 passing assertions. Resume the full suite and add meaningful reminder/startup/tray/streak/loot/template/reward/identity/save-format-11 coverage before production packaging.
+- Version 0.17.1 passes 139 automated assertions, including the original core suite and added template, milestone, reward-reservation, identity, avatar-asset, reminder-preference, migration, and import coverage. The isolated desktop launch/fresh-save/clean-close smoke test also passes.
 - Run an interactive smoke test of creating/completing daily, weekly, monthly, and weekday streaks; restarting; and spending all three familiar skills.
+- Interactively verify actual Windows sign-in startup, tray open/exit behavior, notification delivery and quiet-hour boundaries, export/restore dialogs, and multiple display scales.
 - iOS stage-4 ready eggs conflict with the Windows meaning of stage 4 and remain intentionally skipped.
 - Exact mobile evolution stages, duplicate inventory counts, unsupported reward items, user-supplied avatar photos, friends, calendar links, other settings, and Apple integrations remain unported.
 - Background reminders require the process to stay running in the notification area. No installer, code signing, release packaging, crash reporting, or update mechanism exists.
@@ -146,7 +147,7 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 
 ## Recommended next phase
 
-Build 0.18 around a conventional per-user installer and release package while retaining the portable build and existing save location. Include a clean uninstall path, Start menu shortcut, version metadata, and an upgrade story that keeps progress. Before release, resume the full regression suite and interactively verify 0.17 sign-in startup, tray restore/exit, reminder boundaries, identity editing, daily generation, rewards, and streaks.
+Build 0.18 around a conventional per-user installer and release package while retaining the portable build and existing save location. Include a clean uninstall path, Start menu shortcut, version metadata, and an upgrade story that keeps progress. Before release, resume the full regression suite and interactively verify 0.17.1 sign-in startup, tray restore/exit, reminder boundaries, identity editing, daily generation, rewards, and streaks.
 
 ## Required workflow for every change and push
 
