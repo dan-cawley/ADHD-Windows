@@ -25,22 +25,25 @@ namespace AdhdWarrior {
    Check(IosImport.Date(0,west)=="2000-12-31","Swift date converted to chosen local day");
    Check(Rejects(()=>IosImport.Date(1700000000000L,TimeZoneInfo.Utc)),"Millisecond timestamps rejected");
    var root=new Dictionary<string,object>{
-    {"coinBalance",123},{"xpEvents",new[]{new {amount=25}}},{"inventory",new Dictionary<string,int>{{"standard_1",2},{"egg_silent_basilisk_egg",1}}},
+    {"coinBalance",123},{"xpEvents",new[]{new {amount=25}}},{"inventory",new Dictionary<string,int>{{"standard_1",2},{"egg_silent_basilisk_egg",1},{"egg_fluffy_gold_gryphon_chick",1}}},
     {"quests",new[]{new {id="aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",title="iOS finished quest",category="Home",xp=50,bonusXP=7,completedAt=0,dueAt=0,subquests=new[]{new {title="Step",xp=10,isCompleted=true}}}}},
     {"backlogQuestIDs",new[]{"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}},{"giftSigningPrivateKeyData","SYNTHETIC_PRIVATE_VALUE"},
-    {"selectedPetID","pet-basilisk"},{"pets",new[]{
+    {"selectedPetID","pet-basilisk"},{"selectedEggItemID","egg_fluffy_gold_gryphon_chick"},{"eggLevels",new Dictionary<string,int>{{"egg_fluffy_gold_gryphon_chick",2}}},{"eggProgressByItem",new Dictionary<string,int>{{"egg_fluffy_gold_gryphon_chick",60}}},{"eggHatchesByItem",new Dictionary<string,int>()},{"pets",new[]{
      new {id="pet-basilisk",eggItemID="egg_silent_basilisk_egg",species="Silent Basilisk",level=2,xp=10,unspentSkillPoints=1,questXPSkillLevel=1,streakXPSkillLevel=0,lootChanceSkillLevel=0},
      new {id="pet-duplicate",eggItemID="egg_spiked_forest_basilisk",species="Forest Basilisk",level=1,xp=0,unspentSkillPoints=1,questXPSkillLevel=0,streakXPSkillLevel=0,lootChanceSkillLevel=0}}}};
    var json=new JavaScriptSerializer();var imported=IosImport.Parse(json.Serialize(root),TimeZoneInfo.Utc);
    Check(imported.Data.XP==92&&imported.Data.Coins==123&&imported.Data.Quests[0].AwardedXP==67,"Legacy total includes completed base, bonus, completed steps and XP events exactly once");
    Check(imported.Data.Quests[0].Archived&&imported.Data.Quests[0].Done&&imported.Data.Quests[0].Due=="2001-01-01","Completion dates, steps and backlog transfer");
    Check(imported.Data.Journey.Gear.SequenceEqual(new[]{"standard_1"}),"iOS IDs do not receive Android migration");
-   Check(imported.Data.Journey.Pets.Count==1&&imported.Data.Journey.Active=="basilisk"&&imported.Data.Journey.Pets[0].QuestSkill==1,"Compatible selected iOS familiar and skills transfer");
-   Check(imported.Report.Contains("1 compatible hatched")&&imported.Report.Contains("1 familiars with"),"Preview reports imported and duplicate familiar counts");
-   Check(imported.Report.Contains("1 duplicate")&&imported.Report.Contains("1 eggs/other"),"Preview reports unsupported inventory counts");
+   Check(imported.Data.Journey.Pets.Count==2&&imported.Data.Journey.Active=="basilisk"&&imported.Data.Journey.Pets[0].QuestSkill==1,"Compatible selected iOS familiar and skills transfer");
+   var importedEgg=imported.Data.Journey.Pets.Single(x=>x.Species=="gryphon");Check(importedEgg.EggStage==2&&importedEgg.Growth==90,"Growing egg stage and proportional rarity progress transfer");
+   Check(imported.Report.Contains("1 compatible hatched familiars; 1 growing eggs")&&imported.Report.Contains("1 familiars with"),"Preview reports imported pet, egg and duplicate familiar counts");
+   Check(imported.Report.Contains("1 duplicate")&&imported.Report.Contains("1 egg units")&&imported.Report.Contains("0 other inventory"),"Preview reports unsupported inventory counts");
    Check(!Storage.Encode(imported.Data).Contains("SYNTHETIC_PRIVATE_VALUE")&&!imported.Report.Contains("SYNTHETIC_PRIVATE_VALUE"),"Private integration values are excluded from imported save and preview");
    root["totalXPEarned"]=900;root["quests"]=new[]{new {id="bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",title="Rebuild quest",category="work",xp=50,recurrence="weekly",subquests=new object[0]}};
    imported=IosImport.Parse(json.Serialize(root),TimeZoneInfo.Utc);Check(imported.Data.XP==900&&!imported.Data.Quests[0].Done&&imported.Data.Quests[0].Repeat=="Weekly","Rebuild authoritative XP and recurrence imported without inventing completion history");
+   root["eggProgressByItem"]=new Dictionary<string,int>{{"egg_fluffy_gold_gryphon_chick",80}};Check(Rejects(()=>IosImport.Parse(json.Serialize(root),TimeZoneInfo.Utc)),"Impossible egg progress rejected before Apply");root["eggProgressByItem"]=new Dictionary<string,int>{{"egg_fluffy_gold_gryphon_chick",60}};
+   root["eggLevels"]=new Dictionary<string,int>{{"egg_fluffy_gold_gryphon_chick",4}};imported=IosImport.Parse(json.Serialize(root),TimeZoneInfo.Utc);Check(imported.Data.Journey.Pets.Count==1&&imported.Report.Contains("2 egg units"),"Ready-to-hatch egg is reported without becoming a pet");root["eggLevels"]=new Dictionary<string,int>{{"egg_fluffy_gold_gryphon_chick",2}};
    root["coinBalance"]=-1;Check(Rejects(()=>IosImport.Parse(json.Serialize(root),TimeZoneInfo.Utc)),"Invalid balances rejected before Apply");
    Check(Rejects(()=>IosImport.Parse("{}",TimeZoneInfo.Utc)),"Unrecognized JSON rejected");
    return count;

@@ -1,18 +1,20 @@
-# ADHD Warrior for Windows — 0.6
+# ADHD Warrior for Windows — 0.7
 
 Native Windows desktop preview with the quest loop and adventure progression.
 
 ## Run
 
-Open **Launch ADHD Warrior.lnk** in this folder, or **dist/0.6/ADHD Warrior.exe**. Close any older ADHD Warrior window first. Keep the config and assets folder with the executable. Requires .NET Framework 4.8.
+Open **Launch ADHD Warrior.lnk** in this folder, or **dist/0.7/ADHD Warrior.exe**. Close any older ADHD Warrior window first. Keep the config and assets folder with the executable. Requires .NET Framework 4.8.
 
-The earlier executables remain under `dist/` for reference. Use 0.6 for normal work. Version 0.6 writes save format 5; older previews cannot read it.
+The earlier executables remain under `dist/` for reference. Use 0.7 for normal work. Versions 0.6 and 0.7 share save format 5; older previews cannot read it.
 
 See `docs/PHASE-4.md` for the forest artwork, visual changes and validation.
 
 See `docs/PHASE-5.md` for iOS level thresholds, quest rarity and save migration details.
 
 See `docs/PHASE-6.md` for starter familiar, skill and iOS pet-import details.
+
+See `docs/PHASE-7.md` for growing-egg import rules and compatibility limits.
 
 ## Included
 
@@ -33,13 +35,13 @@ Normal progress lives in `%LOCALAPPDATA%\AdhdWarrior\save.json`. Versions 1–4 
 
 An unsupported or damaged save stops startup without overwriting the file. Keep the original and restore a known-good backup manually if needed.
 
-Backup & settings includes a partial iOS importer for legacy and Rebuild exports. Review the preview before applying. Quests, balances, distinct equipment and compatible hatched familiars transfer; boss progress, unhatched eggs and other mobile-only features do not. Keep the original export. No Android export format was found in the supplied source.
+Backup & settings includes a partial iOS importer for legacy and Rebuild exports. Review the preview before applying. Quests, balances, distinct equipment, compatible hatched familiars and growing eggs at stages 1–3 transfer. Boss progress, stage-4 ready eggs and other mobile-only features do not. Keep the original export. No Android export format was found in the supplied source.
 
 ## Build and tests
 
-Run `powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1`. The included Windows .NET Framework compiler builds into `dist/0.6/`; no package downloads are required. A Visual Studio project is also provided.
+Run `powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1`. The included Windows .NET Framework compiler builds into `dist/0.7/`; no package downloads are required. A Visual Studio project is also provided.
 
-Run `Start-Process -FilePath '.\dist\0.6\ADHD Warrior.exe' -ArgumentList '--self-test' -WindowStyle Hidden -Wait -PassThru`. Exit code 0 means success. Results are in `dist/0.6/test-results.txt`. Regression tests use isolated temporary data.
+Run `Start-Process -FilePath '.\dist\0.7\ADHD Warrior.exe' -ArgumentList '--self-test' -WindowStyle Hidden -Wait -PassThru`. Exit code 0 means success. Results are in `dist/0.7/test-results.txt`. Regression tests use isolated temporary data.
 
 `--preview-test` launches a clearly labeled test session using `dist/0.4/test-state/save.json`. It does not change normal progress. Close the test window and launch normally for everyday use.
 

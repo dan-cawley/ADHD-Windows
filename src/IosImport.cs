@@ -17,6 +17,8 @@ namespace AdhdWarrior {
   static string Text(object v,string fallback=""){if(v==null)return fallback;if(!(v is string))throw new InvalidDataException("Invalid iOS text.");return (string)v;}
   static bool Flag(object v){if(v==null)return false;if(!(v is bool))throw new InvalidDataException("Invalid iOS completion flag.");return (bool)v;}
   static string PetFamily(string species,string egg){string value=(species+" "+egg).ToLowerInvariant();if(value.Contains("basilisk"))return "basilisk";if(value.Contains("gryphon"))return "gryphon";if(value.Contains("hydra"))return "hydra";if(value.Contains("drake")||value.Contains("dragon"))return "drake";return "";}
+  static Dictionary<string,object> DictionaryValue(object v){return v==null?new Dictionary<string,object>():Obj(v);}
+  static int EggThreshold(string id){string value=id.ToLowerInvariant();if(value.Contains("ancient")||value.Contains("colossal")||value.Contains("elder"))return 140;if(value.Contains("three_headed")||value.Contains("wild_hydra")||value.Contains("regal"))return 120;if(value.Contains("arcane")||value.Contains("storm")||value.Contains("spiked"))return 100;return 80;}
   public static string Date(object v,TimeZoneInfo zone){
    if(v==null)return "";
    if(!(v is int)&&!(v is long)&&!(v is double)&&!(v is decimal))throw new InvalidDataException("Expected a Swift date in seconds since 2001.");
@@ -49,10 +51,10 @@ namespace AdhdWarrior {
    }
    if(rebuild)data.XP=Number(root["totalXPEarned"]);
    else {data.XP=completedXP;foreach(var raw in ArrayValue(root["xpEvents"]))data.XP=checked(data.XP+Number(Value(Obj(raw),"amount")));}
-   int extraCopies=0,otherItems=0;
-   foreach(var pair in Obj(root["inventory"])){
+   int extraCopies=0,otherItems=0;var inventory=Obj(root["inventory"]);
+   foreach(var pair in inventory){
     int count=Number(pair.Value);if(count==0)continue;
-    if(GearCatalog.All.Any(g=>g.Id==pair.Key)){data.Journey.Gear.Add(pair.Key);extraCopies=checked(extraCopies+count-1);}else otherItems=checked(otherItems+count);
+    if(GearCatalog.All.Any(g=>g.Id==pair.Key)){data.Journey.Gear.Add(pair.Key);extraCopies=checked(extraCopies+count-1);}else if(!pair.Key.StartsWith("egg_"))otherItems=checked(otherItems+count);
    }
    int petsImported=0,petConflicts=0;var selected=Text(Value(root,"selectedPetID"));var petIDs=new Dictionary<string,string>();var families=new HashSet<string>();var importedPets=new List<Familiar>();
    foreach(var rawPet in ArrayValue(Value(root,"pets"))){
@@ -60,14 +62,22 @@ namespace AdhdWarrior {
     var pet=new Familiar {Species=family,EggStage=4,Level=Number(Value(mobile,"level"),1),XP=Number(Value(mobile,"xp")),Points=Number(Value(mobile,"unspentSkillPoints"),1),QuestSkill=Number(Value(mobile,"questXPSkillLevel")),StreakSkill=Number(Value(mobile,"streakXPSkillLevel")),LootSkill=Number(Value(mobile,"lootChanceSkillLevel"))};
     importedPets.Add(pet);petIDs[Text(Value(mobile,"id"))]=family;petsImported++;
    }
-   if(importedPets.Count>0){data.Journey.Pets=importedPets;string active;data.Journey.Active=petIDs.TryGetValue(selected,out active)?active:importedPets[0].Species;}
+   int eggsImported=0,eggUnitsSkipped=0;var selectedEgg=Text(Value(root,"selectedEggItemID"));var eggIDs=new Dictionary<string,string>();var eggLevels=DictionaryValue(Value(root,"eggLevels"));var eggProgress=DictionaryValue(Value(root,"eggProgressByItem"));var eggHatches=DictionaryValue(Value(root,"eggHatchesByItem"));
+   foreach(var pair in inventory.Where(x=>x.Key.StartsWith("egg_"))){
+    int available=Math.Max(0,Number(pair.Value)-Number(Value(eggHatches,pair.Key)));if(available==0)continue;string family=PetFamily("",pair.Key);int stage=Number(Value(eggLevels,pair.Key),1),progress=Number(Value(eggProgress,pair.Key)),sourceThreshold=EggThreshold(pair.Key);
+    if(progress>=sourceThreshold)throw new InvalidDataException("An iOS egg has invalid growth progress.");
+    if(family==""||stage<1||stage>=4||!families.Add(family)){eggUnitsSkipped=checked(eggUnitsSkipped+available);continue;}
+    int targetThreshold=Journey.Species.Single(x=>x.Id==family).Threshold;var egg=new Familiar {Species=family,EggStage=stage,Growth=progress*targetThreshold/sourceThreshold};importedPets.Add(egg);eggIDs[pair.Key]=family;eggsImported++;eggUnitsSkipped=checked(eggUnitsSkipped+available-1);
+   }
+   if(importedPets.Count>0){data.Journey.Pets=importedPets;string active;if(petIDs.TryGetValue(selected,out active)||eggIDs.TryGetValue(selectedEgg,out active))data.Journey.Active=active;else data.Journey.Active=importedPets[0].Species;}
    data.Journey.Completions=Math.Max(data.Quests.Count(q=>q.Done),Number(Value(root,"completionEventsCount")));
    // Validate everything before offering Apply. Never clamp incompatible values silently.
    data=Storage.Decode(Storage.Encode(data));
-   string report=(rebuild?"iOS Rebuild export":"iOS legacy export")+"\r\n\r\nWill transfer:\r\n"+data.Quests.Count+" quests ("+data.Quests.Count(q=>q.Done)+" completed; "+data.Quests.Count(q=>q.Archived)+" backlog entries become archived)\r\n"+data.XP+" lifetime XP; "+data.Coins+" coins\r\n"+data.Journey.Gear.Count+" distinct equipment pieces\r\n"+petsImported+" compatible hatched familiars\r\n\r\nLimitations in this preview:\r\n"+
-    "Unhatched egg progression, boss progress/history, reward claims, streak quests, daily templates, settings, friends and integrations do not transfer. Boss progress starts fresh.\r\n"+
+   string report=(rebuild?"iOS Rebuild export":"iOS legacy export")+"\r\n\r\nWill transfer:\r\n"+data.Quests.Count+" quests ("+data.Quests.Count(q=>q.Done)+" completed; "+data.Quests.Count(q=>q.Archived)+" backlog entries become archived)\r\n"+data.XP+" lifetime XP; "+data.Coins+" coins\r\n"+data.Journey.Gear.Count+" distinct equipment pieces\r\n"+petsImported+" compatible hatched familiars; "+eggsImported+" growing eggs\r\n\r\nLimitations in this preview:\r\n"+
+    "Boss progress/history, reward claims, streak quests, daily templates, settings, friends and integrations do not transfer. Boss progress starts fresh.\r\n"+
     petConflicts+" familiars with an unsupported or duplicate Windows family are not imported. Familiar names and exact mobile evolution stages are not retained. Streak XP and Loot Chance skill levels are preserved but their Windows effects are still planned.\r\n"+
-    extraCopies+" duplicate equipment copies and "+otherItems+" eggs/other inventory units are not imported.\r\n"+
+    eggUnitsSkipped+" egg units are not imported because Windows supports one familiar per family and cannot yet represent stage-4 ready eggs. Egg growth is proportionally translated between iOS rarity and Windows family thresholds.\r\n"+
+    extraCopies+" duplicate equipment copies and "+otherItems+" other inventory units are not imported.\r\n"+
     "Separate subquest XP, due times, calendar links and other mobile-only metadata are not retained. Completed legacy quest rewards are included in lifetime XP. Active quests use Windows reward rules.\r\n"+
     (rebuild?"Rebuild exports do not contain completed quest dates; reward history is not converted into completed quests.\r\n":"Legacy daily templates are not recreated as recurring quests.\r\n")+
     "Dates use this computer's time zone: "+zone.DisplayName+".\r\n\r\nApplying replaces your Windows progress after saving a recovery backup. Keep the original iOS export for features that do not yet transfer; this app leaves that file unchanged.";
