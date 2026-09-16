@@ -1,0 +1,33 @@
+name: Documentation standard
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  require-current-handoff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Require README and continuation prompt in every update
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BEFORE: ${{ github.event.before }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          if [[ "$EVENT_NAME" == "pull_request" ]]; then
+            start="$BASE_SHA"
+          elif [[ -z "${BEFORE:-}" || "$BEFORE" =~ ^0+$ ]]; then
+            echo "Initial repository publication; documentation is checked by review."
+            exit 0
+          else
+            start="$BEFORE"
+          fi
+          changed="$(git diff --name-only "$start" "$HEAD_SHA")"
+          grep -qx 'README.md' <<<"$changed" || { echo 'README.md must be updated on every push/PR.'; exit 1; }
+          grep -qx 'docs/FUTURE-VERSION-PROMPT.md' <<<"$changed" || { echo 'The continuation prompt must be updated on every push/PR.'; exit 1; }

@@ -1,0 +1,17 @@
+#!/bin/sh
+set -eu
+
+zero=0000000000000000000000000000000000000000
+empty_tree=$(git hash-object -t tree /dev/null)
+
+while read local_ref local_sha remote_ref remote_sha; do
+  [ "$local_sha" = "$zero" ] && continue
+  if [ "$remote_sha" = "$zero" ]; then
+    start="$empty_tree"
+  else
+    start="$remote_sha"
+  fi
+  changed=$(git diff --name-only "$start" "$local_sha")
+  echo "$changed" | grep -qx 'README.md' || { echo 'Push blocked: update README.md for this push.' >&2; exit 1; }
+  echo "$changed" | grep -qx 'docs/FUTURE-VERSION-PROMPT.md' || { echo 'Push blocked: update docs/FUTURE-VERSION-PROMPT.md for this push.' >&2; exit 1; }
+done
