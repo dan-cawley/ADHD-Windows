@@ -2,6 +2,13 @@
 
 All notable Windows migration phases are recorded here. The project is still a preview and does not yet publish packaged releases.
 
+## 0.14 — 2026-09-16
+
+- Added opt-in Windows notifications while ADHD Warrior is running.
+- Added independent quest and streak reminder switches, daily timing, overnight quiet hours, and a test notification.
+- Aggregated due items into one notification and suppressed duplicate quest/cadence alerts.
+- Added save format 8 for reminder preferences and bounded delivery history.
+
 ## 0.13 — 2026-09-16
 
 - Added streak-quest editing and explicit next-eligible dates.

@@ -1,6 +1,6 @@
 # Future-version continuation prompt
 
-Last synchronized with Windows preview **0.13**, save format **7**, on **2026-09-16**.
+Last synchronized with Windows preview **0.14**, save format **8**, on **2026-09-16**.
 
 Copy the prompt below into a new development task. Update this file and the root README before every GitHub push.
 
@@ -14,11 +14,11 @@ ADHD Warrior is a calm, local-first ADHD task app wrapped in a fantasy progressi
 
 ## Current baseline
 
-- Current Windows preview: **0.13**.
-- Save format: **7**.
+- Current Windows preview: **0.14**.
+- Save format: **8**.
 - Runtime: C# Windows Forms on .NET Framework 4.8 with no external packages.
 - Build command: `powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1`.
-- Output: `dist/0.13/ADHD Warrior.exe` plus config and assets.
+- Output: `dist/0.14/ADHD Warrior.exe` plus config and assets.
 - Normal save: `%LOCALAPPDATA%\AdhdWarrior\save.json`.
 - Git branch: `main`.
 - GitHub remote: `https://github.com/dan-cawley/ADHD-Windows.git`.
@@ -77,7 +77,7 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 ### Persistence and imports
 
 - Save writes use temp-file replacement and keep `save.json.bak`.
-- Formats 1–6 migrate forward to format 7. Validate before replacing good data. Never silently clamp impossible imported progress.
+- Formats 1–7 migrate forward to format 8. Validate before replacing good data. Never silently clamp impossible imported progress.
 - Windows backup export/restore is available.
 - iOS import uses preview → explicit Apply → timestamped recovery backup.
 - Imported data includes compatible quests, due times, recurrence, streaks, XP, coins, unique equipment ownership, four familiar families, stages 1–3 growing eggs, skill allocation, current compatible boss state, and dated boss history.
@@ -88,6 +88,13 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 - Twilight forest artwork is `assets/forest-twilight.png`.
 - The theme uses midnight blue surfaces with emerald, gold, violet, blue, and coral accents.
 - `ForestLayout` draws the cover image once and the main form uses composited rendering. Do not restore the default tiled background paint; it caused colored flashing during navigation.
+
+### Windows reminders
+
+- Reminders are opt-in and currently run only while the app is open.
+- Quest and streak notifications can be enabled independently. Date-only quests and ready streaks use the configured daily time; timed quests use their exact due time.
+- Quiet hours may cross midnight. Eligible items are aggregated into one notification and each quest due value or streak cadence is delivered once.
+- Reminder settings and a bounded delivery history use save format 8. A test notification is available in Backup & settings.
 
 ## Code map
 
@@ -101,22 +108,23 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 - `src/IosImport.cs`: safe partial iOS JSON converter and review dialog.
 - `src/GearCatalog.cs`: generated iOS equipment catalog.
 - `src/Theme.cs`: palette, themed controls, background painting, metrics, welcome banner.
+- `src/Reminders.cs`: notification settings, timing, quiet hours, duplicate suppression, and settings UI.
 - `tests/`: in-process regression suite launched with `--self-test`.
 - `generate-ios-catalog.ps1`: catalog regeneration from Swift references.
 
 ## Known gaps and risks
 
-- Versions 0.9–0.13 were compile-checked only. The last complete run was version 0.8 with 113 passing assertions. Resume the full suite and add meaningful streak/loot/save-format-7 coverage before production packaging.
+- Versions 0.9–0.14 were compile-checked only. The last complete run was version 0.8 with 113 passing assertions. Resume the full suite and add meaningful reminder/streak/loot/save-format-8 coverage before production packaging.
 - Run an interactive smoke test of creating/completing daily, weekly, monthly, and weekday streaks; restarting; and spending all three familiar skills.
 - iOS stage-4 ready eggs conflict with the Windows meaning of stage 4 and remain intentionally skipped.
 - Exact mobile pet names/evolution stages, duplicate inventory counts, pending rewards, standalone daily templates, avatar customization, friends, calendar links, settings, and Apple integrations remain unported.
-- No Windows notification design, installer, code signing, release packaging, crash reporting, or update mechanism exists.
+- Reminders require the app to stay open; startup/background mode is not implemented. No installer, code signing, release packaging, crash reporting, or update mechanism exists.
 - The Visual Studio project output path must stay synchronized with `build.ps1` and the documented version.
 - Historical phase documents describe their own point in time and contain superseded limitations. The root README and this prompt describe current behavior.
 
 ## Recommended next phase
 
-Build 0.14 as a quiet Windows reminder phase: due-time and streak reminders, clear opt-in controls, and no Apple-only APIs. Before production packaging, resume the full regression suite and interactively verify the 0.13 streak create/edit/complete/restart flow. After reminders, port daily templates and pending reward milestones, then create a signed installer/release plan.
+Build 0.15 around more iOS parity: daily quest templates, pending rewards, and consistency milestones. Before production packaging, resume the full regression suite and interactively verify 0.14 reminder delivery and quiet-hour boundaries plus the streak create/edit/complete/restart flow. Follow with avatar/familiar identity work, then a signed installer and release plan.
 
 ## Required workflow for every change and push
 

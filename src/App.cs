@@ -24,7 +24,7 @@ namespace AdhdWarrior {
   Color ink=Theme.Text, green=Theme.Emerald, paper=Theme.Canvas;
   public MainWindow(bool testMode=false) {
    if(testMode) path=Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"test-state","save.json");
-   data=Storage.Load(path); Journey.RefreshWeek(data,DateTime.Today); Text="ADHD Warrior — Windows 0.13"+(testMode?" [TEST DATA]":""); MinimumSize=new Size(1000,680); Size=new Size(1240,860); StartPosition=FormStartPosition.CenterScreen; Font=new Font("Segoe UI",10); BackColor=paper; ForeColor=ink; AutoScaleMode=AutoScaleMode.Dpi;
+   data=Storage.Load(path); Journey.RefreshWeek(data,DateTime.Today); Text="ADHD Warrior — Windows 0.14"+(testMode?" [TEST DATA]":""); MinimumSize=new Size(1000,680); Size=new Size(1240,860); StartPosition=FormStartPosition.CenterScreen; Font=new Font("Segoe UI",10); BackColor=paper; ForeColor=ink; AutoScaleMode=AutoScaleMode.Dpi;
    var layout=new ForestLayout {BackgroundImage=Artwork("forest-twilight"),Dock=DockStyle.Fill,ColumnCount=2,RowCount=1}; layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,220));layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,100)); Controls.Add(layout);
    var nav=new FlowLayoutPanel {Dock=DockStyle.Fill,FlowDirection=FlowDirection.TopDown,WrapContents=false,AutoScroll=true,Padding=new Padding(18,28,12,12),BackColor=Theme.Sidebar,ForeColor=Theme.Text};layout.Controls.Add(nav,0,0);
    nav.Controls.Add(new Label {Text="ADHD\nWARRIOR",Font=new Font("Georgia",18,FontStyle.Bold),ForeColor=Theme.Gold,AutoSize=false,Size=new Size(165,90)});
@@ -39,8 +39,8 @@ namespace AdhdWarrior {
    quick.Controls.Add(capture,0,0);quick.Controls.Add(Button("+ Capture",AddQuick),1,0);quick.Controls.Add(Button("+ Details",()=>Edit(null)),2,0);body.Controls.Add(quick,0,2);
    var bar=new FlowLayoutPanel {BackColor=Color.Transparent,Dock=DockStyle.Fill};search.Width=150;search.AccessibleName="Search quests";search.TextChanged+=(s,e)=>Render();bar.Controls.Add(new Label {Text="Search",AutoSize=true,Padding=new Padding(0,6,4,0)});bar.Controls.Add(search);bar.Controls.Add(Button("Complete selected",CompleteSelected));bar.Controls.Add(Button("Archive selected",ArchiveSelected));body.Controls.Add(bar,0,3);
    cards.BackColor=Color.Transparent;cards.Dock=DockStyle.Fill;cards.AutoScroll=true;cards.FlowDirection=FlowDirection.TopDown;cards.WrapContents=false;cards.SizeChanged+=(s,e)=>ResizeCards();body.Controls.Add(cards,0,4);
-   status.BackColor=Color.Transparent;status.Dock=DockStyle.Fill;status.ForeColor=green;status.Text="Capture a thought above. Enter adds it to today.";body.Controls.Add(status,0,5);Render();
-   FormClosed+=(s,e)=>{foreach(var item in artCache.Values)item.Dispose();};
+   status.BackColor=Color.Transparent;status.Dock=DockStyle.Fill;status.ForeColor=green;status.Text="Capture a thought above. Enter adds it to today.";body.Controls.Add(status,0,5);Render();SetupReminders();
+   FormClosed+=(s,e)=>{DisposeReminders();foreach(var item in artCache.Values)item.Dispose();};
   }
   Button Button(string title,Action action) {var b=new ThemedButton {Text=title,AutoSize=true,Height=34,FlatStyle=FlatStyle.Flat,BackColor=Theme.Raised,ForeColor=ink,Margin=new Padding(0,0,8,8),Padding=new Padding(7,3,7,3)};Theme.StyleButton(b,title=="Complete"||title=="+ Capture"||title=="Save quest");b.Click+=(s,e)=>action();return b;}
   bool Change(Action action,string message) {
@@ -65,9 +65,9 @@ namespace AdhdWarrior {
    else if(view=="Equipment")ShowGear();
    else if(view=="Rewards") {Note("Every step counts.\n\n"+data.Quests.Count(q=>q.Done)+" quests completed • "+data.XP+" lifetime XP • "+data.Coins+" coins available");Note(Progression.NextLabel(data.XP)+"\n\nQuest rewards: XP you choose, plus 1 coin per 5 XP. Completing a quest also completes its remaining steps.");foreach(var entry in data.Journey.Journal)Note(entry);}
    else if(view=="Backup & settings") {
-    Note("Windows preview 0.13\n\nYour progress is saved on this computer after every change. No account is required.");
-    cards.Controls.Add(Button("Export Windows backup…",Export));cards.Controls.Add(Button("Restore Windows backup…",Import));cards.Controls.Add(Button("Preview iOS import…",ImportIos));
-    Note("Save location:\n"+path+"\n\nThe previous save is retained as save.json.bak.");Note("Backups use Windows format 7. Older Windows backups upgrade automatically. iOS import supports streak quests, quest due times and active legacy daily recurrence in addition to adventure progress.\n\nKeyboard: Enter to capture; Tab to move between controls; Space to select.");
+    Note("Windows preview 0.14\n\nYour progress is saved on this computer after every change. No account is required.");
+    ShowReminderSettings();cards.Controls.Add(Button("Export Windows backup…",Export));cards.Controls.Add(Button("Restore Windows backup…",Import));cards.Controls.Add(Button("Preview iOS import…",ImportIos));
+    Note("Save location:\n"+path+"\n\nThe previous save is retained as save.json.bak.");Note("Backups use Windows format 8. Older Windows backups upgrade automatically. iOS import supports streak quests, quest due times and active legacy daily recurrence in addition to adventure progress.\n\nKeyboard: Enter to capture; Tab to move between controls; Space to select.");
    } else {
     if(view=="Today")ShowWelcome();
     string today=DateTime.Today.ToString("yyyy-MM-dd");

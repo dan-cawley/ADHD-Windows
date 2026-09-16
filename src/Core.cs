@@ -18,8 +18,9 @@ namespace AdhdWarrior {
  public class SaveData {
   public int Version {get;set;} public int XP {get;set;} public int Coins {get;set;} public List<Quest> Quests {get;set;}
   public List<StreakQuest> StreakQuests {get;set;}
+  public ReminderSettings Reminders {get;set;}
   public JourneyState Journey {get;set;}
-  public SaveData() {Version=7; Quests=new List<Quest>();StreakQuests=new List<StreakQuest>();Journey=new JourneyState();}
+  public SaveData() {Version=8; Quests=new List<Quest>();StreakQuests=new List<StreakQuest>();Reminders=new ReminderSettings();Journey=new JourneyState();}
  }
  public static class Game {
   public static int Complete(SaveData data, IEnumerable<Quest> quests, DateTime today) {
@@ -52,7 +53,7 @@ namespace AdhdWarrior {
    var header=Json().DeserializeObject(json) as Dictionary<string,object>;
    if(header==null || !new[]{"Version","XP","Coins","Quests"}.All(header.ContainsKey)) throw new InvalidDataException("This is not a Windows backup. Required fields are missing.");
    var data=Json().Deserialize<SaveData>(json);
-   if(data==null || data.Version<1||data.Version>7 || data.Quests==null || data.XP<0 || data.Coins<0 || data.Quests.Count>100000) throw new InvalidDataException("This is not a supported Windows backup.");
+   if(data==null || data.Version<1||data.Version>8 || data.Quests==null || data.XP<0 || data.Coins<0 || data.Quests.Count>100000) throw new InvalidDataException("This is not a supported Windows backup.");
    if(data.Version>=2&&!header.ContainsKey("Journey"))throw new InvalidDataException("The adventure section is missing from this backup.");
    var ids=new HashSet<string>();
    foreach(var q in data.Quests) {
@@ -67,7 +68,8 @@ namespace AdhdWarrior {
    if(data.Version==2){data.Journey.Gear=data.Journey.Gear.Select(UpgradeGear).ToList();data.Version=3;}
    if(data.Version<=4)foreach(var pet in data.Journey.Pets){pet.QuestSkill=pet.Skill;pet.Skill=0;}
    if(data.StreakQuests==null)data.StreakQuests=new List<StreakQuest>();var streakIDs=new HashSet<string>();DateTime streakDate;foreach(var s in data.StreakQuests)if(s==null||String.IsNullOrWhiteSpace(s.Id)||!streakIDs.Add(s.Id)||String.IsNullOrWhiteSpace(s.Title)||s.Title.Length>500||Streaks.NormalizeCadence(s.Cadence)!=s.Cadence||s.XP<5||s.XP>1000||s.Total<0||s.Current<0||s.Current>s.Total||s.Best<s.Current||s.Best>s.Total||(s.Total==0&&(s.Current!=0||s.Best!=0||!String.IsNullOrEmpty(s.LastCompleted)))||(s.Total>0&&(s.Current<1||String.IsNullOrEmpty(s.LastCompleted)))||(!String.IsNullOrEmpty(s.LastCompleted)&&!DateTime.TryParseExact(s.LastCompleted,"yyyy-MM-dd",System.Globalization.CultureInfo.InvariantCulture,System.Globalization.DateTimeStyles.None,out streakDate)))throw new InvalidDataException("The backup contains an invalid streak quest.");
-   data.Version=7;
+   if(data.Reminders==null)data.Reminders=new ReminderSettings();DateTime reminderTime;if(!DateTime.TryParseExact(data.Reminders.DailyTime,"HH:mm",System.Globalization.CultureInfo.InvariantCulture,System.Globalization.DateTimeStyles.None,out reminderTime)||!DateTime.TryParseExact(data.Reminders.QuietStart,"HH:mm",System.Globalization.CultureInfo.InvariantCulture,System.Globalization.DateTimeStyles.None,out reminderTime)||!DateTime.TryParseExact(data.Reminders.QuietEnd,"HH:mm",System.Globalization.CultureInfo.InvariantCulture,System.Globalization.DateTimeStyles.None,out reminderTime)||data.Reminders.Sent==null||data.Reminders.Sent.Count>500||data.Reminders.Sent.Distinct().Count()!=data.Reminders.Sent.Count||data.Reminders.Sent.Any(x=>String.IsNullOrWhiteSpace(x)||x.Length>1100))throw new InvalidDataException("The backup contains invalid reminder settings.");
+   data.Version=8;
    Journey.Validate(data.Journey);
    return data;
   }
