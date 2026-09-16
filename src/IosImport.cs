@@ -29,6 +29,7 @@ namespace AdhdWarrior {
    if(Double.IsNaN(seconds)||Double.IsInfinity(seconds)||seconds< -3155760000||seconds>6279811200)throw new InvalidDataException("iOS date is outside the supported range.");
    return TimeZoneInfo.ConvertTimeFromUtc(new DateTime(2001,1,1,0,0,0,DateTimeKind.Utc).AddSeconds(seconds),zone).ToString("yyyy-MM-dd");
   }
+  static string Time(object v,string text,TimeZoneInfo zone){if(v!=null){double seconds=Convert.ToDouble(v,CultureInfo.InvariantCulture);return TimeZoneInfo.ConvertTimeFromUtc(new DateTime(2001,1,1,0,0,0,DateTimeKind.Utc).AddSeconds(seconds),zone).ToString("HH:mm");}DateTime parsed;return DateTime.TryParse(text,CultureInfo.CurrentCulture,DateTimeStyles.AllowWhiteSpaces,out parsed)?parsed.ToString("HH:mm"):"";}
   public static IosImportResult Parse(string json,TimeZoneInfo zone){
    var root=Obj(new JavaScriptSerializer {MaxJsonLength=16*1024*1024}.DeserializeObject(json));
    if(root.ContainsKey("Version")||!root.ContainsKey("quests")||!root.ContainsKey("coinBalance")||!root.ContainsKey("inventory"))throw new InvalidDataException("This is not a supported iOS export.");
@@ -43,10 +44,10 @@ namespace AdhdWarrior {
     string rawID=Text(Value(source,"id"));if(!Guid.TryParse(rawID,out id))throw new InvalidDataException("An iOS quest has an invalid ID.");
     string category=Text(Value(source,"category"),Flag(Value(source,"isSchoolQuest"))?"School":"Life");
     category=CultureInfo.InvariantCulture.TextInfo.ToTitleCase(category.ToLowerInvariant());
-    var q=new Quest {Id=id.ToString(),Title=Text(Value(source,"title")),Category=category,XP=Number(Value(source,"xp"),50),Due=Date(Value(source,"dueAt"),zone),Completed=Date(Value(source,"completedAt"),zone),Archived=backlog.Contains(rawID)};
+    var q=new Quest {Id=id.ToString(),Title=Text(Value(source,"title")),Category=category,XP=Number(Value(source,"xp"),50),Due=Date(Value(source,"dueAt"),zone),DueTime=Time(Value(source,"dueAt"),Text(Value(source,"dueTimeText")),zone),Completed=Date(Value(source,"completedAt"),zone),Archived=backlog.Contains(rawID)};
     q.Rarity=CultureInfo.InvariantCulture.TextInfo.ToTitleCase(Text(Value(source,"rarity"),"Common").Trim().ToLowerInvariant());if(q.Rarity=="Legendary")q.Rarity="Unique";
     q.Done=!String.IsNullOrEmpty(q.Completed);
-    if(rebuild)q.Repeat=CultureInfo.InvariantCulture.TextInfo.ToTitleCase(Text(Value(source,"recurrence"),"none").ToLowerInvariant());
+    if(rebuild)q.Repeat=CultureInfo.InvariantCulture.TextInfo.ToTitleCase(Text(Value(source,"recurrence"),"none").ToLowerInvariant());else if(!q.Done&&!String.IsNullOrEmpty(Text(Value(source,"dailyTemplateID"))))q.Repeat="Daily";
     int stepXP=0;
     foreach(var rawStep in ArrayValue(Value(source,"subquests"))){var step=Obj(rawStep);bool done=Flag(Value(step,"isCompleted"));q.Steps.Add(new Step {Title=Text(Value(step,"title")),Done=done});if(done)stepXP=checked(stepXP+Math.Max(1,Number(Value(step,"xp"),50)));}
     if(q.Done){q.AwardedXP=checked(q.XP+Number(Value(source,"bonusXP"))+stepXP);completedXP=checked(completedXP+q.AwardedXP);}
@@ -91,8 +92,8 @@ namespace AdhdWarrior {
     petConflicts+" familiars with an unsupported or duplicate Windows family are not imported. Familiar names and exact mobile evolution stages are not retained. Streak XP and Loot Chance skill levels are preserved but their Windows effects are still planned.\r\n"+
     eggUnitsSkipped+" egg units are not imported because Windows supports one familiar per family and cannot yet represent stage-4 ready eggs. Egg growth is proportionally translated between iOS rarity and Windows family thresholds.\r\n"+
     extraCopies+" duplicate equipment copies and "+otherItems+" other inventory units are not imported.\r\n"+
-    "Separate subquest XP, due times, calendar links and other mobile-only metadata are not retained. Completed legacy quest rewards are included in lifetime XP. Active quests use Windows reward rules.\r\n"+
-    (rebuild?"Rebuild exports do not contain completed quest dates; reward history is not converted into completed quests.\r\n":"Legacy daily templates are not recreated as recurring quests.\r\n")+
+    "Separate subquest XP, calendar links and other mobile-only metadata are not retained. Completed legacy quest rewards are included in lifetime XP. Active quests use Windows reward rules.\r\n"+
+    (rebuild?"Rebuild exports do not contain completed quest dates; reward history is not converted into completed quests.\r\n":"Active quests linked to a legacy daily template become Daily recurrence; standalone template definitions are not recreated.\r\n")+
     "Dates use this computer's time zone: "+zone.DisplayName+".\r\n\r\nApplying replaces your Windows progress after saving a recovery backup. Keep the original iOS export for features that do not yet transfer; this app leaves that file unchanged.";
    return new IosImportResult {Data=data,Report=report};
   }
