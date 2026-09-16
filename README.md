@@ -1,12 +1,12 @@
-# ADHD Warrior for Windows — 0.9
+# ADHD Warrior for Windows — 0.10
 
 Native Windows desktop preview with the quest loop and adventure progression.
 
 ## Run
 
-Open **Launch ADHD Warrior.lnk** in this folder, or **dist/0.9/ADHD Warrior.exe**. Close any older ADHD Warrior window first. Keep the config and assets folder with the executable. Requires .NET Framework 4.8.
+Open **Launch ADHD Warrior.lnk** in this folder, or **dist/0.10/ADHD Warrior.exe**. Close any older ADHD Warrior window first. Keep the config and assets folder with the executable. Requires .NET Framework 4.8.
 
-The earlier executables remain under `dist/` for reference. Use 0.9 for normal work. Version 0.9 writes save format 6 to preserve quest due times.
+The earlier executables remain under `dist/` for reference. Use 0.10 for normal work. Version 0.10 activates the familiar Loot Chance skill using the iOS evolution multiplier and rarity-weighted drops.
 
 See `docs/PHASE-4.md` for the forest artwork, visual changes and validation.
 
@@ -42,9 +42,9 @@ Backup & settings includes a partial iOS importer for legacy and Rebuild exports
 
 ## Build and tests
 
-Run `powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1`. The included Windows .NET Framework compiler builds into `dist/0.9/`; no package downloads are required. A Visual Studio project is also provided.
+Run `powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1`. The included Windows .NET Framework compiler builds into `dist/0.10/`; no package downloads are required. A Visual Studio project is also provided.
 
-Automated checks were intentionally skipped for version 0.9; the application was compile-checked only.
+Automated checks were intentionally skipped for version 0.10; the application was compile-checked only.
 
 `--preview-test` launches a clearly labeled test session using `dist/0.4/test-state/save.json`. It does not change normal progress. Close the test window and launch normally for everyday use.
 

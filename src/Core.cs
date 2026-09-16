@@ -29,7 +29,7 @@ namespace AdhdWarrior {
     q.AwardedXP=checked(q.XP+Journey.Bonus(data,q,today));
     q.Done=true; q.Completed=today.ToString("yyyy-MM-dd"); foreach(var s in q.Steps) s.Done=true;
     total=checked(total+q.AwardedXP); data.Coins=checked(data.Coins+q.XP/5);
-    Journey.OnCompletion(data,q.AwardedXP,today);
+    Journey.OnCompletion(data,q,today);
     if(q.Repeat!="None") {
      DateTime due; if(!DateTime.TryParseExact(q.Due,"yyyy-MM-dd",System.Globalization.CultureInfo.InvariantCulture,System.Globalization.DateTimeStyles.None,out due)) due=today;
      if(due<today) due=today;

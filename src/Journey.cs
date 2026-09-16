@@ -29,6 +29,7 @@ namespace AdhdWarrior {
   public int Price {get {return Rarity=="COMMON"?20:BaseBonus*20;}}
  }
  public static class Journey {
+  static readonly Random LootRoll=new Random();
   public static readonly PetDefinition[] Species={
    new PetDefinition("drake","Arcane Drake",100,"arcane_drake_egg","tiny_purple_drake","winged_arcane_drake","ancient_arcane_dragon"),
    new PetDefinition("basilisk","Silent Basilisk",80,"silent_basilisk_egg","grey_stone_scaled_basilisk","spiked_forest_basilisk","elder_stone_gaze_basilisk"),
@@ -62,18 +63,24 @@ namespace AdhdWarrior {
    return total;
   }
   public static int Bonus(SaveData data,Quest q,DateTime day){var p=ActivePet(data);return GearBonus(data,q,day)+(p.EggStage==4?p.QuestSkill*Stage(p):0);}
-  public static void OnCompletion(SaveData data,int awardedXP,DateTime day) {
+  public static void OnCompletion(SaveData data,Quest quest,DateTime day) {
    RefreshWeek(data,day);var j=data.Journey;var p=ActivePet(data);j.Completions=checked(j.Completions+1);
    if(p.EggStage<4){p.Growth+=20;while(p.Growth>=Definition(p).Threshold&&p.EggStage<4){p.Growth-=Definition(p).Threshold;p.EggStage++;}if(p.EggStage==4){p.Growth=0;Log(j,Definition(p).Name+" hatched! It is now your active companion.");}}
    else {p.XP+=20;while(p.XP>=PetNextXP(p)){p.XP-=PetNextXP(p);p.Level++;p.Points++;Log(j,Definition(p).Name+" reached level "+p.Level+". You gained a skill point.");}}
-   j.BossHP=Math.Max(0,j.BossHP-awardedXP);
+   j.BossHP=Math.Max(0,j.BossHP-quest.AwardedXP);
    if(j.BossHP==0){AddHistory(j,"Defeated");Log(j,"Defeated "+Bosses[j.BossIndex]+"!");AwardGear(j,true);j.BossIndex=(j.BossIndex+1)%Bosses.Length;j.BossMaxHP=TargetHP(j);j.BossHP=j.BossMaxHP;}
    if(j.Completions%6==0)AwardGear(j,false);
+   if(p.EggStage==4&&p.LootSkill>0&&LootRoll.Next(100)<Math.Min(100,p.LootSkill*Stage(p)))AwardGear(j,RolledRarity(quest.Rarity));
   }
   static void AwardGear(JourneyState j,bool highTier){var item=GearCatalog.All.FirstOrDefault(g=>!j.Gear.Contains(g.Id)&&(!highTier||g.Rarity=="RARE"||g.Rarity=="EPIC"||g.Rarity=="UNIQUE"));if(item==null){Log(j,"Collection complete. Your adventure continues!");return;}j.Gear.Add(item.Id);Log(j,"Collected "+item.Name+". Its bonuses apply automatically.");}
+  static void AwardGear(JourneyState j,string rarity){var item=GearCatalog.All.FirstOrDefault(g=>!j.Gear.Contains(g.Id)&&g.Rarity==rarity);if(item==null)return;j.Gear.Add(item.Id);Log(j,"Your familiar found bonus loot: "+item.Name+" ("+rarity.ToLowerInvariant()+").");}
+  static string RolledRarity(string questRarity){
+   int[] weights=questRarity=="Uncommon"?new[]{50,35,12,3,0}:questRarity=="Rare"?new[]{25,40,28,7,0}:questRarity=="Epic"?new[]{10,25,40,25,5}:questRarity=="Unique"?new[]{0,10,30,45,25}:new[]{75,20,4,1,0};
+   int total=weights.Sum(),roll=LootRoll.Next(1,total+1);string[] rarities={"COMMON","UNCOMMON","RARE","EPIC","UNIQUE"};for(int i=0;i<weights.Length;i++){roll-=weights[i];if(roll<=0)return rarities[i];}return "COMMON";
+  }
   public static void BuyGear(SaveData data,string id){var g=GearCatalog.All.Single(x=>x.Id==id);if(data.Journey.Gear.Contains(id))throw new InvalidOperationException("You already own this item.");if(data.Coins<g.Price)throw new InvalidOperationException("Not enough coins.");data.Coins-=g.Price;data.Journey.Gear.Add(id);Log(data.Journey,"Purchased "+g.Name+".");}
   public static void Adopt(SaveData data,string id){if(!Species.Any(s=>s.Id==id))throw new InvalidOperationException("Unknown familiar.");if(data.Journey.Pets.Any(p=>p.Species==id))throw new InvalidOperationException("You already have this familiar.");if(data.Coins<150)throw new InvalidOperationException("An egg costs 150 coins.");data.Coins-=150;data.Journey.Pets.Add(new Familiar {Species=id});data.Journey.Active=id;Log(data.Journey,"Adopted a "+Species.Single(s=>s.Id==id).Name+" egg.");}
-  public static void Train(SaveData data,string id,string skill){var p=data.Journey.Pets.Single(x=>x.Species==id);if(p.EggStage<4||p.Points<1)throw new InvalidOperationException("Hatch your familiar and earn a skill point first.");if(skill!="Quest XP")throw new InvalidOperationException("That iOS skill is preserved for a future Windows feature.");p.Points--;p.QuestSkill++;}
+  public static void Train(SaveData data,string id,string skill){var p=data.Journey.Pets.Single(x=>x.Species==id);if(p.EggStage<4||p.Points<1)throw new InvalidOperationException("Hatch your familiar and earn a skill point first.");if(skill=="Quest XP")p.QuestSkill++;else if(skill=="Loot Chance")p.LootSkill++;else throw new InvalidOperationException("Streak XP will unlock with the dedicated streak quest system.");p.Points--;}
   public static void Validate(JourneyState j) {
    if(j==null||j.Pets==null||j.Pets.Count<1||j.Pets.Count>4||j.Pets.Any(p=>p==null)||j.Pets.Select(p=>p.Species).Distinct().Count()!=j.Pets.Count||!j.Pets.Any(p=>p.Species==j.Active)||j.Gear==null||j.Gear.Count>GearCatalog.All.Length||j.Gear.Distinct().Count()!=j.Gear.Count||j.Gear.Any(id=>!GearCatalog.All.Any(g=>g.Id==id))||j.Completions<0||j.BossIndex<0||j.BossIndex>=Bosses.Length||j.History==null||j.History.Count>30||j.Journal==null||j.Journal.Count>50||j.Journal.Any(x=>x==null||x.Length>1000))throw new InvalidDataException("Invalid adventure data.");
    DateTime d;if(j.Week==null||j.Week!=""&&(!ParseDate(j.Week,out d)||WeekKey(d)!=j.Week)||j.BossHP<0||j.BossHP>j.BossMaxHP||j.BossMaxHP>1000000||j.Week!=""&&(j.BossHP==0||j.BossMaxHP<300))throw new InvalidDataException("Invalid weekly boss data.");

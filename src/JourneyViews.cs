@@ -37,15 +37,16 @@ namespace AdhdWarrior {
    Note("Active familiar: "+Journey.Definition(pet).Name+"\n"+(pet.EggStage<4?"Your egg grows with each completed quest.":"Quest XP skill bonus: +"+(pet.QuestSkill*Journey.Stage(pet))+" XP per quest.")+"\nOwned gear bonuses apply automatically. View Equipment to see your collection.");
   }
   void ShowPets() {
-   Note("Your companions grow with you.\nOnly the active familiar earns 20 XP per completed quest. Eggs hatch at stage 4; pets evolve at levels 2 and 3. Extra eggs cost 150 coins.");
+   Note("Your companions grow with you.\nOnly the active familiar earns 20 XP per completed quest. Each Loot Chance level adds 1% per evolution stage to find bonus gear. Extra eggs cost 150 coins.");
    foreach(var definition in Journey.Species) {
     var def=definition;var p=data.Journey.Pets.FirstOrDefault(x=>x.Species==def.Id);
     if(p==null){var adopt=Button("Adopt egg · 150 coins",()=>Change(()=>Journey.Adopt(data,def.Id),"Egg adopted and selected."));adopt.Enabled=data.Coins>=150;AdventureCard(def.Name,"Not yet in your collection.\nEach egg stage needs "+def.Threshold+" growth XP.",Artwork(def.Art[0]),0,0,adopt);continue;}
     string phase=p.EggStage<4?"Egg · stage "+p.EggStage+" / 4":new[]{"","Hatchling","Companion","Ascended"}[Journey.Stage(p)];
-    string description=phase+"\n"+(p.EggStage<4?p.Growth+" / "+def.Threshold+" growth XP to next stage":"Level "+p.Level+" · "+p.XP+" / "+Journey.PetNextXP(p)+" XP\n"+p.Points+" skill points · Quest XP "+p.QuestSkill+" · Streak XP "+p.StreakSkill+" · Loot % "+p.LootSkill);
+    string description=phase+"\n"+(p.EggStage<4?p.Growth+" / "+def.Threshold+" growth XP to next stage":"Level "+p.Level+" · "+p.XP+" / "+Journey.PetNextXP(p)+" XP\n"+p.Points+" skill points · Quest XP "+p.QuestSkill+" · Streak XP "+p.StreakSkill+" · Loot "+(p.LootSkill*Journey.Stage(p))+"%");
     var choose=Button(p.Species==data.Journey.Active?"Active familiar":"Make active",()=>Change(()=>data.Journey.Active=p.Species,"Active familiar changed."));choose.Enabled=p.Species!=data.Journey.Active;
     var train=Button("Train Quest XP",()=>Change(()=>Journey.Train(data,p.Species,"Quest XP"),"Skill point spent. Quest XP bonus increased."));train.Enabled=p.EggStage==4&&p.Points>0;
-    AdventureCard(def.Name,description,Artwork(def.Art[Journey.Stage(p)]),p.EggStage<4?p.Growth:p.XP,p.EggStage<4?def.Threshold:Journey.PetNextXP(p),choose,train);
+    var loot=Button("Train Loot Chance",()=>Change(()=>Journey.Train(data,p.Species,"Loot Chance"),"Skill point spent. Bonus loot chance increased."));loot.Enabled=p.EggStage==4&&p.Points>0;
+    AdventureCard(def.Name,description,Artwork(def.Art[Journey.Stage(p)]),p.EggStage<4?p.Growth:p.XP,p.EggStage<4?def.Threshold:Journey.PetNextXP(p),choose,train,loot);
    }
   }
   void ShowBosses() {

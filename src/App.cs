@@ -24,7 +24,7 @@ namespace AdhdWarrior {
   Color ink=Theme.Text, green=Theme.Emerald, paper=Theme.Canvas;
   public MainWindow(bool testMode=false) {
    if(testMode) path=Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"test-state","save.json");
-   data=Storage.Load(path); Journey.RefreshWeek(data,DateTime.Today); Text="ADHD Warrior — Windows 0.9"+(testMode?" [TEST DATA]":""); MinimumSize=new Size(1000,680); Size=new Size(1240,860); StartPosition=FormStartPosition.CenterScreen; Font=new Font("Segoe UI",10); BackColor=paper; ForeColor=ink; AutoScaleMode=AutoScaleMode.Dpi;
+   data=Storage.Load(path); Journey.RefreshWeek(data,DateTime.Today); Text="ADHD Warrior — Windows 0.10"+(testMode?" [TEST DATA]":""); MinimumSize=new Size(1000,680); Size=new Size(1240,860); StartPosition=FormStartPosition.CenterScreen; Font=new Font("Segoe UI",10); BackColor=paper; ForeColor=ink; AutoScaleMode=AutoScaleMode.Dpi;
    var layout=new ForestLayout {BackgroundImage=Artwork("forest-twilight"),Dock=DockStyle.Fill,ColumnCount=2,RowCount=1}; layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,220));layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,100)); Controls.Add(layout);
    var nav=new FlowLayoutPanel {Dock=DockStyle.Fill,FlowDirection=FlowDirection.TopDown,WrapContents=false,AutoScroll=true,Padding=new Padding(18,28,12,12),BackColor=Theme.Sidebar,ForeColor=Theme.Text};layout.Controls.Add(nav,0,0);
    nav.Controls.Add(new Label {Text="ADHD\nWARRIOR",Font=new Font("Georgia",18,FontStyle.Bold),ForeColor=Theme.Gold,AutoSize=false,Size=new Size(165,90)});
@@ -64,7 +64,7 @@ namespace AdhdWarrior {
    else if(view=="Equipment")ShowGear();
    else if(view=="Rewards") {Note("Every step counts.\n\n"+data.Quests.Count(q=>q.Done)+" quests completed • "+data.XP+" lifetime XP • "+data.Coins+" coins available");Note(Progression.NextLabel(data.XP)+"\n\nQuest rewards: XP you choose, plus 1 coin per 5 XP. Completing a quest also completes its remaining steps.");foreach(var entry in data.Journey.Journal)Note(entry);}
    else if(view=="Backup & settings") {
-    Note("Windows preview 0.9\n\nYour progress is saved on this computer after every change. No account is required.");
+    Note("Windows preview 0.10\n\nYour progress is saved on this computer after every change. No account is required.");
     cards.Controls.Add(Button("Export Windows backup…",Export));cards.Controls.Add(Button("Restore Windows backup…",Import));cards.Controls.Add(Button("Preview iOS import…",ImportIos));
     Note("Save location:\n"+path+"\n\nThe previous save is retained as save.json.bak.");Note("Backups use Windows format 6. Older Windows backups upgrade automatically. iOS import supports quest due times and active legacy daily recurrence in addition to adventure progress.\n\nKeyboard: Enter to capture; Tab to move between controls; Space to select.");
    } else {
