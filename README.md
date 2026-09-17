@@ -6,7 +6,7 @@ ADHD Warrior is a private, local-first Windows desktop app that turns everyday t
 
 ## Current release
 
-**Windows preview 0.18.1 · save format 11 · .NET Framework 4.8**
+**Windows preview 0.18.2 · save format 11 · .NET Framework 4.8**
 
 This repository is the native C# Windows migration of the more complete iOS app. The iOS implementation is the behavioral source of truth whenever a matching Windows feature is added. The Android port and preserved artwork are secondary references.
 
@@ -26,6 +26,7 @@ This repository is the native C# Windows migration of the more complete iOS app.
 - Local character display names, custom familiar names, and nine iOS avatar themes unlocked through matching equipment sets.
 - A nine-panel character portrait that starts with the Standard hood and face visible, then reveals each remaining panel as its matching gear slot is earned or purchased.
 - Eighteen weekly bosses with quest damage, rollover healing, history, and rewards.
+- An iOS-style quest-completion popup showing the current boss artwork, damage dealt, remaining health, victory, next encounter, and newly collected rewards.
 - All 81 iOS equipment definitions, nine visual sets, automatic bonuses, collections, and a coin shop.
 - Rarity-weighted bonus loot based on the iOS drop tables.
 - Claimable consistency milestone rewards at 3, 7, 14, 30, and 60 total completions.
@@ -38,7 +39,7 @@ The left navigation contains Today, All quests, Review, Daily templates, Streak 
 
 ## Run the app
 
-On the development machine, close any older ADHD Warrior window and open `Launch ADHD Warrior.lnk`. The launcher points to `dist/0.18.1/ADHD Warrior.exe`.
+On the development machine, close any older ADHD Warrior window and open `Launch ADHD Warrior.lnk`. The launcher points to `dist/0.18.2/ADHD Warrior.exe`.
 
 Build output and the local shortcut are intentionally excluded from Git. A fresh clone must be built before it can run:
 
@@ -56,7 +57,7 @@ Build the per-user installer with:
 powershell -NoProfile -ExecutionPolicy Bypass -File .\build-installer.ps1
 ```
 
-The unsigned setup executable is written to `release/0.18.1/ADHD Warrior Setup 0.18.1.exe`. It installs under `%LOCALAPPDATA%\Programs\ADHD Warrior`, creates Start menu and desktop shortcuts, and registers a clean uninstall entry in Windows Apps & Features. Upgrades overwrite application files while preserving `%LOCALAPPDATA%\AdhdWarrior\save.json` and its backups. Uninstall removes application files, shortcuts, and the optional startup entry while keeping progress for a later reinstall.
+The unsigned setup executable is written to `release/0.18.2/ADHD Warrior Setup 0.18.2.exe`. It installs under `%LOCALAPPDATA%\Programs\ADHD Warrior`, creates Start menu and desktop shortcuts, and registers a clean uninstall entry in Windows Apps & Features. Upgrades overwrite application files while preserving `%LOCALAPPDATA%\AdhdWarrior\save.json` and its backups. Uninstall removes application files, shortcuts, and the optional startup entry while keeping progress for a later reinstall.
 
 ## Saves and privacy
 
@@ -110,7 +111,7 @@ The build script compiles every `src/*.cs` and `tests/*.cs` file into one execut
 
 ## Validation status
 
-Version 0.18.1 passes **142 automated assertions** covering the core quest/adventure suite plus current templates, milestones, reward reservation, identity, progressive portrait reveal, avatar assets, reminder preferences, save migrations, and iOS import boundaries. Earlier isolated smoke tests confirmed desktop startup, fresh format-11 save creation, installer extraction, installed-app tests, and complete uninstall cleanup. Sign-in startup, tray interaction, real notification delivery, shortcuts, Apps & Features UI, export/restore dialogs, and varied display scaling still require interactive verification before calling the app production-ready.
+Version 0.18.2 passes **142 automated assertions** covering the core quest/adventure suite plus current templates, milestones, reward reservation, identity, progressive portrait reveal, avatar assets, reminder preferences, save migrations, and iOS import boundaries. The completion popup compiles against the same tested boss and reward state transitions. Earlier isolated smoke tests confirmed desktop startup, fresh format-11 save creation, installer extraction, installed-app tests, and complete uninstall cleanup. Sign-in startup, tray interaction, real notification delivery, shortcuts, Apps & Features UI, completion-dialog scaling, export/restore dialogs, and varied display scaling still require interactive verification before calling the app production-ready.
 
 This preview now has both portable and per-user installer builds. Both are unsigned; Windows may show a reputation warning. Background reminders require the app process to remain running in the notification area. Code signing, automatic updates, and a published GitHub release are not yet implemented.
 

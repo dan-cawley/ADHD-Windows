@@ -8,7 +8,7 @@
     <RootNamespace>AdhdWarrior</RootNamespace>
     <AssemblyName>ADHD Warrior</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <OutputPath>dist\0.18.1\</OutputPath>
+    <OutputPath>dist\0.18.2\</OutputPath>
     <AppConfig>src\App.config</AppConfig>
   </PropertyGroup>
   <ItemGroup>

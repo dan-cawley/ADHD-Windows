@@ -2,6 +2,12 @@
 
 All notable Windows migration phases are recorded here. The project is still a preview and does not yet publish packaged releases.
 
+## 0.18.2 — 2026-09-17
+
+- Added a themed quest-completion popup modeled on the iOS boss-impact presentation.
+- The popup shows the boss portrait, damage dealt, remaining health, and a health meter after each ordinary quest completion.
+- Boss victories identify the defeated boss, next encounter, and any gear collected during the completion.
+
 ## 0.18.1 — 2026-09-17
 
 - Added the iOS-style nine-panel character reveal to the Windows Character page.

@@ -1,6 +1,6 @@
 # Future-version continuation prompt
 
-Last synchronized with Windows preview **0.18.1**, save format **11**, on **2026-09-17**.
+Last synchronized with Windows preview **0.18.2**, save format **11**, on **2026-09-17**.
 
 Copy the prompt below into a new development task. Update this file and the root README before every GitHub push.
 
@@ -14,13 +14,13 @@ ADHD Warrior is a calm, local-first ADHD task app wrapped in a fantasy progressi
 
 ## Current baseline
 
-- Current Windows preview: **0.18.1**.
+- Current Windows preview: **0.18.2**.
 - Save format: **11**.
 - Runtime: C# Windows Forms on .NET Framework 4.8 with no external packages.
 - Build command: `powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1`.
-- Output: `dist/0.18.1/ADHD Warrior.exe` plus config and assets.
+- Output: `dist/0.18.2/ADHD Warrior.exe` plus config and assets.
 - Installer command: `powershell -NoProfile -ExecutionPolicy Bypass -File .\build-installer.ps1`.
-- Installer output: `release/0.18.1/ADHD Warrior Setup 0.18.1.exe`.
+- Installer output: `release/0.18.2/ADHD Warrior Setup 0.18.2.exe`.
 - Normal save: `%LOCALAPPDATA%\AdhdWarrior\save.json`.
 - Git branch: `main`.
 - GitHub remote: `https://github.com/dan-cawley/ADHD-Windows.git`.
@@ -90,6 +90,7 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 
 - Eighteen shared iOS boss identities and sprite positions.
 - Awarded quest/streak XP becomes boss damage. Defeat records history, grants rare-or-better gear, and advances the encounter without damage spillover.
+- Completing one or more ordinary quests opens a themed boss-impact dialog with the boss portrait, total awarded damage, remaining HP, victory/next-encounter details, and gear collected during that completion.
 - A later Monday-based week heals an undefeated boss by up to half maximum HP. Backward clock movement does nothing.
 - The catalog contains all 81 iOS items across nine sets. Owned bonuses apply automatically; there is no equip step.
 - Every sixth general completion grants an unowned catalog item. The coin shop offers specific unowned gear.
@@ -140,7 +141,7 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 
 ## Known gaps and risks
 
-- Version 0.18.1 passes 142 automated assertions, including the original core suite and added template, milestone, reward-reservation, identity, progressive portrait-reveal, avatar-asset, reminder-preference, migration, and import coverage. Earlier isolated desktop launch/fresh-save/clean-close plus installer/install/uninstall smoke tests pass.
+- Version 0.18.2 passes 142 automated assertions, including the original core suite and added template, milestone, reward-reservation, identity, progressive portrait-reveal, avatar-asset, reminder-preference, migration, and import coverage. The completion dialog compiles against those tested boss/reward transitions. Earlier isolated desktop launch/fresh-save/clean-close plus installer/install/uninstall smoke tests pass.
 - Run an interactive smoke test of creating/completing daily, weekly, monthly, and weekday streaks; restarting; and spending all three familiar skills.
 - Interactively verify actual Windows sign-in startup, tray open/exit behavior, notification delivery and quiet-hour boundaries, export/restore dialogs, and multiple display scales.
 - iOS stage-4 ready eggs conflict with the Windows meaning of stage 4 and remain intentionally skipped.
@@ -151,7 +152,7 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 
 ## Recommended next phase
 
-Review the 0.18.1 Character experience interactively, especially the hood/face crop and the order in which portrait panels reveal. Choose the next application iteration after that review. Release-readiness work remains queued: a Windows application icon, installer checksums, a GitHub Release workflow, and a practical code-signing path.
+Interactively review the 0.18.2 completion popup for normal damage, a boss defeat, bulk completion, and display scaling, along with the Character hood/face crop. Choose the next application iteration after that review. Release-readiness work remains queued: a Windows application icon, installer checksums, a GitHub Release workflow, and a practical code-signing path.
 
 ## Required workflow for every change and push
 
