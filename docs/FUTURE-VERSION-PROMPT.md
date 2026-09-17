@@ -1,6 +1,6 @@
 # Future-version continuation prompt
 
-Last synchronized with Windows preview **0.17.1**, save format **11**, on **2026-09-16**.
+Last synchronized with Windows preview **0.18**, save format **11**, on **2026-09-17**.
 
 Copy the prompt below into a new development task. Update this file and the root README before every GitHub push.
 
@@ -14,15 +14,17 @@ ADHD Warrior is a calm, local-first ADHD task app wrapped in a fantasy progressi
 
 ## Current baseline
 
-- Current Windows preview: **0.17.1**.
+- Current Windows preview: **0.18**.
 - Save format: **11**.
 - Runtime: C# Windows Forms on .NET Framework 4.8 with no external packages.
 - Build command: `powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1`.
-- Output: `dist/0.17.1/ADHD Warrior.exe` plus config and assets.
+- Output: `dist/0.18/ADHD Warrior.exe` plus config and assets.
+- Installer command: `powershell -NoProfile -ExecutionPolicy Bypass -File .\build-installer.ps1`.
+- Installer output: `release/0.18/ADHD Warrior Setup 0.18.exe`.
 - Normal save: `%LOCALAPPDATA%\AdhdWarrior\save.json`.
 - Git branch: `main`.
 - GitHub remote: `https://github.com/dan-cawley/ADHD-Windows.git`.
-- The app is an unsigned portable preview; there is no installer or auto-update path yet.
+- Portable and per-user installer builds exist. Both remain unsigned and there is no auto-update path yet.
 
 ## Authority and references
 
@@ -133,21 +135,22 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 - `src/Reminders.cs`: notification settings, timing, quiet hours, duplicate suppression, and settings UI.
 - `tests/`: in-process regression suite launched with `--self-test`.
 - `generate-ios-catalog.ps1`: catalog regeneration from Swift references.
+- `build-installer.ps1`, `installer/Installer.cs`: embedded-payload per-user setup and uninstall package.
 
 ## Known gaps and risks
 
-- Version 0.17.1 passes 139 automated assertions, including the original core suite and added template, milestone, reward-reservation, identity, avatar-asset, reminder-preference, migration, and import coverage. The isolated desktop launch/fresh-save/clean-close smoke test also passes.
+- Version 0.18 passes 139 automated assertions, including the original core suite and added template, milestone, reward-reservation, identity, avatar-asset, reminder-preference, migration, and import coverage. Isolated desktop launch/fresh-save/clean-close plus installer/install/uninstall smoke tests pass.
 - Run an interactive smoke test of creating/completing daily, weekly, monthly, and weekday streaks; restarting; and spending all three familiar skills.
 - Interactively verify actual Windows sign-in startup, tray open/exit behavior, notification delivery and quiet-hour boundaries, export/restore dialogs, and multiple display scales.
 - iOS stage-4 ready eggs conflict with the Windows meaning of stage 4 and remain intentionally skipped.
 - Exact mobile evolution stages, duplicate inventory counts, unsupported reward items, user-supplied avatar photos, friends, calendar links, other settings, and Apple integrations remain unported.
-- Background reminders require the process to stay running in the notification area. No installer, code signing, release packaging, crash reporting, or update mechanism exists.
+- Background reminders require the process to stay running in the notification area. The installer is unsigned; code signing, a published GitHub release, crash reporting, and automatic updates remain absent.
 - The Visual Studio project output path must stay synchronized with `build.ps1` and the documented version.
 - Historical phase documents describe their own point in time and contain superseded limitations. The root README and this prompt describe current behavior.
 
 ## Recommended next phase
 
-Build 0.18 around a conventional per-user installer and release package while retaining the portable build and existing save location. Include a clean uninstall path, Start menu shortcut, version metadata, and an upgrade story that keeps progress. Before release, resume the full regression suite and interactively verify 0.17.1 sign-in startup, tray restore/exit, reminder boundaries, identity editing, daily generation, rewards, and streaks.
+Build 0.19 around release readiness: add a Windows application icon, publish checksums with the installer, prepare a GitHub Release workflow, and document a practical code-signing path. Interactively verify 0.18 shortcuts and Apps & Features registration plus sign-in startup, tray restore/exit, reminder boundaries, export/restore, identity editing, daily generation, rewards, and streaks before labeling a stable release.
 
 ## Required workflow for every change and push
 

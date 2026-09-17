@@ -2,6 +2,14 @@
 
 All notable Windows migration phases are recorded here. The project is still a preview and does not yet publish packaged releases.
 
+## 0.18 — 2026-09-17
+
+- Added a dependency-free per-user Windows installer while retaining the portable build.
+- Added Start menu and desktop shortcuts plus an Apps & Features uninstall entry.
+- Added clean uninstall behavior that preserves saves and backups and removes the optional startup entry.
+- Added executable version metadata and upgrade-safe replacement of application files.
+- Verified isolated install, the installed 139-assertion suite, and uninstall cleanup.
+
 ## 0.17.1 — 2026-09-16
 
 - Fixed a save-breaking conflict where normal, boss, familiar, or shop gear acquisition could duplicate an item reserved in pending milestone rewards.

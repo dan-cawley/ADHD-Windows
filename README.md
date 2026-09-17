@@ -6,7 +6,7 @@ ADHD Warrior is a private, local-first Windows desktop app that turns everyday t
 
 ## Current release
 
-**Windows preview 0.17.1 · save format 11 · .NET Framework 4.8**
+**Windows preview 0.18 · save format 11 · .NET Framework 4.8**
 
 This repository is the native C# Windows migration of the more complete iOS app. The iOS implementation is the behavioral source of truth whenever a matching Windows feature is added. The Android port and preserved artwork are secondary references.
 
@@ -37,7 +37,7 @@ The left navigation contains Today, All quests, Review, Daily templates, Streak 
 
 ## Run the app
 
-On the development machine, close any older ADHD Warrior window and open `Launch ADHD Warrior.lnk`. The launcher points to `dist/0.17.1/ADHD Warrior.exe`.
+On the development machine, close any older ADHD Warrior window and open `Launch ADHD Warrior.lnk`. The launcher points to `dist/0.18/ADHD Warrior.exe`.
 
 Build output and the local shortcut are intentionally excluded from Git. A fresh clone must be built before it can run:
 
@@ -46,6 +46,16 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1
 ```
 
 The build uses the Windows .NET Framework compiler already included with Windows and downloads no packages. Keep the generated `assets` folder and `.config` file beside the executable.
+
+## Install or uninstall
+
+Build the per-user installer with:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\build-installer.ps1
+```
+
+The unsigned setup executable is written to `release/0.18/ADHD Warrior Setup 0.18.exe`. It installs under `%LOCALAPPDATA%\Programs\ADHD Warrior`, creates Start menu and desktop shortcuts, and registers a clean uninstall entry in Windows Apps & Features. Upgrades overwrite application files while preserving `%LOCALAPPDATA%\AdhdWarrior\save.json` and its backups. Uninstall removes application files, shortcuts, and the optional startup entry while keeping progress for a later reinstall.
 
 ## Saves and privacy
 
@@ -91,16 +101,17 @@ This is a dependency-free Windows Forms application targeting .NET Framework 4.8
 | iOS JSON preview/import | `src/IosImport.cs` |
 | Visual system and repaint buffering | `src/Theme.cs` |
 | Quest editor | `src/Editor.cs` |
-| Build | `build.ps1`, `AdhdWarrior.Windows.csproj` |
+| Portable build | `build.ps1`, `AdhdWarrior.Windows.csproj` |
+| Installer and release packaging | `build-installer.ps1`, `installer/Installer.cs` |
 | Mobile references | `reference/` |
 
 The build script compiles every `src/*.cs` and `tests/*.cs` file into one executable and copies runtime artwork. `generate-ios-catalog.ps1` regenerates the equipment catalog from the preserved Swift models.
 
 ## Validation status
 
-Version 0.17.1 passes **139 automated assertions** covering the core quest/adventure suite plus current templates, milestones, reward reservation, identity, avatar assets, reminder preferences, save migrations, and iOS import boundaries. An isolated desktop smoke test confirmed startup, fresh format-11 save creation, four default daily quests, and a clean window close. Sign-in startup, tray interaction, real notification delivery, export/restore dialogs, and varied display scaling still require interactive verification before calling the app production-ready.
+Version 0.18 passes **139 automated assertions** covering the core quest/adventure suite plus current templates, milestones, reward reservation, identity, avatar assets, reminder preferences, save migrations, and iOS import boundaries. Isolated smoke tests confirmed desktop startup, fresh format-11 save creation, installer extraction, installed-app tests, and complete uninstall cleanup. Sign-in startup, tray interaction, real notification delivery, shortcuts, Apps & Features UI, export/restore dialogs, and varied display scaling still require interactive verification before calling the app production-ready.
 
-This is an unsigned portable preview. Background reminders require the app process to remain running in the notification area. It does not yet have an installer, code signing, automatic updates, or a release package.
+This preview now has both portable and per-user installer builds. Both are unsigned; Windows may show a reputation warning. Background reminders require the app process to remain running in the notification area. Code signing, automatic updates, and a published GitHub release are not yet implemented.
 
 ## Development source of truth
 
