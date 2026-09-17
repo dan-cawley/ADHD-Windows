@@ -1,6 +1,6 @@
 # Future-version continuation prompt
 
-Last synchronized with Windows preview **0.18**, save format **11**, on **2026-09-17**.
+Last synchronized with Windows preview **0.18.1**, save format **11**, on **2026-09-17**.
 
 Copy the prompt below into a new development task. Update this file and the root README before every GitHub push.
 
@@ -14,13 +14,13 @@ ADHD Warrior is a calm, local-first ADHD task app wrapped in a fantasy progressi
 
 ## Current baseline
 
-- Current Windows preview: **0.18**.
+- Current Windows preview: **0.18.1**.
 - Save format: **11**.
 - Runtime: C# Windows Forms on .NET Framework 4.8 with no external packages.
 - Build command: `powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1`.
-- Output: `dist/0.18/ADHD Warrior.exe` plus config and assets.
+- Output: `dist/0.18.1/ADHD Warrior.exe` plus config and assets.
 - Installer command: `powershell -NoProfile -ExecutionPolicy Bypass -File .\build-installer.ps1`.
-- Installer output: `release/0.18/ADHD Warrior Setup 0.18.exe`.
+- Installer output: `release/0.18.1/ADHD Warrior Setup 0.18.1.exe`.
 - Normal save: `%LOCALAPPDATA%\AdhdWarrior\save.json`.
 - Git branch: `main`.
 - GitHub remote: `https://github.com/dan-cawley/ADHD-Windows.git`.
@@ -82,6 +82,7 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 - Character supports a local display name with no account requirement.
 - The nine iOS avatar themes and full-size artwork are included: Standard, Archanist, Garden Gnome, Wood Elf, Micah, Stacy, Spellbinder, Sunforge, and Moonveil.
 - Standard is always available. Each other avatar becomes selectable when every equipment item in its matching set is owned.
+- Character artwork uses the iOS nine-panel reveal order. A new Standard character shows only the hood/face panel; weapon, offhand, hands, chest, legs, accessory, feet, and ring panels become visible as matching gear is owned.
 - The Character page shows set progress and provides the identity editor. Save validation prevents selecting a locked or unknown avatar.
 - iOS import preserves the display name and selected avatar when its required equipment is also compatible and imported.
 
@@ -139,7 +140,7 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 
 ## Known gaps and risks
 
-- Version 0.18 passes 139 automated assertions, including the original core suite and added template, milestone, reward-reservation, identity, avatar-asset, reminder-preference, migration, and import coverage. Isolated desktop launch/fresh-save/clean-close plus installer/install/uninstall smoke tests pass.
+- Version 0.18.1 passes 142 automated assertions, including the original core suite and added template, milestone, reward-reservation, identity, progressive portrait-reveal, avatar-asset, reminder-preference, migration, and import coverage. Earlier isolated desktop launch/fresh-save/clean-close plus installer/install/uninstall smoke tests pass.
 - Run an interactive smoke test of creating/completing daily, weekly, monthly, and weekday streaks; restarting; and spending all three familiar skills.
 - Interactively verify actual Windows sign-in startup, tray open/exit behavior, notification delivery and quiet-hour boundaries, export/restore dialogs, and multiple display scales.
 - iOS stage-4 ready eggs conflict with the Windows meaning of stage 4 and remain intentionally skipped.
@@ -150,7 +151,7 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 
 ## Recommended next phase
 
-Build 0.19 around release readiness: add a Windows application icon, publish checksums with the installer, prepare a GitHub Release workflow, and document a practical code-signing path. Interactively verify 0.18 shortcuts and Apps & Features registration plus sign-in startup, tray restore/exit, reminder boundaries, export/restore, identity editing, daily generation, rewards, and streaks before labeling a stable release.
+Review the 0.18.1 Character experience interactively, especially the hood/face crop and the order in which portrait panels reveal. Choose the next application iteration after that review. Release-readiness work remains queued: a Windows application icon, installer checksums, a GitHub Release workflow, and a practical code-signing path.
 
 ## Required workflow for every change and push
 

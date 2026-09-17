@@ -2,6 +2,12 @@
 
 All notable Windows migration phases are recorded here. The project is still a preview and does not yet publish packaged releases.
 
+## 0.18.1 — 2026-09-17
+
+- Added the iOS-style nine-panel character reveal to the Windows Character page.
+- New Standard characters begin with only the hood and face visible; matching owned gear reveals each remaining portrait panel.
+- Updated character progress text and added regression coverage for fresh, partial, and complete reveals without changing the save format.
+
 ## 0.18 — 2026-09-17
 
 - Added a dependency-free per-user Windows installer while retaining the portable build.

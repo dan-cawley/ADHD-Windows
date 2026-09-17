@@ -4,6 +4,7 @@ using System.IO;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Collections.Generic;
+using System.Drawing.Drawing2D;
 
 namespace AdhdWarrior {
  public partial class MainWindow {
@@ -19,6 +20,11 @@ namespace AdhdWarrior {
     artCache.Add(key,result);return result;
    }
   }
+  Image AvatarArtwork(AvatarDefinition avatar) {
+   var revealed=Identity.RevealedPanels(data,avatar);string mask=String.Join("",Enumerable.Range(0,9).Select(i=>revealed.Contains(i)?"1":"0"));string key="avatar:"+avatar.Id+":"+mask;if(artCache.ContainsKey(key))return artCache[key];
+   var source=Artwork(avatar.Asset);if(source==null)return null;var bitmap=new Bitmap(source.Width,source.Height);using(var g=Graphics.FromImage(bitmap)){g.DrawImage(source,0,0,source.Width,source.Height);using(var shade=new SolidBrush(Color.FromArgb(218,43,46,53)))using(var hatch=new HatchBrush(HatchStyle.LargeCheckerBoard,Color.FromArgb(28,255,255,255),Color.Transparent))using(var edge=new Pen(Color.FromArgb(100,196,184,150),Math.Max(2,source.Width/300))){for(int i=0;i<9;i++){if(revealed.Contains(i))continue;int column=i%3,row=i/3,left=column*source.Width/3,top=row*source.Height/3,right=(column+1)*source.Width/3,bottom=(row+1)*source.Height/3;var cell=Rectangle.FromLTRB(left,top,right,bottom);g.FillRectangle(shade,cell);g.FillRectangle(hatch,cell);g.DrawRectangle(edge,left,top,Math.Max(1,right-left-1),Math.Max(1,bottom-top-1));}}}
+   artCache.Add(key,bitmap);return bitmap;
+  }
   void AdventureCard(string title,string description,Image artwork,int current,int maximum,params Button[] actions) {
    var panel=new TableLayoutPanel {ColumnCount=2,RowCount=1,Height=235,BackColor=Theme.Surface,Padding=new Padding(14),Margin=new Padding(0,0,0,12)};
    Color accent=view=="Boss map"?Theme.Coral:view=="Familiars"?Theme.Violet:view=="Equipment"?Theme.Rarity(description.Split(' ')[0]):Theme.Gold;Theme.Frame(panel,accent);
@@ -33,8 +39,8 @@ namespace AdhdWarrior {
   }
   void ShowCharacter() {
    var pet=Journey.ActivePet(data);
-   var avatar=Identity.Avatar(data);AdventureCard(Identity.Name(data)+" · Level "+Progression.Level(data.XP),data.XP+" lifetime XP · "+data.Coins+" coins\n"+data.Journey.Gear.Count+" pieces collected · "+Game.Streak(data,DateTime.Today)+" day streak\nAvatar: "+avatar.Title+" · "+Progression.NextLabel(data.XP),Artwork(avatar.Asset),Progression.Current(data.XP),Progression.Span(data.XP),Button("Customize identity",EditIdentity));
-   Note("Active familiar: "+Journey.PetName(pet)+"\n"+(pet.EggStage<4?"Your egg grows with each completed quest.":"Quest XP skill bonus: +"+(pet.QuestSkill*Journey.Stage(pet))+" XP per quest.")+"\nComplete every piece in an equipment set to unlock its matching avatar theme.");
+   var avatar=Identity.Avatar(data);AdventureCard(Identity.Name(data)+" · Level "+Progression.Level(data.XP),data.XP+" lifetime XP · "+data.Coins+" coins\n"+data.Journey.Gear.Count+" pieces collected · "+Game.Streak(data,DateTime.Today)+" day streak\nAvatar: "+avatar.Title+" · "+Progression.NextLabel(data.XP),AvatarArtwork(avatar),Progression.Current(data.XP),Progression.Span(data.XP),Button("Customize identity",EditIdentity));
+   Note("Active familiar: "+Journey.PetName(pet)+"\n"+(pet.EggStage<4?"Your egg grows with each completed quest.":"Quest XP skill bonus: +"+(pet.QuestSkill*Journey.Stage(pet))+" XP per quest.")+"\nYour hood and face begin visible. Earn matching gear to reveal the rest of the portrait and complete sets to unlock their avatar themes.");
    foreach(var option in Identity.Avatars)Note(option.Title+" avatar · "+Identity.SetProgress(data,option)+(Identity.Unlocked(data,option)?" · available":""));
   }
   void ShowPets() {

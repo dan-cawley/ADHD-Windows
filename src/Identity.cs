@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Drawing;
 using System.Windows.Forms;
+using System.Collections.Generic;
 
 namespace AdhdWarrior {
  public class AvatarDefinition {
@@ -11,12 +12,14 @@ namespace AdhdWarrior {
   public override string ToString(){return Title;}
  }
  public static class Identity {
+  static readonly Dictionary<string,int> RevealPanels=new Dictionary<string,int>{{"WEAPON",0},{"HEAD",1},{"OFFHAND",2},{"HANDS",3},{"CHEST",4},{"LEGS",5},{"ACCESSORY",6},{"FEET",7},{"RING",8}};
   public static readonly AvatarDefinition[] Avatars={
    new AvatarDefinition("standard_clothes","Standard","storybook_adah_standard"),new AvatarDefinition("standard","Archanist","storybook_adah_arcanist"),new AvatarDefinition("garden_gnome","Garden Gnome","storybook_adah_garden_gnome"),new AvatarDefinition("wood_elf","Wood Elf","storybook_adah_wood_elf"),new AvatarDefinition("micah","Micah","storybook_adah_micah"),new AvatarDefinition("stacy","Stacy","storybook_adah_stacy"),new AvatarDefinition("library","Spellbinder","storybook_adah_library"),new AvatarDefinition("emberforge","Sunforge","storybook_adah_emberforge"),new AvatarDefinition("nightveil","Moonveil","storybook_adah_nightveil")};
   public static AvatarDefinition Avatar(SaveData data){return Avatars.FirstOrDefault(x=>x.Id==data.AvatarSet)??Avatars[0];}
   public static bool Unlocked(SaveData data,AvatarDefinition avatar){if(avatar.Id=="standard_clothes")return true;var items=GearCatalog.All.Where(g=>g.Sheet==avatar.Id).ToList();return items.Count>0&&items.All(g=>data.Journey.Gear.Contains(g.Id));}
+  public static HashSet<int> RevealedPanels(SaveData data,AvatarDefinition avatar){var revealed=new HashSet<int>();if(avatar.Id=="standard_clothes")revealed.Add(1);foreach(var gear in GearCatalog.All.Where(g=>g.Sheet==avatar.Id&&data.Journey.Gear.Contains(g.Id))){int panel;if(RevealPanels.TryGetValue(gear.Slot,out panel))revealed.Add(panel);}return revealed;}
   public static string Name(SaveData data){return String.IsNullOrWhiteSpace(data.DisplayName)?"Boggins":data.DisplayName.Trim();}
-  public static string SetProgress(SaveData data,AvatarDefinition avatar){var items=GearCatalog.All.Where(g=>g.Sheet==avatar.Id).ToList();return avatar.Id=="standard_clothes"?"Always available":items.Count(g=>data.Journey.Gear.Contains(g.Id))+" / "+items.Count+" matching pieces";}
+  public static string SetProgress(SaveData data,AvatarDefinition avatar){var items=GearCatalog.All.Where(g=>g.Sheet==avatar.Id).ToList();int owned=items.Count(g=>data.Journey.Gear.Contains(g.Id));return avatar.Id=="standard_clothes"?"hood and face visible · "+owned+" / "+items.Count+" pieces earned":owned+" / "+items.Count+" matching pieces";}
   public static string FromIosAsset(string asset){string key=(asset??"").ToLowerInvariant();var match=Avatars.FirstOrDefault(x=>key.Contains(x.Asset.Replace("storybook_","").ToLowerInvariant())||key.Contains(x.Asset.ToLowerInvariant()));return match==null?"standard_clothes":match.Id;}
   public static void Validate(SaveData data){if(data.DisplayName==null||data.DisplayName.Length>80||String.IsNullOrWhiteSpace(data.DisplayName)||!Avatars.Any(x=>x.Id==data.AvatarSet)||!Unlocked(data,Avatar(data)))throw new InvalidDataException("The backup contains invalid character identity data.");}
  }
