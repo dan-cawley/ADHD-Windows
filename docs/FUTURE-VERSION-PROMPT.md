@@ -1,6 +1,6 @@
 # Future-version continuation prompt
 
-Last synchronized with Windows preview **0.18.2**, save format **11**, on **2026-09-17**.
+Last synchronized with Windows preview **0.19**, save format **12**, on **2026-09-17**.
 
 Copy the prompt below into a new development task. Update this file and the root README before every GitHub push.
 
@@ -14,13 +14,13 @@ ADHD Warrior is a calm, local-first ADHD task app wrapped in a fantasy progressi
 
 ## Current baseline
 
-- Current Windows preview: **0.18.2**.
-- Save format: **11**.
+- Current Windows preview: **0.19**.
+- Save format: **12**.
 - Runtime: C# Windows Forms on .NET Framework 4.8 with no external packages.
 - Build command: `powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1`.
-- Output: `dist/0.18.2/ADHD Warrior.exe` plus config and assets.
+- Output: `dist/0.19/ADHD Warrior.exe` plus config and assets.
 - Installer command: `powershell -NoProfile -ExecutionPolicy Bypass -File .\build-installer.ps1`.
-- Installer output: `release/0.18.2/ADHD Warrior Setup 0.18.2.exe`.
+- Installer output: `release/0.19/ADHD Warrior Setup 0.19.exe`.
 - Normal save: `%LOCALAPPDATA%\AdhdWarrior\save.json`.
 - Git branch: `main`.
 - GitHub remote: `https://github.com/dan-cawley/ADHD-Windows.git`.
@@ -99,7 +99,8 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 ### Persistence and imports
 
 - Save writes use temp-file replacement and keep `save.json.bak`.
-- Formats 1–10 migrate forward to format 11. Validate before replacing good data. Never silently clamp impossible imported progress.
+- Formats 1–11 migrate forward to format 12. Validate before replacing good data. Never silently clamp impossible imported progress.
+- Settings can link a Google Calendar through its private iCal feed. The encrypted URL is stored separately under Local AppData with Windows DPAPI and is intentionally excluded from JSON backups. Manual sync imports upcoming events once by UID and never deletes existing quests.
 - Windows backup export/restore is available.
 - iOS import uses preview → explicit Apply → timestamped recovery backup.
 - Imported data includes compatible quests, due times, recurrence, streaks, daily templates, pending equipment rewards, consistency milestones, character and familiar identity, XP, coins, unique equipment ownership, four familiar families, stages 1–3 growing eggs, skill allocation, current compatible boss state, and dated boss history.
@@ -118,7 +119,7 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 - Quiet hours may cross midnight. Eligible items are aggregated into one notification and each quest due value or streak cadence is delivered once.
 - The tray menu can reopen or fully exit the app. Launching the shortcut while a hidden instance exists restores that window.
 - Startup uses the current portable executable in the current user's Windows Run key and is removed when disabled. The app refreshes the path after an update.
-- Reminder settings and delivery history began in save format 8; startup/background preferences use format 11. A test notification is available in Backup & settings.
+- Reminder settings and delivery history began in save format 8; startup/background preferences use format 11. Calendar import metadata uses format 12. A test notification is available in Settings.
 
 ## Code map
 
@@ -141,18 +142,19 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 
 ## Known gaps and risks
 
-- Version 0.18.2 passes 142 automated assertions, including the original core suite and added template, milestone, reward-reservation, identity, progressive portrait-reveal, avatar-asset, reminder-preference, migration, and import coverage. The completion dialog compiles against those tested boss/reward transitions. Earlier isolated desktop launch/fresh-save/clean-close plus installer/install/uninstall smoke tests pass.
+- Version 0.19 passes 145 automated assertions, including Google iCal parsing plus the original core suite and template, milestone, reward-reservation, identity, progressive portrait-reveal, avatar-asset, reminder-preference, migration, and import coverage. Earlier isolated desktop launch/fresh-save/clean-close plus installer/install/uninstall smoke tests pass.
 - Run an interactive smoke test of creating/completing daily, weekly, monthly, and weekday streaks; restarting; and spending all three familiar skills.
 - Interactively verify actual Windows sign-in startup, tray open/exit behavior, notification delivery and quiet-hour boundaries, export/restore dialogs, and multiple display scales.
 - iOS stage-4 ready eggs conflict with the Windows meaning of stage 4 and remain intentionally skipped.
-- Exact mobile evolution stages, duplicate inventory counts, unsupported reward items, user-supplied avatar photos, friends, calendar links, other settings, and Apple integrations remain unported.
+- Calendar sync is currently read-only and manual. Event edits/deletions, recurring-event reconciliation, automatic background refresh, and writing quests back to Google are not implemented.
+- Exact mobile evolution stages, duplicate inventory counts, unsupported reward items, user-supplied avatar photos, friends, appearance/text-size controls, sound/animation preferences, cloud sync, automatic updates, focus/body-double controls, account features, and Apple integrations remain unported.
 - Background reminders require the process to stay running in the notification area. The installer is unsigned; code signing, a published GitHub release, crash reporting, and automatic updates remain absent.
 - The Visual Studio project output path must stay synchronized with `build.ps1` and the documented version.
 - Historical phase documents describe their own point in time and contain superseded limitations. The root README and this prompt describe current behavior.
 
 ## Recommended next phase
 
-Interactively review the 0.18.2 completion popup for normal damage, a boss defeat, bulk completion, and display scaling, along with the Character hood/face crop. Choose the next application iteration after that review. Release-readiness work remains queued: a Windows application icon, installer checksums, a GitHub Release workflow, and a practical code-signing path.
+Interactively connect a private Google iCal feed and verify timed, all-day, duplicate, and disconnected behavior. Then decide whether the next application phase should add automatic calendar refresh and event reconciliation or address another missing Settings area. Also review the completion popup and Character crop at normal display scaling.
 
 ## Required workflow for every change and push
 

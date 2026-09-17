@@ -2,6 +2,13 @@
 
 All notable Windows migration phases are recorded here. The project is still a preview and does not yet publish packaged releases.
 
+## 0.19 — 2026-09-17
+
+- Renamed Backup & settings to Settings and kept backup, restore, iOS import, and reminder controls there.
+- Added read-only Google Calendar linking through a private iCal feed, duplicate-safe event import, category selection, sync history, and disconnect behavior.
+- Protected the private calendar address with Windows account encryption and excluded it from portable backups.
+- Added save format 12 for calendar import metadata and documented the remaining Settings gaps.
+
 ## 0.18.2 — 2026-09-17
 
 - Added a themed quest-completion popup modeled on the iOS boss-impact presentation.

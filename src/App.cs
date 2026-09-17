@@ -12,7 +12,7 @@ namespace AdhdWarrior {
   [DllImport("user32.dll",SetLastError=true)]static extern IntPtr FindWindow(string className,string windowName);
   [DllImport("user32.dll")]static extern bool ShowWindow(IntPtr window,int command);
   [DllImport("user32.dll")]static extern bool SetForegroundWindow(IntPtr window);
-  static bool RestoreExisting(){var window=FindWindow(null,"ADHD Warrior — Windows 0.18.2");if(window==IntPtr.Zero)return false;ShowWindow(window,9);SetForegroundWindow(window);return true;}
+  static bool RestoreExisting(){var window=FindWindow(null,"ADHD Warrior — Windows 0.19");if(window==IntPtr.Zero)return false;ShowWindow(window,9);SetForegroundWindow(window);return true;}
   [STAThread] static int Main(string[] args) {
    Application.EnableVisualStyles(); Application.SetCompatibleTextRenderingDefault(false);
    if(args.Contains("--self-test")) return Tests.Run();
@@ -30,12 +30,12 @@ namespace AdhdWarrior {
   public MainWindow(bool testMode=false,bool startHidden=false) {
    this.testMode=testMode;this.startHidden=startHidden;
    if(testMode) path=Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"test-state","save.json");
-   data=Storage.Load(path); Journey.RefreshWeek(data,DateTime.Today);if(DailyTemplatesEngine.EnsureToday(data,DateTime.Today))Storage.Save(path,data); Text="ADHD Warrior — Windows 0.18.2"+(testMode?" [TEST DATA]":""); MinimumSize=new Size(1000,680); Size=new Size(1240,860); StartPosition=FormStartPosition.CenterScreen; Font=new Font("Segoe UI",10); BackColor=paper; ForeColor=ink; AutoScaleMode=AutoScaleMode.Dpi;
+   data=Storage.Load(path); Journey.RefreshWeek(data,DateTime.Today);if(DailyTemplatesEngine.EnsureToday(data,DateTime.Today))Storage.Save(path,data); Text="ADHD Warrior — Windows 0.19"+(testMode?" [TEST DATA]":""); MinimumSize=new Size(1000,680); Size=new Size(1240,860); StartPosition=FormStartPosition.CenterScreen; Font=new Font("Segoe UI",10); BackColor=paper; ForeColor=ink; AutoScaleMode=AutoScaleMode.Dpi;
    var layout=new ForestLayout {BackgroundImage=Artwork("forest-twilight"),Dock=DockStyle.Fill,ColumnCount=2,RowCount=1}; layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,220));layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,100)); Controls.Add(layout);
    var nav=new FlowLayoutPanel {Dock=DockStyle.Fill,FlowDirection=FlowDirection.TopDown,WrapContents=false,AutoScroll=true,Padding=new Padding(18,28,12,12),BackColor=Theme.Sidebar,ForeColor=Theme.Text};layout.Controls.Add(nav,0,0);
    nav.Controls.Add(new Label {Text="ADHD\nWARRIOR",Font=new Font("Georgia",18,FontStyle.Bold),ForeColor=Theme.Gold,AutoSize=false,Size=new Size(165,90)});
    nav.Controls.Add(new Label {Text="Small steps. Real progress.",ForeColor=Theme.Muted,AutoSize=true,MaximumSize=new Size(165,0),Margin=new Padding(0,0,0,22)});
-   foreach(string v in new[]{"Today","All quests","Review","Daily templates","Streak quests","Character","Familiars","Boss map","Equipment","Rewards","Completed","Archive","Backup & settings"}) {string target=v;var b=Button(v,()=>{view=target;selected.Clear();Render();});b.AutoSize=false;b.Width=165;b.Height=36;b.TextAlign=ContentAlignment.MiddleLeft;b.Padding=new Padding(12,3,7,3);b.FlatAppearance.BorderSize=0;b.BackColor=Theme.Sidebar;b.Paint+=(sender,e)=>{if(view==target)using(var pen=new Pen(Theme.Gold,3))e.Graphics.DrawLine(pen,1,8,1,b.Height-8);};navigation.Add(v,b);nav.Controls.Add(b);}
+   foreach(string v in new[]{"Today","All quests","Review","Daily templates","Streak quests","Character","Familiars","Boss map","Equipment","Rewards","Completed","Archive","Settings"}) {string target=v;var b=Button(v,()=>{view=target;selected.Clear();Render();});b.AutoSize=false;b.Width=165;b.Height=36;b.TextAlign=ContentAlignment.MiddleLeft;b.Padding=new Padding(12,3,7,3);b.FlatAppearance.BorderSize=0;b.BackColor=Theme.Sidebar;b.Paint+=(sender,e)=>{if(view==target)using(var pen=new Pen(Theme.Gold,3))e.Graphics.DrawLine(pen,1,8,1,b.Height-8);};navigation.Add(v,b);nav.Controls.Add(b);}
    var body=new TableLayoutPanel {BackColor=Color.Transparent,Dock=DockStyle.Fill,ColumnCount=1,RowCount=6,Padding=new Padding(30,24,30,14)};layout.Controls.Add(body,1,0);
    foreach(int h in new[]{58,88,52,52}) body.RowStyles.Add(new RowStyle(SizeType.Absolute,h)); body.RowStyles.Add(new RowStyle(SizeType.Percent,100));body.RowStyles.Add(new RowStyle(SizeType.Absolute,44));
    heading.Font=new Font("Georgia",25);heading.ForeColor=Theme.Text;heading.BackColor=Color.Transparent;heading.Dock=DockStyle.Fill;body.Controls.Add(heading,0,0);
@@ -71,10 +71,10 @@ namespace AdhdWarrior {
    else if(view=="Boss map")ShowBosses();
    else if(view=="Equipment")ShowGear();
    else if(view=="Rewards")ShowRewards();
-   else if(view=="Backup & settings") {
-    Note("Windows preview 0.18.2\n\nYour progress is saved on this computer after every change. No account is required.");
-    ShowReminderSettings();cards.Controls.Add(Button("Export Windows backup…",Export));cards.Controls.Add(Button("Restore Windows backup…",Import));cards.Controls.Add(Button("Preview iOS import…",ImportIos));
-    Note("Save location:\n"+path+"\n\nThe previous save is retained as save.json.bak.");Note("Backups use Windows format 11. Older Windows backups upgrade automatically. iOS import supports streak quests, quest due times and active legacy daily recurrence in addition to adventure progress.\n\nKeyboard: Enter to capture; Tab to move between controls; Space to select.");
+   else if(view=="Settings") {
+    Note("Windows preview 0.19\n\nYour progress is saved on this computer after every change. No account is required.");
+    ShowCalendarSettings();ShowReminderSettings();cards.Controls.Add(Button("Export Windows backup…",Export));cards.Controls.Add(Button("Restore Windows backup…",Import));cards.Controls.Add(Button("Preview iOS import…",ImportIos));
+    Note("Save location:\n"+path+"\n\nThe previous save is retained as save.json.bak.");Note("Backups use Windows format 12. Older Windows backups upgrade automatically. The encrypted Google Calendar address stays on this Windows account and is excluded from backups.\n\nStill missing from Settings: appearance and text-size controls, sound and animation preferences, cloud sync, automatic updates, focus and body-double controls, and account or friend features.\n\nKeyboard: Enter to capture; Tab to move between controls; Space to select.");
    } else {
     if(view=="Today")ShowWelcome();
     string today=DateTime.Today.ToString("yyyy-MM-dd");
