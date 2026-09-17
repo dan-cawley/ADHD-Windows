@@ -2,6 +2,11 @@
 
 All notable Windows migration phases are recorded here. The project is still a preview and does not yet publish packaged releases.
 
+## 0.20.1 — 2026-09-17
+
+- Expanded the boss-impact popup with visual reward tiles matching the iOS completion flow.
+- Added coin totals with a gold coin image, familiar XP or egg-growth totals with current familiar artwork, and every newly dropped equipment item with its catalog artwork.
+
 ## 0.20 — 2026-09-17
 
 - Replaced the borrowed Boggins application image with a dedicated sword, forest-leaf, and quest-ring emblem in the established midnight, emerald, gold, and coral palette.

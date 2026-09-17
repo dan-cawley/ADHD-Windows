@@ -1,6 +1,6 @@
 # Future-version continuation prompt
 
-Last synchronized with Windows preview **0.20**, save format **12**, on **2026-09-17**.
+Last synchronized with Windows preview **0.20.1**, save format **12**, on **2026-09-17**.
 
 Copy the prompt below into a new development task. Update this file and the root README before every GitHub push.
 
@@ -14,13 +14,13 @@ ADHD Warrior is a calm, local-first ADHD task app wrapped in a fantasy progressi
 
 ## Current baseline
 
-- Current Windows preview: **0.20**.
+- Current Windows preview: **0.20.1**.
 - Save format: **12**.
 - Runtime: C# Windows Forms on .NET Framework 4.8 with no external packages.
 - Build command: `powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1`.
-- Output: `dist/0.20/ADHD Warrior.exe` plus config and assets.
+- Output: `dist/0.20.1/ADHD Warrior.exe` plus config and assets.
 - Installer command: `powershell -NoProfile -ExecutionPolicy Bypass -File .\build-installer.ps1`.
-- Installer output: `release/0.20/ADHD Warrior Setup 0.20.exe`.
+- Installer output: `release/0.20.1/ADHD Warrior Setup 0.20.1.exe`.
 - Normal save: `%LOCALAPPDATA%\AdhdWarrior\save.json`.
 - Git branch: `main`.
 - GitHub remote: `https://github.com/dan-cawley/ADHD-Windows.git`.
@@ -90,7 +90,8 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 
 - Eighteen shared iOS boss identities and sprite positions.
 - Awarded quest/streak XP becomes boss damage. Defeat records history, grants rare-or-better gear, and advances the encounter without damage spillover.
-- Completing one or more ordinary quests opens a themed boss-impact dialog with the boss portrait, total awarded damage, remaining HP, victory/next-encounter details, and gear collected during that completion.
+- Completing one or more ordinary quests opens a themed boss-impact dialog with the boss portrait, total awarded damage, remaining HP, victory, and next-encounter details.
+- The dialog renders reward tiles for coins, familiar XP or egg growth, and each gear drop. Coin art is drawn locally; familiar and equipment tiles reuse packaged game artwork.
 - A later Monday-based week heals an undefeated boss by up to half maximum HP. Backward clock movement does nothing.
 - The catalog contains all 81 iOS items across nine sets. Owned bonuses apply automatically; there is no equip step.
 - Every sixth general completion grants an unowned catalog item. The coin shop offers specific unowned gear.
@@ -144,7 +145,7 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 
 ## Known gaps and risks
 
-- Version 0.20 passes 148 automated assertions, including the embedded Windows icon, ICS parsing and trusted Microsoft 365 link recognition plus the original core suite and template, milestone, reward-reservation, identity, progressive portrait-reveal, avatar-asset, reminder-preference, migration, and import coverage. Earlier isolated desktop launch/fresh-save/clean-close plus installer/install/uninstall smoke tests pass.
+- Version 0.20.1 passes 148 automated assertions, including the embedded Windows icon, ICS parsing and trusted Microsoft 365 link recognition plus the original core suite and template, milestone, reward-reservation, identity, progressive portrait-reveal, avatar-asset, reminder-preference, migration, and import coverage. Earlier isolated desktop launch/fresh-save/clean-close plus installer/install/uninstall smoke tests pass.
 - Run an interactive smoke test of creating/completing daily, weekly, monthly, and weekday streaks; restarting; and spending all three familiar skills.
 - Interactively verify actual Windows sign-in startup, tray open/exit behavior, notification delivery and quiet-hour boundaries, export/restore dialogs, and multiple display scales.
 - iOS stage-4 ready eggs conflict with the Windows meaning of stage 4 and remain intentionally skipped.
@@ -156,7 +157,7 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 
 ## Recommended next phase
 
-Interactively verify the 0.20 sword emblem in the title bar, taskbar, notification area, desktop/Start shortcuts, setup executable, and Apps & Features at normal and high DPI. Windows may retain the older shortcut icon until its icon cache refreshes. Calendar feed verification remains outstanding.
+Interactively verify the 0.20.1 completion reward row with normal completion, egg growth, hatched familiar XP, one or multiple gear drops, and boss defeat. Also verify the sword emblem across Windows surfaces. Calendar feed verification remains outstanding.
 
 ## Required workflow for every change and push
 
