@@ -2,6 +2,12 @@
 
 All notable Windows migration phases are recorded here. The project is still a preview and does not yet publish packaged releases.
 
+## 0.19.1 — 2026-09-17
+
+- Added Microsoft 365 and Outlook calendar imports through published ICS links.
+- Google and Microsoft calendars can be linked, synchronized, and disconnected independently.
+- Namespaced imported event IDs by provider while preserving duplicate protection for existing Google imports.
+
 ## 0.19 — 2026-09-17
 
 - Renamed Backup & settings to Settings and kept backup, restore, iOS import, and reminder controls there.

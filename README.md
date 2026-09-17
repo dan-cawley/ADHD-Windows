@@ -6,7 +6,7 @@ ADHD Warrior is a private, local-first Windows desktop app that turns everyday t
 
 ## Current release
 
-**Windows preview 0.19 · save format 12 · .NET Framework 4.8**
+**Windows preview 0.19.1 · save format 12 · .NET Framework 4.8**
 
 This repository is the native C# Windows migration of the more complete iOS app. The iOS implementation is the behavioral source of truth whenever a matching Windows feature is added. The Android port and preserved artwork are secondary references.
 
@@ -21,7 +21,7 @@ This repository is the native C# Windows migration of the more complete iOS app.
 - iOS character level thresholds and visible progress toward the next level.
 - Dedicated daily, weekly, monthly, and weekday streak quests with editing, next-eligible dates, guarded removal, and current/best history.
 - Optional Windows notifications with sign-in startup, close-to-tray background mode, separate quest/streak switches, a daily reminder time, quiet hours, aggregation, and duplicate suppression.
-- Read-only Google Calendar linking through its private iCal address, with encrypted local link storage, duplicate-safe manual imports, and selectable quest category.
+- Read-only Google Calendar and Microsoft 365/Outlook linking through private or published ICS addresses, with separate encrypted local links, duplicate-safe manual imports, and selectable quest category.
 - Four familiar families: Silent Basilisk, Arcane Drake, Storm Gryphon, and Wild Hydra.
 - Familiar hatching, leveling, evolution, skill points, Quest XP, Streak XP, and Loot Chance.
 - Local character display names, custom familiar names, and nine iOS avatar themes unlocked through matching equipment sets.
@@ -36,11 +36,11 @@ This repository is the native C# Windows migration of the more complete iOS app.
 
 ### Screens
 
-The left navigation contains Today, All quests, Review, Daily templates, Streak quests, Character, Familiars, Boss map, Equipment, Rewards, Completed, Archive, and Settings. Settings contains Google Calendar, reminders, backup/restore, and iOS import controls.
+The left navigation contains Today, All quests, Review, Daily templates, Streak quests, Character, Familiars, Boss map, Equipment, Rewards, Completed, Archive, and Settings. Settings contains linked calendars, reminders, backup/restore, and iOS import controls.
 
 ## Run the app
 
-On the development machine, close any older ADHD Warrior window and open `Launch ADHD Warrior.lnk`. The launcher points to `dist/0.19/ADHD Warrior.exe`.
+On the development machine, close any older ADHD Warrior window and open `Launch ADHD Warrior.lnk`. The launcher points to `dist/0.19.1/ADHD Warrior.exe`.
 
 Build output and the local shortcut are intentionally excluded from Git. A fresh clone must be built before it can run:
 
@@ -58,7 +58,7 @@ Build the per-user installer with:
 powershell -NoProfile -ExecutionPolicy Bypass -File .\build-installer.ps1
 ```
 
-The unsigned setup executable is written to `release/0.19/ADHD Warrior Setup 0.19.exe`. It installs under `%LOCALAPPDATA%\Programs\ADHD Warrior`, creates Start menu and desktop shortcuts, and registers a clean uninstall entry in Windows Apps & Features. Upgrades overwrite application files while preserving `%LOCALAPPDATA%\AdhdWarrior\save.json` and its backups. Uninstall removes application files, shortcuts, and the optional startup entry while keeping progress for a later reinstall.
+The unsigned setup executable is written to `release/0.19.1/ADHD Warrior Setup 0.19.1.exe`. It installs under `%LOCALAPPDATA%\Programs\ADHD Warrior`, creates Start menu and desktop shortcuts, and registers a clean uninstall entry in Windows Apps & Features. Upgrades overwrite application files while preserving `%LOCALAPPDATA%\AdhdWarrior\save.json` and its backups. Uninstall removes application files, shortcuts, and the optional startup entry while keeping progress for a later reinstall.
 
 ## Saves and privacy
 
@@ -70,7 +70,7 @@ Normal progress is stored at:
 
 Writes are atomic. The prior file is retained as `save.json.bak`. Windows save formats 1–11 migrate to format 12 when loaded and are written in the new format after the next successful change. Startup, background, and calendar linking default off. Invalid or unsupported saves stop loading before the original is overwritten.
 
-The app requires no account. Calendar linking is optional; when the user requests a sync, the app downloads the linked Google calendar feed directly and creates local quests. The private feed address is encrypted with Windows account protection in Local AppData, excluded from backups, and never committed. Personal saves, backups, build output, shortcuts, and test state are excluded from Git.
+The app requires no account. Calendar linking is optional; when the user requests a sync, the app downloads the linked Google or Microsoft 365 calendar feed directly and creates local quests. Calendar addresses are encrypted with Windows account protection in Local AppData, excluded from backups, and never committed. Personal saves, backups, build output, shortcuts, and test state are excluded from Git.
 
 ## iOS migration
 
@@ -112,7 +112,7 @@ The build script compiles every `src/*.cs` and `tests/*.cs` file into one execut
 
 ## Validation status
 
-Version 0.19 passes **145 automated assertions** covering the core quest/adventure suite plus Google iCal parsing, current templates, milestones, reward reservation, identity, progressive portrait reveal, avatar assets, reminder preferences, save migrations, and iOS import boundaries. Earlier isolated smoke tests confirmed desktop startup, installer extraction, installed-app tests, and complete uninstall cleanup. A real private Google Calendar link, sign-in startup, tray interaction, notification delivery, shortcuts, Apps & Features UI, completion-dialog scaling, export/restore dialogs, and varied display scaling still require interactive verification before calling the app production-ready.
+Version 0.19.1 passes **147 automated assertions** covering the core quest/adventure suite plus ICS parsing, trusted Microsoft 365 link recognition, current templates, milestones, reward reservation, identity, progressive portrait reveal, avatar assets, reminder preferences, save migrations, and iOS import boundaries. Earlier isolated smoke tests confirmed desktop startup, installer extraction, installed-app tests, and complete uninstall cleanup. Live Google and Microsoft 365 calendar feeds, sign-in startup, tray interaction, notification delivery, shortcuts, Apps & Features UI, completion-dialog scaling, export/restore dialogs, and varied display scaling still require interactive verification before calling the app production-ready.
 
 This preview now has both portable and per-user installer builds. Both are unsigned; Windows may show a reputation warning. Background reminders require the app process to remain running in the notification area. Code signing, automatic updates, and a published GitHub release are not yet implemented.
 
