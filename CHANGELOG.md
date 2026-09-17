@@ -2,6 +2,12 @@
 
 All notable Windows migration phases are recorded here. The project is still a preview and does not yet publish packaged releases.
 
+## 0.20 — 2026-09-17
+
+- Replaced the borrowed Boggins application image with a dedicated sword, forest-leaf, and quest-ring emblem in the established midnight, emerald, gold, and coral palette.
+- Added a multi-resolution Windows icon with 16, 20, 24, 32, 40, 48, 64, 128, and 256 pixel representations.
+- Embedded the icon in the application and installer and reused it for the window, notification area, shortcuts, and Apps & Features entry.
+
 ## 0.19.2 — 2026-09-17
 
 - Replaced the generic Google Calendar sync failure for HTTP 404 with instructions explaining that public iCal addresses require a public calendar.

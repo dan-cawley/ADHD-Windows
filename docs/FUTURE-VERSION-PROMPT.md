@@ -1,6 +1,6 @@
 # Future-version continuation prompt
 
-Last synchronized with Windows preview **0.19.2**, save format **12**, on **2026-09-17**.
+Last synchronized with Windows preview **0.20**, save format **12**, on **2026-09-17**.
 
 Copy the prompt below into a new development task. Update this file and the root README before every GitHub push.
 
@@ -14,13 +14,13 @@ ADHD Warrior is a calm, local-first ADHD task app wrapped in a fantasy progressi
 
 ## Current baseline
 
-- Current Windows preview: **0.19.2**.
+- Current Windows preview: **0.20**.
 - Save format: **12**.
 - Runtime: C# Windows Forms on .NET Framework 4.8 with no external packages.
 - Build command: `powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1`.
-- Output: `dist/0.19.2/ADHD Warrior.exe` plus config and assets.
+- Output: `dist/0.20/ADHD Warrior.exe` plus config and assets.
 - Installer command: `powershell -NoProfile -ExecutionPolicy Bypass -File .\build-installer.ps1`.
-- Installer output: `release/0.19.2/ADHD Warrior Setup 0.19.2.exe`.
+- Installer output: `release/0.20/ADHD Warrior Setup 0.20.exe`.
 - Normal save: `%LOCALAPPDATA%\AdhdWarrior\save.json`.
 - Git branch: `main`.
 - GitHub remote: `https://github.com/dan-cawley/ADHD-Windows.git`.
@@ -110,6 +110,7 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 ### Visual system
 
 - Twilight forest artwork is `assets/forest-twilight.png`.
+- The application mark is `assets/adhd-warrior-sword-icon.png`; `assets/adhd-warrior.ico` contains Windows sizes from 16 through 256 pixels and is embedded in the portable executable and installer. The main window and notification icon use the executable icon.
 - The theme uses midnight blue surfaces with emerald, gold, violet, blue, and coral accents.
 - `ForestLayout` draws the cover image once and the main form uses composited rendering. Do not restore the default tiled background paint; it caused colored flashing during navigation.
 
@@ -143,7 +144,7 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 
 ## Known gaps and risks
 
-- Version 0.19.2 passes 147 automated assertions, including ICS parsing and trusted Microsoft 365 link recognition plus the original core suite and template, milestone, reward-reservation, identity, progressive portrait-reveal, avatar-asset, reminder-preference, migration, and import coverage. The user-observed Google public-feed 404 path now has specific recovery guidance. Earlier isolated desktop launch/fresh-save/clean-close plus installer/install/uninstall smoke tests pass.
+- Version 0.20 passes 148 automated assertions, including the embedded Windows icon, ICS parsing and trusted Microsoft 365 link recognition plus the original core suite and template, milestone, reward-reservation, identity, progressive portrait-reveal, avatar-asset, reminder-preference, migration, and import coverage. Earlier isolated desktop launch/fresh-save/clean-close plus installer/install/uninstall smoke tests pass.
 - Run an interactive smoke test of creating/completing daily, weekly, monthly, and weekday streaks; restarting; and spending all three familiar skills.
 - Interactively verify actual Windows sign-in startup, tray open/exit behavior, notification delivery and quiet-hour boundaries, export/restore dialogs, and multiple display scales.
 - iOS stage-4 ready eggs conflict with the Windows meaning of stage 4 and remain intentionally skipped.
@@ -155,7 +156,7 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 
 ## Recommended next phase
 
-Interactively connect both a private Google iCal feed and a published Microsoft 365 ICS feed; verify timed, all-day, duplicate, simultaneous-provider, and disconnected behavior. Microsoft 365 tenants may disable calendar publishing. Then decide whether to add automatic refresh and event reconciliation or address another missing Settings area.
+Interactively verify the 0.20 sword emblem in the title bar, taskbar, notification area, desktop/Start shortcuts, setup executable, and Apps & Features at normal and high DPI. Windows may retain the older shortcut icon until its icon cache refreshes. Calendar feed verification remains outstanding.
 
 ## Required workflow for every change and push
 

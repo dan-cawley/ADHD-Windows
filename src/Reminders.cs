@@ -16,7 +16,7 @@ namespace AdhdWarrior {
  public partial class MainWindow {
   NotifyIcon reminderIcon; System.Windows.Forms.Timer reminderTimer;bool allowClose;
   void SetupReminders(){
-   reminderIcon=new NotifyIcon {Icon=SystemIcons.Information,Text="ADHD Warrior reminders",Visible=data.Reminders.Enabled};
+   reminderIcon=new NotifyIcon {Icon=Icon??SystemIcons.Information,Text="ADHD Warrior reminders",Visible=data.Reminders.Enabled};
    var menu=new ContextMenuStrip();menu.Items.Add("Open ADHD Warrior",null,(s,e)=>RestoreFromTray());menu.Items.Add("Exit",null,(s,e)=>{allowClose=true;Close();});reminderIcon.ContextMenuStrip=menu;
    reminderIcon.DoubleClick+=(s,e)=>RestoreFromTray();
    reminderTimer=new System.Windows.Forms.Timer {Interval=60000,Enabled=true};reminderTimer.Tick+=(s,e)=>CheckReminders(DateTime.Now);Shown+=(s,e)=>BeginInvoke((Action)(()=>{if(startHidden&&data.Reminders.CloseToTray){Hide();reminderIcon.Visible=true;}CheckReminders(DateTime.Now);}));
