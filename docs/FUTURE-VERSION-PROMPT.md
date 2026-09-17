@@ -1,6 +1,6 @@
 # Future-version continuation prompt
 
-Last synchronized with Windows preview **0.19.1**, save format **12**, on **2026-09-17**.
+Last synchronized with Windows preview **0.19.2**, save format **12**, on **2026-09-17**.
 
 Copy the prompt below into a new development task. Update this file and the root README before every GitHub push.
 
@@ -14,13 +14,13 @@ ADHD Warrior is a calm, local-first ADHD task app wrapped in a fantasy progressi
 
 ## Current baseline
 
-- Current Windows preview: **0.19.1**.
+- Current Windows preview: **0.19.2**.
 - Save format: **12**.
 - Runtime: C# Windows Forms on .NET Framework 4.8 with no external packages.
 - Build command: `powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1`.
-- Output: `dist/0.19.1/ADHD Warrior.exe` plus config and assets.
+- Output: `dist/0.19.2/ADHD Warrior.exe` plus config and assets.
 - Installer command: `powershell -NoProfile -ExecutionPolicy Bypass -File .\build-installer.ps1`.
-- Installer output: `release/0.19.1/ADHD Warrior Setup 0.19.1.exe`.
+- Installer output: `release/0.19.2/ADHD Warrior Setup 0.19.2.exe`.
 - Normal save: `%LOCALAPPDATA%\AdhdWarrior\save.json`.
 - Git branch: `main`.
 - GitHub remote: `https://github.com/dan-cawley/ADHD-Windows.git`.
@@ -101,6 +101,7 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 - Save writes use temp-file replacement and keep `save.json.bak`.
 - Formats 1–11 migrate forward to format 12. Validate before replacing good data. Never silently clamp impossible imported progress.
 - Settings can independently link Google Calendar and Microsoft 365/Outlook through private or published ICS feeds. Each encrypted URL is stored separately under Local AppData with Windows DPAPI and is intentionally excluded from JSON backups. Manual sync imports upcoming events once by provider plus UID and never deletes existing quests.
+- A Google 404 is translated into instructions to replace a non-working public feed with the calendar’s Secret address in iCal format; do not log or display saved secret URLs.
 - Windows backup export/restore is available.
 - iOS import uses preview → explicit Apply → timestamped recovery backup.
 - Imported data includes compatible quests, due times, recurrence, streaks, daily templates, pending equipment rewards, consistency milestones, character and familiar identity, XP, coins, unique equipment ownership, four familiar families, stages 1–3 growing eggs, skill allocation, current compatible boss state, and dated boss history.
@@ -142,7 +143,7 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 
 ## Known gaps and risks
 
-- Version 0.19.1 passes 147 automated assertions, including ICS parsing and trusted Microsoft 365 link recognition plus the original core suite and template, milestone, reward-reservation, identity, progressive portrait-reveal, avatar-asset, reminder-preference, migration, and import coverage. Earlier isolated desktop launch/fresh-save/clean-close plus installer/install/uninstall smoke tests pass.
+- Version 0.19.2 passes 147 automated assertions, including ICS parsing and trusted Microsoft 365 link recognition plus the original core suite and template, milestone, reward-reservation, identity, progressive portrait-reveal, avatar-asset, reminder-preference, migration, and import coverage. The user-observed Google public-feed 404 path now has specific recovery guidance. Earlier isolated desktop launch/fresh-save/clean-close plus installer/install/uninstall smoke tests pass.
 - Run an interactive smoke test of creating/completing daily, weekly, monthly, and weekday streaks; restarting; and spending all three familiar skills.
 - Interactively verify actual Windows sign-in startup, tray open/exit behavior, notification delivery and quiet-hour boundaries, export/restore dialogs, and multiple display scales.
 - iOS stage-4 ready eggs conflict with the Windows meaning of stage 4 and remain intentionally skipped.

@@ -2,6 +2,11 @@
 
 All notable Windows migration phases are recorded here. The project is still a preview and does not yet publish packaged releases.
 
+## 0.19.2 — 2026-09-17
+
+- Replaced the generic Google Calendar sync failure for HTTP 404 with instructions explaining that public iCal addresses require a public calendar.
+- Directed users to the Secret address in iCal format and reminded them to keep it private.
+
 ## 0.19.1 — 2026-09-17
 
 - Added Microsoft 365 and Outlook calendar imports through published ICS links.
