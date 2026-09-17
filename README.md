@@ -8,7 +8,7 @@ ADHD Warrior is a private, local-first Windows desktop app that turns everyday t
 
 ## Current release
 
-**Windows preview 0.20.1 · save format 12 · .NET Framework 4.8**
+**Windows preview 0.20.2 · save format 12 · .NET Framework 4.8**
 
 This repository is the native C# Windows migration of the more complete iOS app. The iOS implementation is the behavioral source of truth whenever a matching Windows feature is added. The Android port and preserved artwork are secondary references.
 
@@ -45,7 +45,7 @@ The left navigation contains Today, All quests, Review, Daily templates, Streak 
 
 ## Run the app
 
-On the development machine, close any older ADHD Warrior window and open `Launch ADHD Warrior.lnk`. The launcher points to `dist/0.20.1/ADHD Warrior.exe`.
+On the development machine, close any older ADHD Warrior window and open `Launch ADHD Warrior.lnk`. The launcher points to `dist/0.20.2/ADHD Warrior.exe`.
 
 Build output and the local shortcut are intentionally excluded from Git. A fresh clone must be built before it can run:
 
@@ -63,7 +63,7 @@ Build the per-user installer with:
 powershell -NoProfile -ExecutionPolicy Bypass -File .\build-installer.ps1
 ```
 
-The unsigned setup executable is written to `release/0.20.1/ADHD Warrior Setup 0.20.1.exe`. It installs under `%LOCALAPPDATA%\Programs\ADHD Warrior`, creates Start menu and desktop shortcuts, and registers a clean uninstall entry in Windows Apps & Features. Upgrades overwrite application files while preserving `%LOCALAPPDATA%\AdhdWarrior\save.json` and its backups. Uninstall removes application files, shortcuts, and the optional startup entry while keeping progress for a later reinstall.
+Run `build-release.ps1` to create the setup executable, portable ZIP, and `SHA256SUMS.txt` under `release/0.20.2/`. The app and installer embed Windows compatibility manifests for per-user execution, Windows 10/11 recognition, per-monitor DPI awareness, and long-path awareness. The installer places the app under `%LOCALAPPDATA%\Programs\ADHD Warrior`, creates Start menu and desktop shortcuts, and registers a clean uninstall entry in Windows Apps & Features. Upgrades preserve `%LOCALAPPDATA%\AdhdWarrior\save.json` and its backups.
 
 ## Saves and privacy
 
@@ -117,9 +117,9 @@ The build script compiles every `src/*.cs` and `tests/*.cs` file into one execut
 
 ## Validation status
 
-Version 0.20.1 passes **148 automated assertions** covering the embedded Windows icon, core quest/adventure suite, ICS parsing, trusted Microsoft 365 link recognition, current templates, milestones, reward reservation, identity, progressive portrait reveal, avatar assets, reminder preferences, save migrations, and iOS import boundaries. The completion popup reads the tested completion state to display coins, familiar progress, and gear drops. Earlier isolated smoke tests confirmed desktop startup, installer extraction, installed-app tests, and complete uninstall cleanup. Successful live calendar feeds, Windows icon-cache refresh, sign-in startup, tray interaction, notification delivery, shortcuts, Apps & Features UI, completion-dialog scaling, export/restore dialogs, and varied display scaling still require interactive verification before calling the app production-ready.
+Version 0.20.2 passes **148 automated assertions** covering the embedded Windows icon, core quest/adventure suite, ICS parsing, trusted Microsoft 365 link recognition, current templates, milestones, reward reservation, identity, progressive portrait reveal, avatar assets, reminder preferences, save migrations, and iOS import boundaries. The completion popup reads the tested completion state to display coins, familiar progress, and gear drops. Earlier isolated smoke tests confirmed desktop startup, installer extraction, installed-app tests, and complete uninstall cleanup. Successful live calendar feeds, Windows icon-cache refresh, sign-in startup, tray interaction, notification delivery, shortcuts, Apps & Features UI, completion-dialog scaling, export/restore dialogs, and varied display scaling still require interactive verification before calling the app production-ready.
 
-This preview now has both portable and per-user installer builds. Both are unsigned; Windows may show a reputation warning. Background reminders require the app process to remain running in the notification area. Code signing, automatic updates, and a published GitHub release are not yet implemented.
+This preview now has portable and per-user installer builds with SHA-256 checksums. Both are unsigned; Windows SmartScreen may show a publisher or reputation warning until code signing is added. Background reminders require the app process to remain running in the notification area. Automatic updates and a published GitHub release are not yet implemented.
 
 ## Development source of truth
 

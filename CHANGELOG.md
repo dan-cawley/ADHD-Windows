@@ -2,6 +2,13 @@
 
 All notable Windows migration phases are recorded here. The project is still a preview and does not yet publish packaged releases.
 
+## 0.20.2 — 2026-09-17
+
+- Added explicit Windows compatibility manifests to the app and per-user installer to prevent Program Compatibility Assistant prompts.
+- Declared as-invoker execution, Windows compatibility, per-monitor DPI awareness, and long-path awareness.
+- Added a release build that creates setup and portable packages plus SHA-256 checksums.
+- Kept save format 12 and gameplay behavior unchanged.
+
 ## 0.20.1 — 2026-09-17
 
 - Expanded the boss-impact popup with visual reward tiles matching the iOS completion flow.

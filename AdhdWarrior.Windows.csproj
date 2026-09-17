@@ -8,16 +8,17 @@
     <RootNamespace>AdhdWarrior</RootNamespace>
     <AssemblyName>ADHD Warrior</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <OutputPath>dist\0.20.1\</OutputPath>
+    <OutputPath>dist\0.20.2\</OutputPath>
     <AppConfig>src\App.config</AppConfig>
     <ApplicationIcon>assets\adhd-warrior.ico</ApplicationIcon>
+    <ApplicationManifest>src\app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System"/><Reference Include="System.Core"/>
     <Reference Include="System.Drawing"/><Reference Include="System.Windows.Forms"/>
     <Reference Include="System.Web.Extensions"/><Reference Include="System.Security"/>
     <Compile Include="src\*.cs"/><Compile Include="tests\*.cs"/>
-    <None Include="src\App.config"/>
+    <None Include="src\App.config"/><None Include="src\app.manifest"/>
     <Content Include="assets\*.png"><CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory></Content><Content Include="assets\adhd-warrior.ico"/>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
