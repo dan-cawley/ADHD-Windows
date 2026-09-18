@@ -2,6 +2,13 @@
 
 All notable Windows migration phases are recorded here. The project is still a preview and does not yet publish packaged releases.
 
+## 0.22.3 — 2026-09-18
+
+- Restored top-to-bottom flow and vertical scrolling on Character and every other detail page after the quest-grid conversion.
+- Kept left-to-right responsive wrapping only on quest-card pages.
+- Removed the Customize Identity button from the Character sheet.
+- Extended the release render test to fail when any page uses the wrong flow direction.
+
 ## 0.22.2 — 2026-09-18
 
 - Shows only the earliest incomplete avatar sheet on the Character page; later sheets remain hidden until their predecessor is complete.

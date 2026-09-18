@@ -1,7 +1,7 @@
 $ErrorActionPreference = 'Stop'
 & (Join-Path $PSScriptRoot 'build.ps1')
 $compiler = Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
-$version = '0.22.2'
+$version = '0.22.3'
 $appOutput = Join-Path $PSScriptRoot "dist\$version"
 $work = Join-Path $env:TEMP "adhd-warrior-installer-$([Guid]::NewGuid().ToString('N'))"
 $release = Join-Path $PSScriptRoot "release\$version"
