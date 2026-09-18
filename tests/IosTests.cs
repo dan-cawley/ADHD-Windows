@@ -17,10 +17,10 @@ namespace AdhdWarrior {
    Check(GearCatalog.All.Single(g=>g.Id=="micah_2").Slot=="RING"&&GearCatalog.All.Single(g=>g.Id=="stacy_9").Rarity=="EPIC","iOS exceptional slots and rarity preserved");
    var d=new SaveData();d.Journey.Gear.AddRange(new[]{"standard_7","standard_8","standard_9"});
    var q=new Quest {Title="Steps",Steps=new List<Step>{new Step {Title="One"}}};
-   Check(Journey.GearBonus(d,q,day)==6,"Offhand, accessory and ring bonuses plus epic piece bonus");
-   q.Repeat="Daily";Check(Journey.GearBonus(d,q,day)==3,"Daily accessory and epic bonus");
+   Check(Journey.GearBonus(d,q,day)==0,"Collected gear does not alter ordinary quest XP");
+   q.Repeat="Daily";Check(Journey.GearBonus(d,q,day)==0,"Collected gear does not alter daily quest XP");
    d.Journey.Gear=GearCatalog.All.Where(g=>g.Sheet=="standard").Select(g=>g.Id).ToList();
-   q.Repeat="None";int complete=Journey.GearBonus(d,q,day);d.Journey.Gear.Remove("standard_5");Check(complete-Journey.GearBonus(d,q,day)==10,"Full set ordinary bonus requires feet");
+   q.Repeat="None";int complete=Journey.GearBonus(d,q,day);d.Journey.Gear.Remove("standard_5");Check(complete==0&&Journey.GearBonus(d,q,day)==0,"Complete and partial equipment sets remain cosmetic");
    Check(IosImport.Date(0,TimeZoneInfo.Utc)=="2001-01-01","Swift epoch, not Unix epoch");
    var west=TimeZoneInfo.CreateCustomTimeZone("Test west",TimeSpan.FromHours(-5),"Test west","Test west");
    Check(IosImport.Date(0,west)=="2000-12-31","Swift date converted to chosen local day");

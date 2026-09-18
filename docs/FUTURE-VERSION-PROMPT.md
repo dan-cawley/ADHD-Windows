@@ -1,6 +1,6 @@
 # Future-version continuation prompt
 
-Last synchronized with Windows preview **0.20.2**, save format **12**, on **2026-09-17**.
+Last synchronized with Windows preview **0.21.0**, save format **12**, on **2026-09-17**.
 
 Copy the prompt below into a new development task. Update this file and the root README before every GitHub push.
 
@@ -14,13 +14,13 @@ ADHD Warrior is a calm, local-first ADHD task app wrapped in a fantasy progressi
 
 ## Current baseline
 
-- Current Windows preview: **0.20.2**.
+- Current Windows preview: **0.21.0**.
 - Save format: **12**.
 - Runtime: C# Windows Forms on .NET Framework 4.8 with no external packages.
 - Build command: `powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1`.
-- Output: `dist/0.20.2/ADHD Warrior.exe` plus config and assets.
+- Output: `dist/0.21.0/ADHD Warrior.exe` plus config and assets.
 - Installer command: `powershell -NoProfile -ExecutionPolicy Bypass -File .\build-installer.ps1`.
-- Run `build-release.ps1` for the installer, portable ZIP, and SHA-256 checksum list under `release/0.20.2/`.
+- Run `build-release.ps1` for the installer, portable ZIP, and SHA-256 checksum list under `release/0.21.0/`.
 - Normal save: `%LOCALAPPDATA%\AdhdWarrior\save.json`.
 - Git branch: `main`.
 - GitHub remote: `https://github.com/dan-cawley/ADHD-Windows.git`.
@@ -44,7 +44,7 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 - Daily and weekly recurrence. A recurring copy preserves title, category, rarity, XP, due time, recurrence, and step titles.
 - Rarities and iOS default XP: Common 50, Uncommon 75, Rare 100, Epic 150, Unique 225. XP remains editable.
 - Character levels use the iOS thresholds through level 20.
-- Quest completion is idempotent, grants base XP plus familiar/gear bonuses, grants `base XP / 5` coins, progresses the active familiar, and damages the boss by awarded XP.
+- Quest completion is idempotent, grants base XP plus the active familiar bonus, grants `base XP / 5` coins, progresses the active familiar, and damages the boss by awarded XP. Equipment is cosmetic and never changes statistics.
 
 ### Streak quests
 
@@ -93,9 +93,10 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 - Completing one or more ordinary quests opens a themed boss-impact dialog with the boss portrait, total awarded damage, remaining HP, victory, and next-encounter details.
 - The dialog renders reward tiles for coins, familiar XP or egg growth, and each gear drop. Coin art is drawn locally; familiar and equipment tiles reuse packaged game artwork.
 - A later Monday-based week heals an undefeated boss by up to half maximum HP. Backward clock movement does nothing.
-- The catalog contains all 81 iOS items across nine sets. Owned bonuses apply automatically; there is no equip step.
+- The catalog contains all 81 iOS items across nine visual avatar sets. Equipment is cosmetic: it does not change quest XP, boss health, or other statistics.
+- Character uses an iOS-style paper doll. The selected avatar is centered, with head above, hands/offhand/chest/legs on the left, accessory/ring/weapon on the right, and feet below. Owned pieces appear in color; locked targets are dimmed.
 - Every sixth general completion grants an unowned catalog item. The coin shop offers specific unowned gear.
-- Full-set and slot/rarity XP rules are implemented in `Journey.GearBonus`.
+- Owned pieces reveal matching avatar panels and complete sets unlock their avatar themes. `Journey.GearBonus` intentionally returns zero for compatibility with older callers.
 
 ### Persistence and imports
 
@@ -130,7 +131,7 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 - `src/Core.cs`: quest and save models, completion, character streak metric, serialization, validation, migrations.
 - `src/Editor.cs`: quest editor.
 - `src/Progression.cs`: rarity defaults and character level thresholds.
-- `src/Journey.cs`: familiar, boss, gear bonuses, loot rolls, training, adventure validation.
+- `src/Journey.cs`: familiar and boss progression, cosmetic gear collection, loot rolls, training, and adventure validation.
 - `src/JourneyViews.cs`: Character, Familiars, Boss map, Equipment, and adventure completion UI.
 - `src/Streaks.cs`: streak model, cadence rules, rewards, validation-facing shape, and UI.
 - `src/DailyTemplates.cs`: daily template generation/editor, consistency milestones, pending rewards, and Rewards UI.
@@ -145,7 +146,7 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 
 ## Known gaps and risks
 
-- Version 0.20.2 embeds explicit Windows compatibility manifests in the app and installer and produces setup and portable artifacts with SHA-256 checksums. It passes 148 automated assertions, including the embedded Windows icon, ICS parsing and trusted Microsoft 365 link recognition plus the original core suite and template, milestone, reward-reservation, identity, progressive portrait-reveal, avatar-asset, reminder-preference, migration, and import coverage. Earlier isolated desktop launch/fresh-save/clean-close plus installer/install/uninstall smoke tests pass.
+- Version 0.21.0 adds the iOS-style character paper doll and makes all equipment strictly cosmetic. It embeds explicit Windows compatibility manifests and produces setup and portable artifacts with SHA-256 checksums. It passes 149 automated assertions, including cosmetic equipment boundaries and the prior core, calendar, template, milestone, identity, reminder, migration, and import coverage. Earlier isolated desktop launch/fresh-save/clean-close plus installer/install/uninstall smoke tests pass.
 - Run an interactive smoke test of creating/completing daily, weekly, monthly, and weekday streaks; restarting; and spending all three familiar skills.
 - Interactively verify actual Windows sign-in startup, tray open/exit behavior, notification delivery and quiet-hour boundaries, export/restore dialogs, and multiple display scales.
 - iOS stage-4 ready eggs conflict with the Windows meaning of stage 4 and remain intentionally skipped.
@@ -157,7 +158,7 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 
 ## Recommended next phase
 
-Interactively verify the 0.20.2 completion reward row with normal completion, egg growth, hatched familiar XP, one or multiple gear drops, and boss defeat. Also verify the sword emblem across Windows surfaces. Calendar feed verification remains outstanding.
+Interactively verify the 0.21.0 character paper doll at common Windows display scales, including fresh, partial, and complete sets. Then port the iOS completion-undo receipt model so mistaken completions can be reversed safely. Calendar feed verification remains outstanding.
 
 ## Required workflow for every change and push
 

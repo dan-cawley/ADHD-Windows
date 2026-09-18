@@ -18,8 +18,8 @@ namespace AdhdWarrior {
    var day=new DateTime(2026,9,15);var data=new SaveData();var q=new Quest {Title="Recurring epic",Rarity="Epic",Repeat="Weekly",XP=175};data.Quests.Add(q);Game.Complete(data,new[]{q},day);
    Check(data.Quests[1].Rarity=="Epic"&&data.Quests[1].XP==175,"Recurring quest preserves rarity and custom XP");
    data.Journey.Gear.AddRange(new[]{"standard_5","standard_7","standard_8","standard_9"});
-   var unique=new Quest {Title="Unique task",Rarity="Unique"};Check(Journey.GearBonus(data,unique,day)==13,"Unique quest gets feet, offhand, accessory and flat epic bonuses");
-   unique.Repeat="Daily";Check(Journey.GearBonus(data,unique,day)==3,"Daily slot rules precede unique slot rules as in iOS");
+   var unique=new Quest {Title="Unique task",Rarity="Unique"};Check(Journey.GearBonus(data,unique,day)==0,"Equipment remains cosmetic for Unique quests");
+   unique.Repeat="Daily";Check(Journey.GearBonus(data,unique,day)==0,"Equipment remains cosmetic for daily quests");
    string json="{\"quests\":[{\"id\":\"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa\",\"title\":\"Imported legendary\",\"category\":\"Life\",\"rarity\":\"legendary\",\"xp\":225}],\"xpEvents\":[],\"coinBalance\":0,\"inventory\":{}}";
    Check(IosImport.Parse(json,TimeZoneInfo.Utc).Data.Quests[0].Rarity=="Unique","iOS legendary alias maps to Unique");
    bool rejected=false;try{data.Quests[0].Rarity="Invalid";Storage.Decode(Storage.Encode(data));}catch{rejected=true;}Check(rejected,"Unknown rarity cannot corrupt a Windows save");

@@ -43,7 +43,7 @@ namespace AdhdWarrior {
   public static int Stage(Familiar p){return p.EggStage<4?0:Math.Min(3,p.Level);}
   public static int PetNextXP(Familiar p){return checked(100+(p.Level-1)*30);}
   public static string WeekKey(DateTime day){return day.Date.AddDays(-(((int)day.DayOfWeek+6)%7)).ToString("yyyy-MM-dd");}
-  public static int TargetHP(JourneyState j){return Math.Max(300,(350*(90+j.BossIndex*2)/100)*(100+j.Gear.Count*5)/100);}
+  public static int TargetHP(JourneyState j){return Math.Max(300,350*(90+j.BossIndex*2)/100);}
   public static bool RefreshWeek(SaveData data,DateTime day) {
    var j=data.Journey;string week=WeekKey(day);
    if(j.Week==""){j.Week=week;j.BossMaxHP=TargetHP(j);j.BossHP=j.BossMaxHP;return true;}
@@ -53,18 +53,8 @@ namespace AdhdWarrior {
   }
   static void AddHistory(JourneyState j,string outcome){j.History.Insert(0,new BossRecord {Index=j.BossIndex,Week=j.Week,Outcome=outcome,HP=j.BossHP});if(j.History.Count>30)j.History.RemoveAt(30);}
   public static void Log(JourneyState j,string text){j.Journal.Insert(0,text);if(j.Journal.Count>50)j.Journal.RemoveAt(50);}
-  public static int GearBonus(SaveData data,Quest q,DateTime day) {
-   int total=0;foreach(string id in data.Journey.Gear){var g=GearCatalog.All.Single(x=>x.Id==id);int b=g.BaseBonus;if(b==0)continue;
-    if(q.Repeat=="Daily"||!String.IsNullOrEmpty(q.DailyTemplateId)){if(g.Slot=="ACCESSORY")total++;if(g.Slot=="HEAD")total+=b;if(g.Slot=="CHEST")total+=Math.Max(1,b/2);}
-    else if(q.Rarity=="Unique"){if(g.Slot=="FEET")total+=b+2;if(g.Slot=="WEAPON")total+=b;if(g.Slot=="OFFHAND")total+=Math.Max(1,b/2);if(g.Slot=="ACCESSORY")total+=2;}
-    else {if(g.Slot=="ACCESSORY"||g.Slot=="RING")total++;if(g.Slot=="OFFHAND"&&q.Steps.Count>0)total+=Math.Max(1,b/2);if(g.Slot=="HANDS")total+=Math.Max(1,b-1);if(g.Slot=="WEAPON")total+=b;if(g.Slot=="CHEST")total+=Math.Max(1,b/2);if(g.Slot=="LEGS"&&(q.Steps.Count>=2||(!String.IsNullOrEmpty(q.Due)&&String.CompareOrdinal(q.Due,day.ToString("yyyy-MM-dd"))<=0)))total+=Math.Max(1,b/2);}
-    if(g.Rarity=="EPIC")total+=2;if(g.Rarity=="UNIQUE")total+=3;
-   }
-   var required=new[]{"HEAD","CHEST","HANDS","LEGS","FEET","WEAPON","ACCESSORY"};
-   if(GearCatalog.All.Where(g=>data.Journey.Gear.Contains(g.Id)).GroupBy(g=>g.Sheet).Any(set=>required.All(slot=>set.Any(g=>g.Slot==slot))))total+=q.Rarity=="Unique"?12:(q.Repeat=="Daily"||!String.IsNullOrEmpty(q.DailyTemplateId))?8:10;
-   return total;
-  }
-  public static int Bonus(SaveData data,Quest q,DateTime day){var p=ActivePet(data);return GearBonus(data,q,day)+(p.EggStage==4?p.QuestSkill*Stage(p):0);}
+  public static int GearBonus(SaveData data,Quest q,DateTime day){return 0;}
+  public static int Bonus(SaveData data,Quest q,DateTime day){var p=ActivePet(data);return p.EggStage==4?p.QuestSkill*Stage(p):0;}
   public static void OnCompletion(SaveData data,Quest quest,DateTime day) {
    RefreshWeek(data,day);var j=data.Journey;var p=ActivePet(data);j.Completions=checked(j.Completions+1);DailyTemplatesEngine.ProcessMilestones(data);
    if(p.EggStage<4){p.Growth+=20;while(p.Growth>=Definition(p).Threshold&&p.EggStage<4){p.Growth-=Definition(p).Threshold;p.EggStage++;}if(p.EggStage==4){p.Growth=0;Log(j,Definition(p).Name+" hatched! It is now your active companion.");}}
@@ -75,7 +65,7 @@ namespace AdhdWarrior {
    if(p.EggStage==4&&p.LootSkill>0&&LootRoll.Next(100)<Math.Min(100,p.LootSkill*Stage(p)))AwardGear(data,RolledRarity(quest.Rarity));
   }
   static bool Available(SaveData data,GearDefinition gear){return !data.Journey.Gear.Contains(gear.Id)&&!data.PendingRewards.Any(r=>r.GearId==gear.Id);}
-  static void AwardGear(SaveData data,bool highTier){var j=data.Journey;var item=GearCatalog.All.FirstOrDefault(g=>Available(data,g)&&(!highTier||g.Rarity=="RARE"||g.Rarity=="EPIC"||g.Rarity=="UNIQUE"));if(item==null){Log(j,"Collection complete. Your adventure continues!");return;}j.Gear.Add(item.Id);Log(j,"Collected "+item.Name+". Its bonuses apply automatically.");}
+  static void AwardGear(SaveData data,bool highTier){var j=data.Journey;var item=GearCatalog.All.FirstOrDefault(g=>Available(data,g)&&(!highTier||g.Rarity=="RARE"||g.Rarity=="EPIC"||g.Rarity=="UNIQUE"));if(item==null){Log(j,"Collection complete. Your adventure continues!");return;}j.Gear.Add(item.Id);Log(j,"Collected "+item.Name+" for your character collection.");}
   static void AwardGear(SaveData data,string rarity){var j=data.Journey;var item=GearCatalog.All.FirstOrDefault(g=>Available(data,g)&&g.Rarity==rarity);if(item==null)return;j.Gear.Add(item.Id);Log(j,"Your familiar found bonus loot: "+item.Name+" ("+rarity.ToLowerInvariant()+").");}
   static string RolledRarity(string questRarity){
    int[] weights=questRarity=="Uncommon"?new[]{50,35,12,3,0}:questRarity=="Rare"?new[]{25,40,28,7,0}:questRarity=="Epic"?new[]{10,25,40,25,5}:questRarity=="Unique"?new[]{0,10,30,45,25}:new[]{75,20,4,1,0};

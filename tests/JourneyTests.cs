@@ -25,10 +25,10 @@ namespace AdhdWarrior {
    int oldXP=pet.XP;Complete(data,day);Expect(pet.XP==oldXP&&Journey.ActivePet(data).Growth==20,"Only active familiar advances");
    Expect(Rejects(()=>Journey.Adopt(data,"basilisk"))&&data.Journey.Pets.Count==2,"Duplicate adoption rejected");
    Expect(Rejects(()=>Journey.Train(data,"basilisk","Quest XP")),"Unhatched eggs cannot spend skill points");
-   var shop=new SaveData {Coins=150};Journey.BuyGear(shop,"standard_2");Expect(shop.Coins==50&&Journey.GearBonus(shop,ordinary,day)==2,"Owned chest gear automatically grants ordinary quest XP");
+   var shop=new SaveData {Coins=150};Journey.BuyGear(shop,"standard_2");Expect(shop.Coins==50&&Journey.GearBonus(shop,ordinary,day)==0,"Owned gear is cosmetic and does not grant quest XP");
    Expect(Rejects(()=>Journey.BuyGear(shop,"standard_2"))&&shop.Coins==50,"Cannot pay twice for an owned item");
    Expect(Rejects(()=>Journey.BuyGear(shop,"nightveil_2"))&&shop.Coins==50,"Insufficient balance cannot purchase gear");
-   var earned=Complete(shop,day);Expect(earned.AwardedXP==52&&shop.XP==52&&shop.Coins==60,"Quest receipt records bonus XP while coins follow base XP");
+   var earned=Complete(shop,day);Expect(earned.AwardedXP==50&&shop.XP==50&&shop.Coins==60,"Cosmetic gear leaves quest XP unchanged while coins follow base XP");
    var victory=new SaveData();Journey.RefreshWeek(victory,day);victory.Journey.BossHP=5;var winner=Complete(victory,day);Expect(victory.Journey.BossIndex==1&&victory.Journey.History.Count==1&&victory.Journey.History[0].HP==0,"Victory records history and advances to next boss");
    Expect(victory.Journey.Gear.Count==1&&GearCatalog.All.Single(g=>g.Id==victory.Journey.Gear[0]).Rarity=="RARE","Boss drops rare-or-better gear");
    int hp=victory.Journey.BossHP;Game.Complete(victory,new[]{winner},day);Expect(victory.Journey.BossHP==hp&&victory.Journey.History.Count==1,"Boss victory cannot be replayed");

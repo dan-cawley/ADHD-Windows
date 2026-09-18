@@ -2,6 +2,14 @@
 
 All notable Windows migration phases are recorded here. The project is still a preview and does not yet publish packaged releases.
 
+## 0.21.0 — 2026-09-17
+
+- Added an iOS-style character paper doll with equipment-slot artwork arranged around the selected avatar.
+- Shows owned pieces in color and locked pieces dimmed while preserving the progressive avatar reveal.
+- Made equipment strictly cosmetic; gear no longer changes quest XP, boss health, or any other statistic.
+- Kept save format 12 because ownership data already contains everything required for the visual layout.
+- Added regression coverage that equipment collection cannot scale boss health.
+
 ## 0.20.2 — 2026-09-17
 
 - Added explicit Windows compatibility manifests to the app and per-user installer to prevent Program Compatibility Assistant prompts.
