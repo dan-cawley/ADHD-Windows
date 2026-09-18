@@ -8,7 +8,7 @@ ADHD Warrior is a private, local-first Windows desktop app that turns everyday t
 
 ## Current release
 
-**Windows preview 0.21.0 · save format 12 · .NET Framework 4.8**
+**Windows preview 0.21.1 · save format 12 · .NET Framework 4.8**
 
 This repository is the native C# Windows migration of the more complete iOS app. The iOS implementation is the behavioral source of truth whenever a matching Windows feature is added. The Android port and preserved artwork are secondary references.
 
@@ -27,7 +27,7 @@ This repository is the native C# Windows migration of the more complete iOS app.
 - Google public-feed 404 errors explain that public addresses require a public calendar and direct the user to Google’s private Secret address instead.
 - Four familiar families: Silent Basilisk, Arcane Drake, Storm Gryphon, and Wild Hydra.
 - Familiar hatching, leveling, evolution, skill points, Quest XP, Streak XP, and Loot Chance.
-- Local character display names, custom familiar names, and nine iOS avatar themes unlocked through matching equipment sets.
+- Local character display names, custom familiar names, and nine sequential iOS avatar journeys.
 - A nine-panel character portrait that starts with the Standard hood and face visible, then reveals each remaining panel as its matching gear slot is earned or purchased.
 - Eighteen weekly bosses with quest damage, rollover healing, history, and rewards.
 - An iOS-style quest-completion popup showing the current boss artwork, damage dealt, remaining health, victory, and next encounter.
@@ -35,7 +35,8 @@ This repository is the native C# Windows migration of the more complete iOS app.
 - All 81 iOS equipment definitions, nine visual avatar sets, cosmetic collection progress, and a coin shop.
 - An iOS-style character paper doll with owned and locked equipment arranged around the avatar by slot.
 - Rarity-weighted bonus loot based on the iOS drop tables.
-- Claimable consistency milestone rewards at 3, 7, 14, 30, and 60 total completions.
+- Automatically claimed consistency rewards at 3, 7, 14, 30, and 60 total completions.
+- Sequential gear rewards: Standard fills first, then Archanist, Garden Gnome, Wood Elf, Micah, Stacy, Spellbinder, Sunforge, and Moonveil.
 - Twilight forest theme with buffered page rendering.
 - A dedicated sword-and-forest application emblem embedded into the executable, installer, window, notification area, and generated shortcuts.
 - Atomic local saves, previous-save recovery, Windows backup/restore, and reviewed partial iOS import.
@@ -46,7 +47,7 @@ The left navigation contains Today, All quests, Review, Daily templates, Streak 
 
 ## Run the app
 
-On the development machine, close any older ADHD Warrior window and open `Launch ADHD Warrior.lnk`. The launcher points to `dist/0.21.0/ADHD Warrior.exe`.
+On the development machine, close any older ADHD Warrior window and open `Launch ADHD Warrior.lnk`. The launcher points to `dist/0.21.1/ADHD Warrior.exe`.
 
 Build output and the local shortcut are intentionally excluded from Git. A fresh clone must be built before it can run:
 
@@ -64,7 +65,7 @@ Build the per-user installer with:
 powershell -NoProfile -ExecutionPolicy Bypass -File .\build-installer.ps1
 ```
 
-Run `build-release.ps1` to create the setup executable, portable ZIP, and `SHA256SUMS.txt` under `release/0.21.0/`. The app and installer embed Windows compatibility manifests for per-user execution, Windows 10/11 recognition, per-monitor DPI awareness, and long-path awareness. The installer places the app under `%LOCALAPPDATA%\Programs\ADHD Warrior`, creates Start menu and desktop shortcuts, and registers a clean uninstall entry in Windows Apps & Features. Upgrades preserve `%LOCALAPPDATA%\AdhdWarrior\save.json` and its backups.
+Run `build-release.ps1` to create the setup executable, portable ZIP, and `SHA256SUMS.txt` under `release/0.21.1/`. The app and installer embed Windows compatibility manifests for per-user execution, Windows 10/11 recognition, per-monitor DPI awareness, and long-path awareness. The installer places the app under `%LOCALAPPDATA%\Programs\ADHD Warrior`, creates Start menu and desktop shortcuts, and registers a clean uninstall entry in Windows Apps & Features. Upgrades preserve `%LOCALAPPDATA%\AdhdWarrior\save.json` and its backups.
 
 ## Saves and privacy
 
@@ -86,7 +87,7 @@ The importer currently carries over:
 
 - Quest identity, title, category, rarity, XP, due date/time, completion, substeps, backlog/archive state, and supported recurrence.
 - Streak quests, cadence, XP, total completions, current/best streaks, and last completion date.
-- Daily templates, their schedules and generation preference, compatible pending equipment rewards, and claimed consistency milestones.
+- Daily templates, their schedules and generation preference, compatible equipment rewards, and claimed consistency milestones. Imported pending gear is automatically redirected into the current avatar journey.
 - Lifetime XP, coins, and distinct known equipment.
 - Compatible hatched familiars, skill allocations, selected familiar, and growing eggs at stages 1–3.
 - Character display name, compatible unlocked avatar selection, and familiar names.
@@ -105,7 +106,7 @@ This is a dependency-free Windows Forms application targeting .NET Framework 4.8
 | Familiar, equipment, and boss rules | `src/Journey.cs`, `src/GearCatalog.cs` |
 | Adventure pages | `src/JourneyViews.cs` |
 | Streak model, rules, and page | `src/Streaks.cs` |
-| Daily templates and pending rewards | `src/DailyTemplates.cs` |
+| Daily templates and automatic milestone rewards | `src/DailyTemplates.cs` |
 | Character and familiar identity | `src/Identity.cs` |
 | iOS JSON preview/import | `src/IosImport.cs` |
 | Visual system and repaint buffering | `src/Theme.cs` |
@@ -118,7 +119,7 @@ The build script compiles every `src/*.cs` and `tests/*.cs` file into one execut
 
 ## Validation status
 
-Version 0.21.0 passes **149 automated assertions** covering cosmetic equipment boundaries, the embedded Windows icon, core quest/adventure suite, ICS parsing, trusted Microsoft 365 link recognition, templates, milestones, reward reservation, identity, progressive portrait reveal, avatar assets, reminder preferences, save migrations, and iOS import boundaries. Equipment ownership affects only collection and avatar presentation; it does not change quest XP, boss health, or other statistics. Earlier isolated smoke tests confirmed desktop startup, installer extraction, installed-app tests, and complete uninstall cleanup. Successful live calendar feeds, Windows icon-cache refresh, sign-in startup, tray interaction, notification delivery, shortcuts, Apps & Features UI, completion-dialog scaling, export/restore dialogs, and varied display scaling still require interactive verification before calling the app production-ready.
+Version 0.21.1 passes **152 automated assertions** covering sequential current-set rewards, automatic claiming, avatar advancement, cosmetic equipment boundaries, the embedded Windows icon, core quest/adventure behavior, calendars, templates, identity, reminders, migrations, and iOS import boundaries. Every gear source and the shop now target only the earliest incomplete avatar set. Earlier isolated smoke tests confirmed desktop startup, installer extraction, installed-app tests, and complete uninstall cleanup. Successful live calendar feeds, Windows icon-cache refresh, sign-in startup, tray interaction, notification delivery, shortcuts, Apps & Features UI, completion-dialog scaling, export/restore dialogs, and varied display scaling still require interactive verification before calling the app production-ready.
 
 This preview now has portable and per-user installer builds with SHA-256 checksums. Both are unsigned; Windows SmartScreen may show a publisher or reputation warning until code signing is added. Background reminders require the app process to remain running in the notification area. Automatic updates and a published GitHub release are not yet implemented.
 

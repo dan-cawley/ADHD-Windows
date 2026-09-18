@@ -2,6 +2,14 @@
 
 All notable Windows migration phases are recorded here. The project is still a preview and does not yet publish packaged releases.
 
+## 0.21.1 — 2026-09-17
+
+- Restricted milestone, six-completion, boss, familiar, and shop gear to the earliest incomplete avatar set.
+- Automatically adds awarded gear to the collection and converts older pending rewards into current-set pieces.
+- Advances and selects the next avatar journey only after all nine current pieces are owned.
+- Preserved existing out-of-order gear ownership and kept all equipment cosmetic.
+- Added regression coverage for reward order, automatic claiming, future-set shop blocking, and avatar advancement.
+
 ## 0.21.0 — 2026-09-17
 
 - Added an iOS-style character paper doll with equipment-slot artwork arranged around the selected avatar.

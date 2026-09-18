@@ -1,6 +1,6 @@
 # Future-version continuation prompt
 
-Last synchronized with Windows preview **0.21.0**, save format **12**, on **2026-09-17**.
+Last synchronized with Windows preview **0.21.1**, save format **12**, on **2026-09-17**.
 
 Copy the prompt below into a new development task. Update this file and the root README before every GitHub push.
 
@@ -14,13 +14,13 @@ ADHD Warrior is a calm, local-first ADHD task app wrapped in a fantasy progressi
 
 ## Current baseline
 
-- Current Windows preview: **0.21.0**.
+- Current Windows preview: **0.21.1**.
 - Save format: **12**.
 - Runtime: C# Windows Forms on .NET Framework 4.8 with no external packages.
 - Build command: `powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1`.
-- Output: `dist/0.21.0/ADHD Warrior.exe` plus config and assets.
+- Output: `dist/0.21.1/ADHD Warrior.exe` plus config and assets.
 - Installer command: `powershell -NoProfile -ExecutionPolicy Bypass -File .\build-installer.ps1`.
-- Run `build-release.ps1` for the installer, portable ZIP, and SHA-256 checksum list under `release/0.21.0/`.
+- Run `build-release.ps1` for the installer, portable ZIP, and SHA-256 checksum list under `release/0.21.1/`.
 - Normal save: `%LOCALAPPDATA%\AdhdWarrior\save.json`.
 - Git branch: `main`.
 - GitHub remote: `https://github.com/dan-cawley/ADHD-Windows.git`.
@@ -63,7 +63,7 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 - New saves start with the four iOS standard templates and automatic generation enabled. Each matching template creates one Common quest per day, tracked by template ID and generated date.
 - Editing, pausing, removing, or rescheduling a template updates or removes today's unfinished generated quest. Completed generated quests remain history.
 - Saves upgraded from format 8 receive the standard templates paused to avoid surprise quests.
-- Completion milestones are 3, 7, 14, 30, and 60. Reaching one queues an unowned non-egg equipment reward; Rewards shows and claims the queue.
+- Completion milestones are 3, 7, 14, 30, and 60. Reaching one automatically adds the next piece from the current avatar journey; there is no manual claim step.
 - Older Windows saves mark already-reached milestones as claimed, so migration does not backfill rewards. Existing every-sixth-completion, boss, and familiar loot rules remain active.
 
 ### Familiars
@@ -81,7 +81,7 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 
 - Character supports a local display name with no account requirement.
 - The nine iOS avatar themes and full-size artwork are included: Standard, Archanist, Garden Gnome, Wood Elf, Micah, Stacy, Spellbinder, Sunforge, and Moonveil.
-- Standard is always available. Each other avatar becomes selectable when every equipment item in its matching set is owned.
+- Avatar journeys progress in iOS order: Standard, Archanist, Garden Gnome, Wood Elf, Micah, Stacy, Spellbinder, Sunforge, and Moonveil. Standard starts available; completing one set opens and automatically selects the next.
 - Character artwork uses the iOS nine-panel reveal order. A new Standard character shows only the hood/face panel; weapon, offhand, hands, chest, legs, accessory, feet, and ring panels become visible as matching gear is owned.
 - The Character page shows set progress and provides the identity editor. Save validation prevents selecting a locked or unknown avatar.
 - iOS import preserves the display name and selected avatar when its required equipment is also compatible and imported.
@@ -95,6 +95,7 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 - A later Monday-based week heals an undefeated boss by up to half maximum HP. Backward clock movement does nothing.
 - The catalog contains all 81 iOS items across nine visual avatar sets. Equipment is cosmetic: it does not change quest XP, boss health, or other statistics.
 - Character uses an iOS-style paper doll. The selected avatar is centered, with head above, hands/offhand/chest/legs on the left, accessory/ring/weapon on the right, and feet below. Owned pieces appear in color; locked targets are dimmed.
+- All reward paths—consistency milestones, every sixth completion, boss victories, and familiar loot—automatically grant the next unowned tile from the earliest incomplete set. The shop is limited to that same current set. Existing out-of-order ownership is preserved but never changes the next reward target.
 - Every sixth general completion grants an unowned catalog item. The coin shop offers specific unowned gear.
 - Owned pieces reveal matching avatar panels and complete sets unlock their avatar themes. `Journey.GearBonus` intentionally returns zero for compatibility with older callers.
 
@@ -134,7 +135,7 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 - `src/Journey.cs`: familiar and boss progression, cosmetic gear collection, loot rolls, training, and adventure validation.
 - `src/JourneyViews.cs`: Character, Familiars, Boss map, Equipment, and adventure completion UI.
 - `src/Streaks.cs`: streak model, cadence rules, rewards, validation-facing shape, and UI.
-- `src/DailyTemplates.cs`: daily template generation/editor, consistency milestones, pending rewards, and Rewards UI.
+- `src/DailyTemplates.cs`: daily template generation/editor, automatic consistency rewards, legacy pending-reward conversion, and Rewards history UI.
 - `src/Identity.cs`: character name, avatar unlock rules and editor, and familiar naming dialogs.
 - `src/IosImport.cs`: safe partial iOS JSON converter and review dialog.
 - `src/GearCatalog.cs`: generated iOS equipment catalog.
@@ -146,7 +147,7 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 
 ## Known gaps and risks
 
-- Version 0.21.0 adds the iOS-style character paper doll and makes all equipment strictly cosmetic. It embeds explicit Windows compatibility manifests and produces setup and portable artifacts with SHA-256 checksums. It passes 149 automated assertions, including cosmetic equipment boundaries and the prior core, calendar, template, milestone, identity, reminder, migration, and import coverage. Earlier isolated desktop launch/fresh-save/clean-close plus installer/install/uninstall smoke tests pass.
+- Version 0.21.1 adds sequential current-avatar rewards and automatic claiming on top of the iOS-style cosmetic paper doll. It passes 152 automated assertions, including set order, automatic claiming, avatar advancement, cosmetic boundaries, and the prior core, calendar, template, identity, reminder, migration, and import coverage. Earlier isolated desktop launch/fresh-save/clean-close plus installer/install/uninstall smoke tests pass.
 - Run an interactive smoke test of creating/completing daily, weekly, monthly, and weekday streaks; restarting; and spending all three familiar skills.
 - Interactively verify actual Windows sign-in startup, tray open/exit behavior, notification delivery and quiet-hour boundaries, export/restore dialogs, and multiple display scales.
 - iOS stage-4 ready eggs conflict with the Windows meaning of stage 4 and remain intentionally skipped.
@@ -158,7 +159,7 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 
 ## Recommended next phase
 
-Interactively verify the 0.21.0 character paper doll at common Windows display scales, including fresh, partial, and complete sets. Then port the iOS completion-undo receipt model so mistaken completions can be reversed safely. Calendar feed verification remains outstanding.
+Interactively verify Standard completion advances to Archanist, every gear source stays within the current set, and the paper doll updates immediately. Then port the iOS completion-undo receipt model so mistaken completions can be reversed safely. Calendar feed verification remains outstanding.
 
 ## Required workflow for every change and push
 
