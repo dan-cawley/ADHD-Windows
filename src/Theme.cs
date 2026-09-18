@@ -41,6 +41,12 @@ namespace AdhdWarrior {
  public class BufferedFlowLayoutPanel : FlowLayoutPanel {
   public BufferedFlowLayoutPanel(){SetStyle(ControlStyles.UserPaint|ControlStyles.AllPaintingInWmPaint|ControlStyles.OptimizedDoubleBuffer|ControlStyles.ResizeRedraw|ControlStyles.SupportsTransparentBackColor,true);UpdateStyles();}
  }
+ public class PokerCardPanel : TableLayoutPanel {
+  public Color Accent=Theme.Gold;
+  public PokerCardPanel(){DoubleBuffered=true;BackColor=Theme.Surface;Padding=new Padding(12);Margin=new Padding(0,0,16,16);Size=new Size(286,400);}
+  protected override void OnResize(EventArgs e){base.OnResize(e);if(Width<2||Height<2)return;using(var path=new GraphicsPath()){int radius=18;path.AddArc(0,0,radius,radius,180,90);path.AddArc(Width-radius-1,0,radius,radius,270,90);path.AddArc(Width-radius-1,Height-radius-1,radius,radius,0,90);path.AddArc(0,Height-radius-1,radius,radius,90,90);path.CloseFigure();Region=new Region(path);}}
+  protected override void OnPaint(PaintEventArgs e){base.OnPaint(e);e.Graphics.SmoothingMode=SmoothingMode.AntiAlias;using(var path=new GraphicsPath()){int radius=18;path.AddArc(1,1,radius,radius,180,90);path.AddArc(Width-radius-2,1,radius,radius,270,90);path.AddArc(Width-radius-2,Height-radius-2,radius,radius,0,90);path.AddArc(1,Height-radius-2,radius,radius,90,90);path.CloseFigure();using(var border=new Pen(Accent,2))e.Graphics.DrawPath(border,path);}}
+ }
  public partial class MainWindow {
   protected override CreateParams CreateParams {get {var cp=base.CreateParams;cp.ExStyle|=0x02000000;return cp;}}
   System.Collections.Generic.Dictionary<string,Button> navigation=new System.Collections.Generic.Dictionary<string,Button>();

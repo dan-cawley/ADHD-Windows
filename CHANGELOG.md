@@ -2,6 +2,14 @@
 
 All notable Windows migration phases are recorded here. The project is still a preview and does not yet publish packaged releases.
 
+## 0.22.1 — 2026-09-18
+
+- Reshaped quests into rounded poker-card tiles with a consistent 2.5-by-3.5 proportion.
+- Added Windows Explorer-style responsive wrapping so the number of card columns follows the window width.
+- Moved boss and familiar art into a compact card illustration header.
+- Reserved a full-height bottom action row and shortened the overdue action so card buttons remain visible.
+- Made long small-step lists scroll inside their card instead of stretching or clipping the layout.
+
 ## 0.22.0 — 2026-09-18
 
 - Replaced plain quest rows with illustrated gameplay cards across Today, All quests, Review, Completed, and Archive.
