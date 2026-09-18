@@ -2,6 +2,13 @@
 
 All notable Windows migration phases are recorded here. The project is still a preview and does not yet publish packaged releases.
 
+## 0.22.2 — 2026-09-18
+
+- Shows only the earliest incomplete avatar sheet on the Character page; later sheets remain hidden until their predecessor is complete.
+- Moved level, total XP, coins, set progress, and the level meter below the character artwork.
+- Enabled explicit double buffering and resize repaint protection on the main window.
+- Added a required release-build render smoke test that paints every primary page at three window sizes and fails packaging on a render exception.
+
 ## 0.22.1 — 2026-09-18
 
 - Reshaped quests into rounded poker-card tiles with a consistent 2.5-by-3.5 proportion.

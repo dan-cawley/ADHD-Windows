@@ -12,10 +12,11 @@ namespace AdhdWarrior {
   [DllImport("user32.dll",SetLastError=true)]static extern IntPtr FindWindow(string className,string windowName);
   [DllImport("user32.dll")]static extern bool ShowWindow(IntPtr window,int command);
   [DllImport("user32.dll")]static extern bool SetForegroundWindow(IntPtr window);
-  static bool RestoreExisting(){var window=FindWindow(null,"ADHD Warrior — Windows 0.22.1");if(window==IntPtr.Zero)return false;ShowWindow(window,9);SetForegroundWindow(window);return true;}
+  static bool RestoreExisting(){var window=FindWindow(null,"ADHD Warrior — Windows 0.22.2");if(window==IntPtr.Zero)return false;ShowWindow(window,9);SetForegroundWindow(window);return true;}
   [STAThread] static int Main(string[] args) {
    Application.EnableVisualStyles(); Application.SetCompatibleTextRenderingDefault(false);
    if(args.Contains("--self-test")) return Tests.Run();
+   if(args.Contains("--render-test")) return MainWindow.RenderSmokeTest();
    bool first; using(var mutex=new Mutex(true,"Local\\AdhdWarriorWindows"+(args.Contains("--preview-test")?"Test":""),out first)) {
     if(!first) {if(!RestoreExisting())MessageBox.Show("ADHD Warrior is already running in the notification area.");return 0;}
     try {Application.Run(new MainWindow(args.Contains("--preview-test"),args.Contains("--background")));return 0;} catch(Exception ex) {MessageBox.Show(ex.Message,"ADHD Warrior could not start",MessageBoxButtons.OK,MessageBoxIcon.Error);return 1;}
@@ -31,8 +32,9 @@ namespace AdhdWarrior {
   Color ink=Theme.Text, green=Theme.Emerald, paper=Theme.Canvas;bool testMode,startHidden;
   public MainWindow(bool testMode=false,bool startHidden=false) {
    this.testMode=testMode;this.startHidden=startHidden;
+   SetStyle(ControlStyles.UserPaint|ControlStyles.AllPaintingInWmPaint|ControlStyles.OptimizedDoubleBuffer|ControlStyles.ResizeRedraw,true);DoubleBuffered=true;UpdateStyles();
    if(testMode) path=Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"test-state","save.json");
-   data=Storage.Load(path); Journey.RefreshWeek(data,DateTime.Today);if(DailyTemplatesEngine.EnsureToday(data,DateTime.Today))Storage.Save(path,data); Text="ADHD Warrior — Windows 0.22.1"+(testMode?" [TEST DATA]":"");Icon=Icon.ExtractAssociatedIcon(Application.ExecutablePath); MinimumSize=new Size(1000,680); Size=new Size(1240,860); StartPosition=FormStartPosition.CenterScreen; Font=new Font("Segoe UI",10); BackColor=paper; ForeColor=ink; AutoScaleMode=AutoScaleMode.Dpi;
+   data=Storage.Load(path); Journey.RefreshWeek(data,DateTime.Today);if(DailyTemplatesEngine.EnsureToday(data,DateTime.Today))Storage.Save(path,data); Text="ADHD Warrior — Windows 0.22.2"+(testMode?" [TEST DATA]":"");Icon=Icon.ExtractAssociatedIcon(Application.ExecutablePath); MinimumSize=new Size(1000,680); Size=new Size(1240,860); StartPosition=FormStartPosition.CenterScreen; Font=new Font("Segoe UI",10); BackColor=paper; ForeColor=ink; AutoScaleMode=AutoScaleMode.Dpi;
    var layout=new ForestLayout {BackgroundImage=Artwork("forest-twilight"),Dock=DockStyle.Fill,ColumnCount=2,RowCount=1}; layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute,220));layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent,100)); Controls.Add(layout);
    var nav=new FlowLayoutPanel {Dock=DockStyle.Fill,FlowDirection=FlowDirection.TopDown,WrapContents=false,AutoScroll=true,Padding=new Padding(18,28,12,12),BackColor=Theme.Sidebar,ForeColor=Theme.Text};layout.Controls.Add(nav,0,0);
    nav.Controls.Add(new Label {Text="ADHD\nWARRIOR",Font=new Font("Georgia",18,FontStyle.Bold),ForeColor=Theme.Gold,AutoSize=false,Size=new Size(165,90)});
@@ -46,7 +48,7 @@ namespace AdhdWarrior {
    capture.Dock=DockStyle.Fill;capture.MaxLength=500;capture.AccessibleName="Quick capture quest title";capture.KeyDown+=(s,e)=>{if(e.KeyCode==Keys.Enter){AddQuick();e.SuppressKeyPress=true;}};
    quick.Controls.Add(capture,0,0);quick.Controls.Add(Button("+ Capture",AddQuick),1,0);quick.Controls.Add(Button("+ Details",()=>Edit(null)),2,0);body.Controls.Add(quick,0,2);
    var bar=new FlowLayoutPanel {BackColor=Color.Transparent,Dock=DockStyle.Fill};search.Width=150;search.AccessibleName="Search quests";search.TextChanged+=(s,e)=>Render();bar.Controls.Add(new Label {Text="Search",AutoSize=true,Padding=new Padding(0,6,4,0)});bar.Controls.Add(search);bar.Controls.Add(Button("Complete selected",CompleteSelected));bar.Controls.Add(Button("Archive selected",ArchiveSelected));body.Controls.Add(bar,0,3);
-   cards.BackColor=Color.Transparent;cards.Dock=DockStyle.Fill;cards.AutoScroll=true;cards.FlowDirection=FlowDirection.TopDown;cards.WrapContents=false;cards.SizeChanged+=(s,e)=>ResizeCards();body.Controls.Add(cards,0,4);
+   cards.BackColor=Color.Transparent;cards.Dock=DockStyle.Fill;cards.AutoScroll=true;cards.FlowDirection=FlowDirection.TopDown;cards.WrapContents=false;cards.SizeChanged+=(s,e)=>{if(!cards.WrapContents)ResizeCards();};body.Controls.Add(cards,0,4);
    status.BackColor=Color.Transparent;status.Dock=DockStyle.Fill;status.ForeColor=green;status.Text="Capture a thought above. Enter adds it to today.";body.Controls.Add(status,0,5);Render();SetupReminders();
    FormClosed+=(s,e)=>{DisposeReminders();foreach(var item in artCache.Values)item.Dispose();};
   }
@@ -63,6 +65,7 @@ namespace AdhdWarrior {
   void ArchiveSelected() {var list=Selection();if(list.Count==0){status.Text="Select active quests to archive. You can restore them later.";return;}Change(()=>{foreach(var q in list)q.Archived=true;},"Moved to Archive. Restore whenever you need.");selected.Clear();}
   void ResizeCards() {int full=Math.Max(500,cards.ClientSize.Width-26);foreach(Control c in cards.Controls){if(c.Tag as string=="quest-card"){c.Width=286;c.Height=400;continue;}c.Width=full;cards.SetFlowBreak(c,true);if(c is Label)c.Height=Math.Max(72,TextRenderer.MeasureText(c.Text,c.Font,new Size(c.Width-c.Padding.Horizontal,0),TextFormatFlags.WordBreak).Height+c.Padding.Vertical+8);foreach(Control child in c.Controls) if(child is CheckBox)child.Width=c.Width-32;}}
   void Note(string text) {cards.Controls.Add(new Label {Text=text,AutoSize=false,Height=100,Padding=new Padding(18),Font=new Font("Segoe UI",10),BackColor=Theme.Surface,ForeColor=Theme.Muted,Margin=new Padding(0,0,0,12)});}
+  public static int RenderSmokeTest(){string report=Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"render-test-results.txt");try{using(var window=new MainWindow(true)){window.ShowInTaskbar=false;window.StartPosition=FormStartPosition.Manual;window.Location=new Point(-20000,-20000);window.Show();foreach(var size in new[]{new Size(1000,680),new Size(1240,860),new Size(1600,1000)}){window.Size=size;foreach(var page in new[]{"Today","All quests","Review","Character","Familiars","Boss map","Equipment","Rewards","Completed","Archive","Settings"}){window.view=page;window.Render();Application.DoEvents();using(var image=new Bitmap(window.ClientSize.Width,window.ClientSize.Height))window.DrawToBitmap(image,window.ClientRectangle);}}window.Close();}File.WriteAllText(report,"PASS: all primary pages rendered at 1000x680, 1240x860, and 1600x1000 with buffered repaint enabled.");return 0;}catch(Exception ex){File.WriteAllText(report,"FAIL: "+ex);return 1;}}
   void Render() {
    bool redraw=IsHandleCreated;if(redraw)SendMessage(Handle,WM_SETREDRAW,IntPtr.Zero,IntPtr.Zero);cards.SuspendLayout();try{foreach(Control c in cards.Controls.Cast<Control>().ToArray()){cards.Controls.Remove(c);c.Dispose();}
    bool questGrid=view=="Today"||view=="All quests"||view=="Review"||view=="Completed"||view=="Archive";cards.FlowDirection=FlowDirection.LeftToRight;cards.WrapContents=questGrid;
@@ -75,7 +78,7 @@ namespace AdhdWarrior {
    else if(view=="Equipment")ShowGear();
    else if(view=="Rewards")ShowRewards();
    else if(view=="Settings") {
-    Note("Windows preview 0.22.1\n\nYour progress is saved on this computer after every change. No account is required.");
+    Note("Windows preview 0.22.2\n\nYour progress is saved on this computer after every change. No account is required.");
     ShowCalendarSettings();ShowReminderSettings();cards.Controls.Add(Button("Export Windows backup…",Export));cards.Controls.Add(Button("Restore Windows backup…",Import));cards.Controls.Add(Button("Preview iOS import…",ImportIos));
     Note("Save location:\n"+path+"\n\nThe previous save is retained as save.json.bak.");Note("Backups use Windows format 12. Older Windows backups upgrade automatically. Encrypted calendar addresses stay on this Windows account and is excluded from backups.\n\nStill missing from Settings: appearance and text-size controls, sound and animation preferences, cloud sync, automatic updates, focus and body-double controls, and account or friend features.\n\nKeyboard: Enter to capture; Tab to move between controls; Space to select.");
    } else {
