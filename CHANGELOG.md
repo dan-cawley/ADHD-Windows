@@ -2,6 +2,13 @@
 
 All notable Windows migration phases are recorded here. The project is still a preview and does not yet publish packaged releases.
 
+## 0.21.3 — 2026-09-18
+
+- Removed the drawn grid borders and checker pattern from locked character sections.
+- Expanded adjacent locked masks slightly so fractional three-column boundaries cannot leave bright seams.
+- Added a border-aware inset to every sprite-sheet tile crop, excluding painted gutters and grid lines from equipment, boss, and reward artwork.
+- Uses proportional tile boundaries and high-quality resampling so non-divisible source dimensions cut consistently.
+
 ## 0.21.2 — 2026-09-17
 
 - Rebuilt the Character paper doll around a much larger full-height avatar.

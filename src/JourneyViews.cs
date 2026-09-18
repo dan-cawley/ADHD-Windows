@@ -17,13 +17,13 @@ namespace AdhdWarrior {
    string key=name+":"+tile;if(artCache.ContainsKey(key))return artCache[key];
    string file=Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"assets",name+".png");if(!File.Exists(file))return null;
    using(var source=Image.FromFile(file)) {
-    Image result;if(tile<0)result=new Bitmap(source);else {int w=source.Width/3,h=source.Height/3;var bitmap=new Bitmap(w,h);using(var g=Graphics.FromImage(bitmap))g.DrawImage(source,new Rectangle(0,0,w,h),new Rectangle((tile%3)*w,(tile/3)*h,w,h),GraphicsUnit.Pixel);result=bitmap;}
+    Image result;if(tile<0)result=new Bitmap(source);else {int column=tile%3,row=tile/3,left=column*source.Width/3,top=row*source.Height/3,right=(column+1)*source.Width/3,bottom=(row+1)*source.Height/3,inset=Math.Max(4,Math.Min(source.Width,source.Height)/80);var crop=Rectangle.FromLTRB(left+inset,top+inset,right-inset,bottom-inset);var bitmap=new Bitmap(crop.Width,crop.Height);using(var g=Graphics.FromImage(bitmap)){g.CompositingQuality=CompositingQuality.HighQuality;g.InterpolationMode=InterpolationMode.HighQualityBicubic;g.PixelOffsetMode=PixelOffsetMode.HighQuality;g.SmoothingMode=SmoothingMode.HighQuality;g.DrawImage(source,new Rectangle(0,0,bitmap.Width,bitmap.Height),crop,GraphicsUnit.Pixel);}result=bitmap;}
     artCache.Add(key,result);return result;
    }
   }
   Image AvatarArtwork(AvatarDefinition avatar) {
    var revealed=Identity.RevealedPanels(data,avatar);string mask=String.Join("",Enumerable.Range(0,9).Select(i=>revealed.Contains(i)?"1":"0"));string key="avatar:"+avatar.Id+":"+mask;if(artCache.ContainsKey(key))return artCache[key];
-   var source=Artwork(avatar.Asset);if(source==null)return null;var bitmap=new Bitmap(source.Width,source.Height);using(var g=Graphics.FromImage(bitmap)){g.DrawImage(source,0,0,source.Width,source.Height);using(var shade=new SolidBrush(Color.FromArgb(218,43,46,53)))using(var hatch=new HatchBrush(HatchStyle.LargeCheckerBoard,Color.FromArgb(28,255,255,255),Color.Transparent))using(var edge=new Pen(Color.FromArgb(100,196,184,150),Math.Max(2,source.Width/300))){for(int i=0;i<9;i++){if(revealed.Contains(i))continue;int column=i%3,row=i/3,left=column*source.Width/3,top=row*source.Height/3,right=(column+1)*source.Width/3,bottom=(row+1)*source.Height/3;var cell=Rectangle.FromLTRB(left,top,right,bottom);g.FillRectangle(shade,cell);g.FillRectangle(hatch,cell);g.DrawRectangle(edge,left,top,Math.Max(1,right-left-1),Math.Max(1,bottom-top-1));}}}
+   var source=Artwork(avatar.Asset);if(source==null)return null;var bitmap=new Bitmap(source.Width,source.Height);using(var g=Graphics.FromImage(bitmap)){g.DrawImage(source,0,0,source.Width,source.Height);using(var shade=new SolidBrush(Color.FromArgb(218,43,46,53))){for(int i=0;i<9;i++){if(revealed.Contains(i))continue;int column=i%3,row=i/3,left=column*source.Width/3,top=row*source.Height/3,right=(column+1)*source.Width/3,bottom=(row+1)*source.Height/3;g.FillRectangle(shade,Rectangle.FromLTRB(Math.Max(0,left-1),Math.Max(0,top-1),Math.Min(source.Width,right+1),Math.Min(source.Height,bottom+1)));}}}
    artCache.Add(key,bitmap);return bitmap;
   }
   Image LockedArtwork(GearDefinition item) {
