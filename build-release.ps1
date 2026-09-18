@@ -1,5 +1,5 @@
 $ErrorActionPreference = 'Stop'
-$version = '0.21.1'
+$version = '0.21.2'
 & (Join-Path $PSScriptRoot 'build-installer.ps1')
 $release = Join-Path $PSScriptRoot "release\$version"
 $portable = Join-Path $release "ADHD Warrior Portable $version.zip"

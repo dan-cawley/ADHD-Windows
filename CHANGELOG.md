@@ -2,6 +2,13 @@
 
 All notable Windows migration phases are recorded here. The project is still a preview and does not yet publish packaged releases.
 
+## 0.21.2 — 2026-09-17
+
+- Rebuilt the Character paper doll around a much larger full-height avatar.
+- Enlarged equipment artwork and arranged it in balanced left and right rails around the character.
+- Added buffered card rendering and suspended whole-window redraw while switching pages.
+- Repaints the completed page once after navigation to prevent the forest background from flashing through intermediate layouts.
+
 ## 0.21.1 — 2026-09-17
 
 - Restricted milestone, six-completion, boss, familiar, and shop gear to the earliest incomplete avatar set.
