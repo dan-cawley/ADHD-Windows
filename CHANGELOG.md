@@ -2,6 +2,13 @@
 
 All notable Windows migration phases are recorded here. The project is still a preview and does not yet publish packaged releases.
 
+## 0.22.0 — 2026-09-18
+
+- Replaced plain quest rows with illustrated gameplay cards across Today, All quests, Review, Completed, and Archive.
+- Shows the current boss and active familiar artwork directly on every quest.
+- Adds a reward strip with total quest XP, familiar bonus-loot chance, and the familiar's +20 growth or XP gain.
+- Preserved quest selection, small-step checkboxes, completion, editing, overdue recovery, archiving, and restoration.
+
 ## 0.21.3 — 2026-09-18
 
 - Removed the drawn grid borders and checker pattern from locked character sections.
