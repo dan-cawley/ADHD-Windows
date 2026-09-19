@@ -19,7 +19,7 @@ namespace AdhdWarrior {
    reminderIcon=new NotifyIcon {Icon=Icon??SystemIcons.Information,Text="ADHD Warrior reminders",Visible=data.Reminders.Enabled};
    var menu=new ContextMenuStrip();menu.Items.Add("Open ADHD Warrior",null,(s,e)=>RestoreFromTray());menu.Items.Add("Exit",null,(s,e)=>{allowClose=true;Close();});reminderIcon.ContextMenuStrip=menu;
    reminderIcon.DoubleClick+=(s,e)=>RestoreFromTray();
-   reminderTimer=new System.Windows.Forms.Timer {Interval=60000,Enabled=true};reminderTimer.Tick+=(s,e)=>CheckReminders(DateTime.Now);Shown+=(s,e)=>BeginInvoke((Action)(()=>{if(startHidden&&data.Reminders.CloseToTray){Hide();reminderIcon.Visible=true;}CheckReminders(DateTime.Now);}));
+   reminderTimer=new System.Windows.Forms.Timer {Interval=60000,Enabled=true};reminderTimer.Tick+=(s,e)=>{CheckReminders(DateTime.Now);CheckAutomaticCalendarRefresh(DateTime.Now);};Shown+=(s,e)=>BeginInvoke((Action)(()=>{if(startHidden&&data.Reminders.CloseToTray){Hide();reminderIcon.Visible=true;}CheckReminders(DateTime.Now);CheckAutomaticCalendarRefresh(DateTime.Now);}));
    FormClosing+=(s,e)=>{if(!allowClose&&data.Reminders.CloseToTray&&e.CloseReason==CloseReason.UserClosing){e.Cancel=true;Hide();reminderIcon.Visible=true;ShowReminder("Still running quietly. Double-click the tray icon to reopen.");}};
    if(!testMode&&data.Reminders.StartWithWindows)ConfigureStartup(true);
   }

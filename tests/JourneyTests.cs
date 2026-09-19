@@ -11,7 +11,7 @@ namespace AdhdWarrior {
   public static int Run(string folder) {
    assertions=0;var day=new DateTime(2026,9,14);
    string old="{\"Version\":1,\"XP\":200,\"Coins\":40,\"Quests\":[]}";
-   var migrated=Storage.Decode(old);Expect(migrated.Version==12&&migrated.XP==200&&migrated.Coins==40&&migrated.Journey.Pets.Count==1&&migrated.Journey.Active=="basilisk","V1 migration preserves balances and grants the iOS starter egg");
+   var migrated=Storage.Decode(old);Expect(migrated.Version==13&&migrated.XP==200&&migrated.Coins==40&&migrated.Journey.Pets.Count==1&&migrated.Journey.Active=="basilisk","V1 migration preserves balances and grants the iOS starter egg");
    var again=Storage.Decode(Storage.Encode(migrated));Expect(again.Journey.Pets.Count==1&&again.Coins==40,"V2 reload cannot duplicate starter rewards");
    Expect(Rejects(()=>Storage.Decode("{\"Version\":2,\"XP\":0,\"Coins\":0,\"Quests\":[]}")),"V2 requires adventure section");
    var data=new SaveData();Expect(data.Journey.Active=="basilisk","New Windows saves use the iOS Silent Basilisk starter");data.Journey.Pets[0].Species="drake";data.Journey.Active="drake";Journey.RefreshWeek(data,day);Expect(data.Journey.BossHP==315&&data.Journey.Week=="2026-09-14","Initial boss budget and Monday week key");

@@ -8,7 +8,7 @@ ADHD Warrior is a private, local-first Windows desktop app that turns everyday t
 
 ## Current release
 
-**Windows preview 0.23.0 · save format 12 · .NET Framework 4.8**
+**Windows preview 0.24.0 · save format 13 · .NET Framework 4.8**
 
 This repository is the native C# Windows migration of the more complete iOS app. The iOS implementation is the behavioral source of truth whenever a matching Windows feature is added. The Android port and preserved artwork are secondary references.
 
@@ -16,14 +16,16 @@ This repository is the native C# Windows migration of the more complete iOS app.
 
 - Quick capture and detailed quest editing.
 - School, Work, Home, Life, and Fun categories.
-- Optional due dates and times, substeps, archive/restore, search, and bulk actions.
+- Optional due dates and times, substeps, archive/restore, search, category filters, flexible sorting, and bulk actions.
+- Exact undo for the latest quest batch or streak completion, restoring every related progression change.
+- Completed quest history retains boss damage and victory, coins, familiar XP, and equipment drops.
 - Daily and weekly recurring quests.
 - iOS-style daily quest templates with weekday schedules, time-of-day labels, pause controls, and duplicate-safe daily generation.
 - Common, Uncommon, Rare, Epic, and Unique rarities with iOS XP defaults.
 - iOS character level thresholds and visible progress toward the next level.
 - Dedicated daily, weekly, monthly, and weekday streak quests with editing, next-eligible dates, guarded removal, and current/best history.
 - Optional Windows notifications with sign-in startup, close-to-tray background mode, separate quest/streak switches, a daily reminder time, quiet hours, aggregation, and duplicate suppression.
-- Read-only Google Calendar and Microsoft 365/Outlook linking through private or published ICS addresses, with separate encrypted local links, duplicate-safe manual imports, and selectable quest category.
+- Read-only Google Calendar and Microsoft 365/Outlook linking through private or published ICS addresses, with separate encrypted local links, selectable quest category, edit/cancellation reconciliation, and automatic 30-minute refresh.
 - Google public-feed 404 errors explain that public addresses require a public calendar and direct the user to Google’s private Secret address instead.
 - Four familiar families: Silent Basilisk, Arcane Drake, Storm Gryphon, and Wild Hydra.
 - Familiar hatching, leveling, evolution, skill points, Quest XP, Streak XP, and Loot Chance.
@@ -39,7 +41,7 @@ This repository is the native C# Windows migration of the more complete iOS app.
 - Sequential gear rewards: Standard fills first, then Archanist, Garden Gnome, Wood Elf, Micah, Stacy, Spellbinder, Sunforge, and Moonveil.
 - Twilight forest theme with buffered page rendering.
 - A dedicated sword-and-forest application emblem embedded into the executable, installer, window, notification area, and generated shortcuts.
-- Atomic local saves, previous-save recovery, Windows backup/restore, and reviewed partial iOS import.
+- Atomic local saves, previous-save recovery, Windows backup/restore, reviewed partial iOS import, and local crash reports with a startup recovery window.
 
 ### Screens
 
@@ -47,7 +49,7 @@ The left navigation contains Today, All quests, Review, Daily templates, Streak 
 
 ## Run the app
 
-On the development machine, close any older ADHD Warrior window and open `Launch ADHD Warrior.lnk`. The launcher points to `dist/0.23.0/ADHD Warrior.exe`.
+On the development machine, close any older ADHD Warrior window and open `Launch ADHD Warrior.lnk`. The launcher points to `dist/0.24.0/ADHD Warrior.exe`.
 
 Build output and the local shortcut are intentionally excluded from Git. A fresh clone must be built before it can run:
 
@@ -65,7 +67,7 @@ Build the per-user installer with:
 powershell -NoProfile -ExecutionPolicy Bypass -File .\build-installer.ps1
 ```
 
-Run `build-release.ps1` to create the setup executable, portable ZIP, and `SHA256SUMS.txt` under `release/0.23.0/`. The app and installer embed Windows compatibility manifests for per-user execution, Windows 10/11 recognition, per-monitor DPI awareness, and long-path awareness. The installer places the app under `%LOCALAPPDATA%\Programs\ADHD Warrior`, creates Start menu and desktop shortcuts, and registers a clean uninstall entry in Windows Apps & Features. Upgrades preserve `%LOCALAPPDATA%\AdhdWarrior\save.json` and its backups.
+Run `build-release.ps1` to create the setup executable, portable ZIP, and `SHA256SUMS.txt` under `release/0.24.0/`. The app and installer embed Windows compatibility manifests for per-user execution, Windows 10/11 recognition, per-monitor DPI awareness, and long-path awareness. The installer places the app under `%LOCALAPPDATA%\Programs\ADHD Warrior`, creates Start menu and desktop shortcuts, and registers a clean uninstall entry in Windows Apps & Features. Upgrades preserve `%LOCALAPPDATA%\AdhdWarrior\save.json` and its backups.
 
 ## Saves and privacy
 
@@ -75,7 +77,7 @@ Normal progress is stored at:
 %LOCALAPPDATA%\AdhdWarrior\save.json
 ```
 
-Writes are atomic. The prior file is retained as `save.json.bak`. If the primary save is damaged, startup validates and restores that backup, preserves the damaged file for diagnosis, and tells the user what happened. Windows save formats 1–11 migrate to format 12 when loaded and are written in the new format after the next successful change. Startup, background, and calendar linking default off. Invalid or unsupported saves stop loading before the original is overwritten.
+Writes are atomic. The prior file is retained as `save.json.bak`. If the primary save is damaged, startup validates and restores that backup, preserves the damaged file for diagnosis, and tells the user what happened. Windows save formats 1–12 migrate to format 13 when loaded and are written in the new format after the next successful change. Startup, background, and calendar linking default off. Invalid or unsupported saves stop loading before the original is overwritten.
 
 The app requires no account. Calendar linking is optional; when the user requests a sync, the app downloads the linked Google or Microsoft 365 calendar feed directly and creates local quests. Calendar addresses are encrypted with Windows account protection in Local AppData, excluded from backups, and never committed. Personal saves, backups, build output, shortcuts, and test state are excluded from Git.
 
@@ -119,9 +121,9 @@ The build script compiles every `src/*.cs` and `tests/*.cs` file into one execut
 
 ## Validation status
 
-Version 0.23.0 passes **154 automated assertions** covering sequential current-set rewards, automatic claiming, avatar advancement, cosmetic equipment boundaries, the embedded Windows icon, core quest/adventure behavior, calendars, templates, identity, reminders, migrations, and iOS import boundaries. Quest pages use rounded poker-card tiles that reflow into columns as the window resizes, with the current boss and active familiar artwork plus total XP, familiar loot chance, and familiar growth or XP rewards. Sprite-sheet tiles use proportional, inset crops that remove painted gutters, and locked character sections use overlapping masks without drawn grid borders. The Character page shows only the earliest incomplete avatar sheet, places level, XP, coins, set progress, and the level meter below the artwork, and scrolls vertically to the supporting details. Page rebuilding suppresses intermediate redraws and commits one buffered repaint; every release build renders all primary pages at three window sizes, verifies page flow, and rejects clipped action buttons. Recurring calendar occurrences with shared UIDs remain distinct, corrupt primary saves recover from a validated backup, and bulk completion feedback no longer overstates damage to the defeated boss. Successful live calendar feeds, Windows icon-cache refresh, sign-in startup, tray interaction, notification delivery, shortcuts, Apps & Features UI, completion-dialog scaling, export/restore dialogs, and varied display scaling still require interactive verification before calling the app production-ready.
+Version 0.24.0 passes **158 automated assertions** covering sequential current-set rewards, automatic claiming, avatar advancement, cosmetic equipment boundaries, the embedded Windows icon, core quest/adventure behavior, calendars, templates, identity, reminders, migrations, and iOS import boundaries. Quest pages use rounded poker-card tiles that reflow into columns as the window resizes, with the current boss and active familiar artwork plus total XP, familiar loot chance, and familiar growth or XP rewards. Sprite-sheet tiles use proportional, inset crops that remove painted gutters, and locked character sections use overlapping masks without drawn grid borders. The Character page shows only the earliest incomplete avatar sheet, places level, XP, coins, set progress, and the level meter below the artwork, and scrolls vertically to the supporting details. Page rebuilding suppresses intermediate redraws and commits one buffered repaint; every release build renders all primary pages at three window sizes, verifies page flow, and rejects clipped action buttons. Recurring calendar occurrences with shared UIDs remain distinct, corrupt primary saves recover from a validated backup, and bulk completion feedback no longer overstates damage to the defeated boss. Successful live calendar feeds, Windows icon-cache refresh, sign-in startup, tray interaction, notification delivery, shortcuts, Apps & Features UI, completion-dialog scaling, export/restore dialogs, and varied display scaling still require interactive verification before calling the app production-ready.
 
-This preview now has portable and per-user installer builds with SHA-256 checksums. Both are unsigned; Windows SmartScreen may show a publisher or reputation warning until code signing is added. Background reminders require the app process to remain running in the notification area. Automatic updates and a published GitHub release are not yet implemented.
+This preview now has portable and per-user installer builds with SHA-256 checksums. A signing script signs and verifies both artifacts when a publisher certificate thumbprint is supplied; current builds remain unsigned until that certificate is available, so Windows SmartScreen may show a publisher or reputation warning. Background reminders require the app process to remain running in the notification area. Automatic updates and a published GitHub release are not yet implemented.
 
 ## Development source of truth
 

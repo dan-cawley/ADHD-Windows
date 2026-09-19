@@ -2,6 +2,18 @@
 
 All notable Windows migration phases are recorded here. The project is still a preview and does not yet publish packaged releases.
 
+## 0.24.0 — 2026-09-19
+
+- Added exact undo for the latest quest batch or streak completion, restoring XP, coins, boss and familiar progress, loot, repeat generation, and milestone state.
+- Added category filtering and due date, XP, category, title, or recently completed sorting across quest views.
+- Expanded completed quest history with the boss, damage, familiar XP, coins, and equipment earned at completion time.
+- Reconciles linked calendar changes: renamed or moved events update their active quests, while cancelled or removed future events move to Archive.
+- Added separate Google and Microsoft sync times plus automatic 30-minute background refresh.
+- Expanded bulk-completion results with a per-quest encounter summary so multiple bosses are represented.
+- Added local crash reports, retention, and a recovery window that links to the diagnostic folder without overwriting the save.
+- Added a certificate-driven signing and verification script for release artifacts; a trusted signature still requires the publisher certificate.
+- Migrated saves to format 13 and expanded regression coverage to 158 assertions.
+
 ## 0.23.0 — 2026-09-19
 
 - Added validated automatic recovery from `save.json.bak`; damaged primary saves are preserved and recovery is reported in the app.

@@ -19,6 +19,7 @@ namespace AdhdWarrior {
     var archived=new Quest {Title="Archived",Archived=true};Check(Game.Complete(data,new[]{archived},today)==0,"Archived quests cannot earn rewards");
     Check(Game.Streak(data,today)==1&&Game.Streak(data,today.AddDays(1))==1&&Game.Streak(data,today.AddDays(2))==0,"Streak boundary");
     var weekly=new Quest {Title="Weekly",Repeat="Weekly",Due="2026-09-20"};data.Quests.Add(weekly);Game.Complete(data,new[]{weekly},today);Check(data.Quests.Last().Due=="2026-09-27","Weekly recurrence");
+    var undoData=new SaveData();var undoQuest=new Quest {Title="Accidental",XP=75};undoData.Quests.Add(undoQuest);var receipt=CompletionUndo.Capture(undoData,"Quest",new[]{undoQuest.Id},undoQuest.Title,today);Game.Complete(undoData,new[]{undoQuest},today);undoData.LastCompletion=receipt;var restored=CompletionUndo.Restore(undoData);Check(!restored.Quests[0].Done&&restored.XP==0&&restored.Coins==0&&restored.Journey.Completions==0&&restored.LastCompletion==null,"Undo restores the exact pre-completion progression state");
     string path=Path.Combine(folder,"save.json");Storage.Save(path,data);var loaded=Storage.Load(path);Check(loaded.XP==100&&loaded.Quests.Count==4&&loaded.Quests[0].Steps[0].Done,"Save round trip");
     data.Coins=99;Storage.Save(path,data);Check(Storage.Load(path+".bak").Coins==20&&Storage.Load(path).Coins==99,"Atomic save keeps previous version");
     bool rejected=false;try {Storage.Decode("{\"Version\":9}");} catch {rejected=true;}Check(rejected,"Invalid backup rejected");

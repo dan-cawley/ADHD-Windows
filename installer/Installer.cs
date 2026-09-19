@@ -11,12 +11,12 @@ using Microsoft.Win32;
 [assembly: AssemblyDescription("Per-user installer for ADHD Warrior")]
 [assembly: AssemblyCompany("ADHD Warrior")]
 [assembly: AssemblyProduct("ADHD Warrior Setup")]
-[assembly: AssemblyVersion("0.23.0.0")]
-[assembly: AssemblyFileVersion("0.23.0.0")]
+[assembly: AssemblyVersion("0.24.0.0")]
+[assembly: AssemblyFileVersion("0.24.0.0")]
 
 namespace AdhdWarriorSetup {
  static class Program {
-  const string Version="0.23.0";
+  const string Version="0.24.0";
   [STAThread] static int Main(string[] args){
    Application.EnableVisualStyles();Application.SetCompatibleTextRenderingDefault(false);
    bool uninstall=Path.GetFileNameWithoutExtension(Application.ExecutablePath).StartsWith("Uninstall",StringComparison.OrdinalIgnoreCase)||Array.IndexOf(args,"--uninstall")>=0;

@@ -1,6 +1,6 @@
 # Future-version continuation prompt
 
-Last synchronized with Windows preview **0.23.0**, save format **12**, on **2026-09-19**.
+Last synchronized with Windows preview **0.24.0**, save format **13**, on **2026-09-19**.
 
 Copy the prompt below into a new development task. Update this file and the root README before every GitHub push.
 
@@ -14,13 +14,13 @@ ADHD Warrior is a calm, local-first ADHD task app wrapped in a fantasy progressi
 
 ## Current baseline
 
-- Current Windows preview: **0.23.0**.
-- Save format: **12**.
+- Current Windows preview: **0.24.0**.
+- Save format: **13**.
 - Runtime: C# Windows Forms on .NET Framework 4.8 with no external packages.
 - Build command: `powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1`.
-- Output: `dist/0.23.0/ADHD Warrior.exe` plus config and assets.
+- Output: `dist/0.24.0/ADHD Warrior.exe` plus config and assets.
 - Installer command: `powershell -NoProfile -ExecutionPolicy Bypass -File .\build-installer.ps1`.
-- Run `build-release.ps1` for the installer, portable ZIP, and SHA-256 checksum list under `release/0.23.0/`.
+- Run `build-release.ps1` for the installer, portable ZIP, and SHA-256 checksum list under `release/0.24.0/`.
 - Normal save: `%LOCALAPPDATA%\AdhdWarrior\save.json`.
 - Git branch: `main`.
 - GitHub remote: `https://github.com/dan-cawley/ADHD-Windows.git`.
@@ -40,7 +40,9 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 
 - Quick capture plus a detailed editor.
 - Categories: School, Work, Home, Life, Fun.
-- Optional due date and `HH:mm` due time, substeps, search, bulk complete/archive, restore, and completed history.
+- Optional due date and `HH:mm` due time, substeps, search, category filtering, five sort orders, bulk complete/archive, restore, and detailed completed history.
+- The latest quest batch or streak completion has an exact undo receipt. Undo restores the complete pre-action save, including XP, coins, boss and familiar progress, gear, milestones, recurrence generation, and streak state.
+- Completed quests retain the boss, applied damage, victory status, familiar progress, coins, and loot awarded at completion time. Migrated older completions are labeled as legacy history.
 - Daily and weekly recurrence. A recurring copy preserves title, category, rarity, XP, due time, recurrence, and step titles.
 - Rarities and iOS default XP: Common 50, Uncommon 75, Rare 100, Epic 150, Unique 225. XP remains editable.
 - Character levels use the iOS thresholds through level 20.
@@ -90,7 +92,7 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 
 - Eighteen shared iOS boss identities and sprite positions.
 - Awarded quest/streak XP becomes boss damage. Defeat records history, grants rare-or-better gear, and advances the encounter without damage spillover.
-- Completing one or more ordinary quests opens a themed boss-impact dialog with the boss portrait, total awarded damage, remaining HP, victory, and next-encounter details.
+- Completing one or more ordinary quests opens a themed boss-impact dialog with the boss portrait, total awarded damage, remaining HP, victory, next-encounter details, and a per-quest encounter ledger when a batch spans bosses.
 - The dialog renders reward tiles for coins, familiar XP or egg growth, and each gear drop. Coin art is drawn locally; familiar and equipment tiles reuse packaged game artwork.
 - A later Monday-based week heals an undefeated boss by up to half maximum HP. Backward clock movement does nothing.
 - The catalog contains all 81 iOS items across nine visual avatar sets. Equipment is cosmetic: it does not change quest XP, boss health, or other statistics.
@@ -102,8 +104,8 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 ### Persistence and imports
 
 - Save writes use temp-file replacement and keep `save.json.bak`.
-- Formats 1–11 migrate forward to format 12. Validate before replacing good data. Never silently clamp impossible imported progress.
-- Settings can independently link Google Calendar and Microsoft 365/Outlook through private or published ICS feeds. Each encrypted URL is stored separately under Local AppData with Windows DPAPI and is intentionally excluded from JSON backups. Manual sync imports upcoming events once by provider plus UID and never deletes existing quests.
+- Formats 1–12 migrate forward to format 13. Format 13 adds completion receipts, completion-history details, separate calendar sync times, and automatic-refresh settings. Validate before replacing good data. Never silently clamp impossible imported progress.
+- Settings can independently link Google Calendar and Microsoft 365/Outlook through private or published ICS feeds. Each encrypted URL is stored separately under Local AppData with Windows DPAPI and is intentionally excluded from JSON backups. Sync adds new events, updates unfinished quests when event details change, and moves cancelled or removed future events to Archive. Automatic refresh runs every 30 minutes while the app process is running.
 - A Google 404 is translated into instructions to replace a non-working public feed with the calendar’s Secret address in iCal format; do not log or display saved secret URLs.
 - Windows backup export/restore is available.
 - iOS import uses preview → explicit Apply → timestamped recovery backup.
@@ -124,7 +126,7 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 - Quiet hours may cross midnight. Eligible items are aggregated into one notification and each quest due value or streak cadence is delivered once.
 - The tray menu can reopen or fully exit the app. Launching the shortcut while a hidden instance exists restores that window.
 - Startup uses the current portable executable in the current user's Windows Run key and is removed when disabled. The app refreshes the path after an update.
-- Reminder settings and delivery history began in save format 8; startup/background preferences use format 11. Calendar import metadata uses format 12. A test notification is available in Settings.
+- Reminder settings and delivery history began in save format 8; startup/background preferences use format 11; calendar import metadata uses format 12; undo/history and automatic calendar refresh use format 13. A test notification is available in Settings.
 
 ## Code map
 
@@ -141,25 +143,26 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 - `src/GearCatalog.cs`: generated iOS equipment catalog.
 - `src/Theme.cs`: palette, themed controls, background painting, metrics, welcome banner.
 - `src/Reminders.cs`: notification settings, timing, quiet hours, duplicate suppression, and settings UI.
+- `src/CrashReporter.cs`: retained local crash diagnostics and the recovery window.
 - `tests/`: in-process regression suite launched with `--self-test`.
 - `generate-ios-catalog.ps1`: catalog regeneration from Swift references.
 - `build-installer.ps1`, `installer/Installer.cs`: embedded-payload per-user setup and uninstall package.
 
 ## Known gaps and risks
 
-- Version 0.23.0 is the full QA pass. It restores validated `.bak` saves after primary-file corruption, preserves the damaged file, distinguishes expanded recurring calendar instances, fixes clipped quest and familiar-card actions, corrects bulk-completion boss/pet feedback, and makes release builds reject clipped buttons or incorrect page flow. Character and detail pages scroll vertically; quest pages retain the responsive grid. It retains proportional inset sprite crops, seam-free locked avatar masks, the larger character paper doll, navigation flicker suppression, sequential current-avatar rewards, and 154 passing automated assertions. Isolated installer, installed-app assertion/render, and uninstall cleanup tests pass with all 39 assets.
+- Version 0.24.0 adds reversible completions, quest sort and filter controls, richer completion history, calendar reconciliation and background refresh, multi-encounter summaries, and crash recovery. It restores validated `.bak` saves after primary-file corruption, preserves the damaged file, distinguishes expanded recurring calendar instances, fixes clipped quest and familiar-card actions, corrects bulk-completion boss/pet feedback, and makes release builds reject clipped buttons or incorrect page flow. Character and detail pages scroll vertically; quest pages retain the responsive grid. It retains proportional inset sprite crops, seam-free locked avatar masks, the larger character paper doll, navigation flicker suppression, sequential current-avatar rewards, and 158 passing automated assertions. Isolated installer, installed-app assertion/render, and uninstall cleanup tests pass with all 39 assets.
 - Run an interactive smoke test of creating/completing daily, weekly, monthly, and weekday streaks; restarting; and spending all three familiar skills.
 - Interactively verify actual Windows sign-in startup, tray open/exit behavior, notification delivery and quiet-hour boundaries, export/restore dialogs, and multiple display scales.
 - iOS stage-4 ready eggs conflict with the Windows meaning of stage 4 and remain intentionally skipped.
-- Calendar sync is currently read-only and manual. Event edits/deletions, recurring-event reconciliation, automatic background refresh, and writing quests back to either provider are not implemented.
+- Calendar sync remains read-only. It reconciles edits and cancellations and refreshes automatically, but writing quests back to either provider is not implemented. Live Google and Microsoft feeds, complex recurrence rules, and timezone variations still need interactive verification.
 - Exact mobile evolution stages, duplicate inventory counts, unsupported reward items, user-supplied avatar photos, friends, appearance/text-size controls, sound/animation preferences, cloud sync, automatic updates, focus/body-double controls, account features, and Apple integrations remain unported.
-- Background reminders require the process to stay running in the notification area. The installer is unsigned; code signing, a published GitHub release, crash reporting, and automatic updates remain absent.
+- Background reminders require the process to stay running in the notification area. The installer is unsigned until a publisher certificate is supplied; `sign-release.ps1` is ready to sign and verify the app and installer. A published GitHub release and automatic updates remain absent. Crash reports are stored locally with a recovery window.
 - The Visual Studio project output path must stay synchronized with `build.ps1` and the documented version.
 - Historical phase documents describe their own point in time and contain superseded limitations. The root README and this prompt describe current behavior.
 
 ## Recommended next phase
 
-Interactively verify flicker-free navigation and the enlarged paper doll at 100%, 125%, and 150% Windows scaling, including a full nine-piece set. Then port the iOS completion-undo receipt model so mistaken completions can be reversed safely. Calendar feed verification remains outstanding.
+Interactively verify flicker-free navigation and the enlarged paper doll at 100%, 125%, and 150% Windows scaling, including a full nine-piece set. Then verify real Google and Microsoft calendar feeds, complex recurrence and timezone cases, and certificate signing. Completion undo and automatic calendar reconciliation are implemented.
 
 ## Required workflow for every change and push
 
