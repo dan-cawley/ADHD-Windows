@@ -1,5 +1,5 @@
 $ErrorActionPreference = 'Stop'
-$version = '0.22.3'
+$version = '0.23.0'
 & (Join-Path $PSScriptRoot 'build-installer.ps1')
 $app = Join-Path $PSScriptRoot "dist\$version\ADHD Warrior.exe"
 $test = Start-Process -FilePath $app -ArgumentList '--self-test' -Wait -PassThru

@@ -2,6 +2,16 @@
 
 All notable Windows migration phases are recorded here. The project is still a preview and does not yet publish packaged releases.
 
+## 0.23.0 — 2026-09-19
+
+- Added validated automatic recovery from `save.json.bak`; damaged primary saves are preserved and recovery is reported in the app.
+- Distinguished expanded recurring calendar occurrences that share a UID by using their recurrence identifiers.
+- Fixed clipped quest-card actions with compact fixed-size buttons.
+- Fixed clipped familiar training actions by wrapping them into a taller adventure-card action area.
+- Corrected bulk-completion feedback so the first boss never reports more damage than its remaining HP and egg hatching is labeled as mixed growth/familiar progress.
+- Expanded the release render test to reject clipped visible buttons as well as incorrect grid or vertical page flow.
+- Corrected stale architecture and validation documentation.
+
 ## 0.22.3 — 2026-09-18
 
 - Restored top-to-bottom flow and vertical scrolling on Character and every other detail page after the quest-grid conversion.

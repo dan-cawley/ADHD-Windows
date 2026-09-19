@@ -1,6 +1,6 @@
 # Future-version continuation prompt
 
-Last synchronized with Windows preview **0.22.3**, save format **12**, on **2026-09-18**.
+Last synchronized with Windows preview **0.23.0**, save format **12**, on **2026-09-19**.
 
 Copy the prompt below into a new development task. Update this file and the root README before every GitHub push.
 
@@ -14,13 +14,13 @@ ADHD Warrior is a calm, local-first ADHD task app wrapped in a fantasy progressi
 
 ## Current baseline
 
-- Current Windows preview: **0.22.3**.
+- Current Windows preview: **0.23.0**.
 - Save format: **12**.
 - Runtime: C# Windows Forms on .NET Framework 4.8 with no external packages.
 - Build command: `powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1`.
-- Output: `dist/0.22.3/ADHD Warrior.exe` plus config and assets.
+- Output: `dist/0.23.0/ADHD Warrior.exe` plus config and assets.
 - Installer command: `powershell -NoProfile -ExecutionPolicy Bypass -File .\build-installer.ps1`.
-- Run `build-release.ps1` for the installer, portable ZIP, and SHA-256 checksum list under `release/0.22.3/`.
+- Run `build-release.ps1` for the installer, portable ZIP, and SHA-256 checksum list under `release/0.23.0/`.
 - Normal save: `%LOCALAPPDATA%\AdhdWarrior\save.json`.
 - Git branch: `main`.
 - GitHub remote: `https://github.com/dan-cawley/ADHD-Windows.git`.
@@ -130,7 +130,7 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 
 - `src/App.cs`: program entry, main shell, navigation, quest lists/cards, render cycle, backup/settings.
 - `src/Core.cs`: quest and save models, completion, character streak metric, serialization, validation, migrations.
-- `src/Editor.cs`: quest editor.
+- `src/App.cs`: application shell, quest cards, quest editor, backup UI, and render smoke test.
 - `src/Progression.cs`: rarity defaults and character level thresholds.
 - `src/Journey.cs`: familiar and boss progression, cosmetic gear collection, loot rolls, training, and adventure validation.
 - `src/JourneyViews.cs`: Character, Familiars, Boss map, Equipment, and adventure completion UI.
@@ -147,7 +147,7 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 
 ## Known gaps and risks
 
-- Version 0.22.3 fixes page flow after the quest-grid conversion: quest pages wrap left-to-right while Character and every detail page stack top-to-bottom with vertical scrolling. Character shows only the earliest incomplete avatar sheet, keeps statistics below it, and no longer includes Customize Identity. Main-window double buffering is explicit, and every release build runs a hidden render smoke test over all primary pages at 1000x680, 1240x860, and 1600x1000. It retains proportional inset sprite crops, seam-free locked avatar masks, the larger character paper doll, navigation flicker suppression, sequential current-avatar rewards, and 152 passing automated assertions. Earlier isolated desktop launch/fresh-save/clean-close plus installer/install/uninstall smoke tests pass.
+- Version 0.23.0 is the full QA pass. It restores validated `.bak` saves after primary-file corruption, preserves the damaged file, distinguishes expanded recurring calendar instances, fixes clipped quest and familiar-card actions, corrects bulk-completion boss/pet feedback, and makes release builds reject clipped buttons or incorrect page flow. Character and detail pages scroll vertically; quest pages retain the responsive grid. It retains proportional inset sprite crops, seam-free locked avatar masks, the larger character paper doll, navigation flicker suppression, sequential current-avatar rewards, and 154 passing automated assertions. Isolated installer, installed-app assertion/render, and uninstall cleanup tests pass with all 39 assets.
 - Run an interactive smoke test of creating/completing daily, weekly, monthly, and weekday streaks; restarting; and spending all three familiar skills.
 - Interactively verify actual Windows sign-in startup, tray open/exit behavior, notification delivery and quiet-hour boundaries, export/restore dialogs, and multiple display scales.
 - iOS stage-4 ready eggs conflict with the Windows meaning of stage 4 and remain intentionally skipped.

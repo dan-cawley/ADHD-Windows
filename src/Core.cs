@@ -53,6 +53,7 @@ namespace AdhdWarrior {
   }
  }
  public static class Storage {
+  public static string LastLoadNotice {get;private set;}
   static JavaScriptSerializer Json() {return new JavaScriptSerializer {MaxJsonLength=16*1024*1024};}
   public static string Encode(SaveData data) {return Json().Serialize(data);}
   public static SaveData Decode(string json) {
@@ -98,7 +99,11 @@ namespace AdhdWarrior {
    if(id.StartsWith("stacy_")&&Int32.TryParse(id.Substring(6),out index)&&index>=1&&index<=6)return stacy[index-1];
    return id;
   }
-  public static SaveData Load(string path) {return File.Exists(path)?Decode(File.ReadAllText(path)):new SaveData();}
+  public static SaveData Load(string path) {
+   LastLoadNotice="";if(!File.Exists(path))return new SaveData();
+   try{return Decode(File.ReadAllText(path));}
+   catch(Exception primary){string backup=path+".bak";if(!File.Exists(backup))throw;SaveData recovered;try{recovered=Decode(File.ReadAllText(backup));}catch(Exception backupError){throw new InvalidDataException("The main save and its recovery backup are both unreadable.",new AggregateException(primary,backupError));}string damaged=path+".damaged-"+DateTime.Now.ToString("yyyyMMdd-HHmmssfff")+".json";File.Copy(path,damaged,false);File.Copy(backup,path,true);LastLoadNotice="The latest save was damaged, so ADHD Warrior restored the previous backup. The damaged file was preserved as "+Path.GetFileName(damaged)+".";return recovered;}
+  }
   public static void Save(string path, SaveData data) {
    DailyTemplatesEngine.ClaimPendingAutomatically(data);string text=Encode(data); Decode(text);
    Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path)));
