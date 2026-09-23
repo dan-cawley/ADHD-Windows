@@ -3,7 +3,7 @@ $ErrorActionPreference='Stop'
 if ([string]::IsNullOrWhiteSpace($Thumbprint)) { throw 'Set ADHD_WARRIOR_CERT_THUMBPRINT to the code-signing certificate thumbprint.' }
 $signtool=(Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin" -Filter signtool.exe -Recurse -ErrorAction SilentlyContinue | Sort-Object FullName -Descending | Select-Object -First 1).FullName
 if (-not $signtool) { throw 'signtool.exe was not found. Install the Windows SDK signing tools.' }
-$version='0.24.0'
+$version='0.24.1'
 $app=Join-Path $PSScriptRoot "dist\$version\ADHD Warrior.exe"
 if(-not (Test-Path -LiteralPath $app)){throw "Build artifact missing: $app"}
 & $signtool sign /sha1 $Thumbprint /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 $app

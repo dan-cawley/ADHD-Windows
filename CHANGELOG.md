@@ -2,6 +2,14 @@
 
 All notable Windows migration phases are recorded here. The project is still a preview and does not yet publish packaged releases.
 
+## 0.24.1 — 2026-09-23
+
+- Replaced repeated quest actions with compact check, edit, archive, restore, move-to-today, and undo icon buttons with tooltips and accessible names.
+- Wrapped quest titles, metadata, and small-step text instead of truncating them with ellipses.
+- Shows the quest capture and filter toolbars only on quest pages, giving Character, Settings, and other detail pages more vertical space.
+- Corrected the category-filter width, navigation branding, calendar-link width, and detail-page sizing at high display scaling.
+- Expanded the render QA to reject clipped buttons, filter selections, and fixed labels at 1000×680, 1240×860, and 1600×1000.
+
 ## 0.24.0 — 2026-09-19
 
 - Added exact undo for the latest quest batch or streak completion, restoring XP, coins, boss and familiar progress, loot, repeat generation, and milestone state.

@@ -1,11 +1,11 @@
-# Validation — September 19, 2026
+# Validation — September 23, 2026
 
 ## Passed
 
-- Compiled Windows preview 0.24.0 and its installer with the installed .NET Framework compiler.
+- Compiled Windows preview 0.24.1 and its installer with the installed .NET Framework compiler.
 - The built executable's `--self-test` exits 0 with 158 assertions.
 - Coverage includes quests, exact completion undo, recurrence, streak boundaries, XP and coins, familiar/boss progression, equipment, atomic persistence and validated backup recovery, formats 1–12 migration, calendar parsing, recurring instances and event reconciliation, iOS import boundaries, daily templates, milestone rewards, avatar unlocking/assets, identity, and reminder preferences.
-- The required `--render-test` paints every primary page at 1000×680, 1240×860, and 1600×1000. It verifies responsive quest-grid flow, vertical detail-page flow, buffered painting, and that visible action buttons stay inside their containers.
+- The required `--render-test` paints every primary page at 1000×680, 1240×860, and 1600×1000. It verifies responsive quest-grid flow, vertical detail-page flow, buffered painting, and that visible action buttons stay inside their containers and fixed labels and filter selections do not overflow.
 - The release build runs both test modes and stops packaging if either fails.
 - Installer setup, installed-executable assertions, and asynchronous uninstall cleanup are smoke-tested in an isolated directory without touching the normal install or user save.
 
