@@ -2,6 +2,13 @@
 
 All notable Windows migration phases are recorded here. The project is still a preview and does not yet publish packaged releases.
 
+## 0.24.2 — 2026-09-23
+
+- Replaced boss and familiar artwork inside quest cards with distinct vector icons for School, Work, Home, Life, and Fun.
+- Added a responsive encounter rail with the current boss, health, active familiar, and loot-chance explanation when the window is wide enough.
+- Labels egg loot as locked and untrained familiar loot as needing training instead of displaying an unexplained 0%.
+- Added render assertions that quest cards contain exactly one category icon, never embed boss or familiar portraits, hide the encounter rail at minimum width, and show it on wide screens.
+
 ## 0.24.1 — 2026-09-23
 
 - Replaced repeated quest actions with compact check, edit, archive, restore, move-to-today, and undo icon buttons with tooltips and accessible names.

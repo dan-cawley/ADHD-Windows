@@ -8,7 +8,7 @@ ADHD Warrior is a private, local-first Windows desktop app that turns everyday t
 
 ## Current release
 
-**Windows preview 0.24.1 · save format 13 · .NET Framework 4.8**
+**Windows preview 0.24.2 · save format 13 · .NET Framework 4.8**
 
 This repository is the native C# Windows migration of the more complete iOS app. The iOS implementation is the behavioral source of truth whenever a matching Windows feature is added. The Android port and preserved artwork are secondary references.
 
@@ -18,6 +18,8 @@ This repository is the native C# Windows migration of the more complete iOS app.
 - School, Work, Home, Life, and Fun categories.
 - Optional due dates and times, substeps, archive/restore, search, category filters, flexible sorting, and bulk actions.
 - Wrapped quest titles and small steps plus compact icon actions with explanatory tooltips and accessible names.
+- School, Work, Home, Life, and Fun use distinct vector card icons; boss and familiar artwork moves into a responsive right-side encounter panel on wider windows.
+- Loot feedback explains whether bonus loot is locked until hatching, needs a Loot Chance skill point, or has an active percentage.
 - Exact undo for the latest quest batch or streak completion, restoring every related progression change.
 - Completed quest history retains boss damage and victory, coins, familiar XP, and equipment drops.
 - Daily and weekly recurring quests.
@@ -50,7 +52,7 @@ The left navigation contains Today, All quests, Review, Daily templates, Streak 
 
 ## Run the app
 
-On the development machine, close any older ADHD Warrior window and open `Launch ADHD Warrior.lnk`. The launcher points to `dist/0.24.1/ADHD Warrior.exe`.
+On the development machine, close any older ADHD Warrior window and open `Launch ADHD Warrior.lnk`. The launcher points to `dist/0.24.2/ADHD Warrior.exe`.
 
 Build output and the local shortcut are intentionally excluded from Git. A fresh clone must be built before it can run:
 
@@ -68,7 +70,7 @@ Build the per-user installer with:
 powershell -NoProfile -ExecutionPolicy Bypass -File .\build-installer.ps1
 ```
 
-Run `build-release.ps1` to create the setup executable, portable ZIP, and `SHA256SUMS.txt` under `release/0.24.1/`. The app and installer embed Windows compatibility manifests for per-user execution, Windows 10/11 recognition, per-monitor DPI awareness, and long-path awareness. The installer places the app under `%LOCALAPPDATA%\Programs\ADHD Warrior`, creates Start menu and desktop shortcuts, and registers a clean uninstall entry in Windows Apps & Features. Upgrades preserve `%LOCALAPPDATA%\AdhdWarrior\save.json` and its backups.
+Run `build-release.ps1` to create the setup executable, portable ZIP, and `SHA256SUMS.txt` under `release/0.24.2/`. The app and installer embed Windows compatibility manifests for per-user execution, Windows 10/11 recognition, per-monitor DPI awareness, and long-path awareness. The installer places the app under `%LOCALAPPDATA%\Programs\ADHD Warrior`, creates Start menu and desktop shortcuts, and registers a clean uninstall entry in Windows Apps & Features. Upgrades preserve `%LOCALAPPDATA%\AdhdWarrior\save.json` and its backups.
 
 ## Saves and privacy
 
@@ -122,7 +124,7 @@ The build script compiles every `src/*.cs` and `tests/*.cs` file into one execut
 
 ## Validation status
 
-Version 0.24.1 passes **158 automated assertions** covering sequential current-set rewards, automatic claiming, avatar advancement, cosmetic equipment boundaries, the embedded Windows icon, core quest/adventure behavior, calendars, templates, identity, reminders, migrations, and iOS import boundaries. Quest pages use rounded poker-card tiles that reflow into columns as the window resizes, with wrapped titles, metadata, and small steps plus compact icon actions. Sprite-sheet tiles use proportional, inset crops that remove painted gutters, and locked character sections use overlapping masks without drawn grid borders. Character, Settings, and other detail pages hide irrelevant quest toolbars and scroll vertically. Page rebuilding suppresses intermediate redraws and commits one buffered repaint; every release build renders all primary pages at three window sizes and rejects clipped buttons, fixed labels, filter selections, or incorrect page flow. Recurring calendar occurrences with shared UIDs remain distinct, corrupt primary saves recover from a validated backup, and bulk completion feedback no longer overstates damage to the defeated boss. Successful live calendar feeds, Windows icon-cache refresh, sign-in startup, tray interaction, notification delivery, shortcuts, Apps & Features UI, completion-dialog scaling, export/restore dialogs, and varied display scaling still require interactive verification before calling the app production-ready.
+Version 0.24.2 passes **158 automated assertions** covering sequential current-set rewards, automatic claiming, avatar advancement, cosmetic equipment boundaries, the embedded Windows icon, core quest/adventure behavior, calendars, templates, identity, reminders, migrations, and iOS import boundaries. Quest pages use rounded poker-card tiles that reflow into columns as the window resizes, with wrapped titles, metadata, and small steps plus distinct category icons. Boss and familiar art moves to a responsive right-side encounter rail when the window is wide enough. Sprite-sheet tiles use proportional, inset crops that remove painted gutters, and locked character sections use overlapping masks without drawn grid borders. Character, Settings, and other detail pages hide irrelevant quest toolbars and scroll vertically. Page rebuilding suppresses intermediate redraws and commits one buffered repaint; every release build renders all primary pages at three window sizes and rejects clipped buttons, fixed labels, filter selections, or incorrect page flow. Recurring calendar occurrences with shared UIDs remain distinct, corrupt primary saves recover from a validated backup, and bulk completion feedback no longer overstates damage to the defeated boss. Successful live calendar feeds, Windows icon-cache refresh, sign-in startup, tray interaction, notification delivery, shortcuts, Apps & Features UI, completion-dialog scaling, export/restore dialogs, and varied display scaling still require interactive verification before calling the app production-ready.
 
 This preview now has portable and per-user installer builds with SHA-256 checksums. A signing script signs and verifies both artifacts when a publisher certificate thumbprint is supplied; current builds remain unsigned until that certificate is available, so Windows SmartScreen may show a publisher or reputation warning. Background reminders require the app process to remain running in the notification area. Automatic updates and a published GitHub release are not yet implemented.
 

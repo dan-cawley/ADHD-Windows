@@ -1,6 +1,6 @@
 # Future-version continuation prompt
 
-Last synchronized with Windows preview **0.24.1**, save format **13**, on **2026-09-23**.
+Last synchronized with Windows preview **0.24.2**, save format **13**, on **2026-09-23**.
 
 Copy the prompt below into a new development task. Update this file and the root README before every GitHub push.
 
@@ -14,13 +14,13 @@ ADHD Warrior is a calm, local-first ADHD task app wrapped in a fantasy progressi
 
 ## Current baseline
 
-- Current Windows preview: **0.24.1**.
+- Current Windows preview: **0.24.2**.
 - Save format: **13**.
 - Runtime: C# Windows Forms on .NET Framework 4.8 with no external packages.
 - Build command: `powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1`.
-- Output: `dist/0.24.1/ADHD Warrior.exe` plus config and assets.
+- Output: `dist/0.24.2/ADHD Warrior.exe` plus config and assets.
 - Installer command: `powershell -NoProfile -ExecutionPolicy Bypass -File .\build-installer.ps1`.
-- Run `build-release.ps1` for the installer, portable ZIP, and SHA-256 checksum list under `release/0.24.1/`.
+- Run `build-release.ps1` for the installer, portable ZIP, and SHA-256 checksum list under `release/0.24.2/`.
 - Normal save: `%LOCALAPPDATA%\AdhdWarrior\save.json`.
 - Git branch: `main`.
 - GitHub remote: `https://github.com/dan-cawley/ADHD-Windows.git`.
@@ -42,6 +42,7 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 - Categories: School, Work, Home, Life, Fun.
 - Optional due date and `HH:mm` due time, substeps, search, category filtering, five sort orders, bulk complete/archive, restore, and detailed completed history.
 - Quest cards wrap titles, metadata, and small steps. Repeated actions use compact icon buttons with tooltips and accessible names. Quest capture/filter controls are hidden on non-quest pages.
+- Quest cards use code-drawn icons for School, Work, Home, Life, and Fun. Boss and familiar portraits live in a responsive encounter rail that appears only when the content area is at least 860 logical pixels wide. The rail explains locked, untrained, and active loot chance states.
 - The latest quest batch or streak completion has an exact undo receipt. Undo restores the complete pre-action save, including XP, coins, boss and familiar progress, gear, milestones, recurrence generation, and streak state.
 - Completed quests retain the boss, applied damage, victory status, familiar progress, coins, and loot awarded at completion time. Migrated older completions are labeled as legacy history.
 - Daily and weekly recurrence. A recurring copy preserves title, category, rarity, XP, due time, recurrence, and step titles.
@@ -151,7 +152,7 @@ Never delete or rewrite the original mobile source or artwork. Runtime copies be
 
 ## Known gaps and risks
 
-- Version 0.24.1 adds high-scaling text-fit QA, wrapped quest content, compact accessible action icons, and detail pages without irrelevant quest toolbars. It retains reversible completions, quest sort and filter controls, richer completion history, calendar reconciliation and background refresh, multi-encounter summaries, and crash recovery. It restores validated `.bak` saves after primary-file corruption, preserves the damaged file, distinguishes expanded recurring calendar instances, fixes clipped quest and familiar-card actions, corrects bulk-completion boss/pet feedback, and makes release builds reject clipped buttons or incorrect page flow. Character and detail pages scroll vertically; quest pages retain the responsive grid. It retains proportional inset sprite crops, seam-free locked avatar masks, the larger character paper doll, navigation flicker suppression, sequential current-avatar rewards, and 158 passing automated assertions. Isolated installer, installed-app assertion/render, and uninstall cleanup tests pass with all 39 assets.
+- Version 0.24.2 adds category-specific quest icons, a responsive boss and familiar encounter rail, and explicit loot-state guidance. It retains high-scaling text-fit QA, wrapped quest content, compact accessible action icons, and detail pages without irrelevant quest toolbars. It retains reversible completions, quest sort and filter controls, richer completion history, calendar reconciliation and background refresh, multi-encounter summaries, and crash recovery. It restores validated `.bak` saves after primary-file corruption, preserves the damaged file, distinguishes expanded recurring calendar instances, fixes clipped quest and familiar-card actions, corrects bulk-completion boss/pet feedback, and makes release builds reject clipped buttons or incorrect page flow. Character and detail pages scroll vertically; quest pages retain the responsive grid. It retains proportional inset sprite crops, seam-free locked avatar masks, the larger character paper doll, navigation flicker suppression, sequential current-avatar rewards, and 158 passing automated assertions. Isolated installer, installed-app assertion/render, and uninstall cleanup tests pass with all 39 assets.
 - Run an interactive smoke test of creating/completing daily, weekly, monthly, and weekday streaks; restarting; and spending all three familiar skills.
 - Interactively verify actual Windows sign-in startup, tray open/exit behavior, notification delivery and quiet-hour boundaries, export/restore dialogs, and multiple display scales.
 - iOS stage-4 ready eggs conflict with the Windows meaning of stage 4 and remain intentionally skipped.
